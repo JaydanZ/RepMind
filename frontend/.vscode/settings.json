@@ -4,5 +4,15 @@
   },
   "files.associations": {
     "*.css": "tailwindcss"
+  },
+
+  "files.readonlyInclude": {
+    "**/routeTree.gen.ts": true
+  },
+  "files.watcherExclude": {
+    "**/routeTree.gen.ts": true
+  },
+  "search.exclude": {
+    "**/routeTree.gen.ts": true
   }
 }

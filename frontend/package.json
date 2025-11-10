@@ -5,13 +5,9 @@
   "private": true,
   "type": "module",
   "author": {
-    "name": "João Paulo Moraes",
-    "email": "joaopaulomoraes@outlook.com",
-    "url": "https://github.com/joaopaulomoraes"
-  },
-  "bugs": {
-    "url": "https://github.com/joaopaulomoraes/reactjs-vite-tailwindcss-boilerplate/issues",
-    "email": "joaopaulomoraes@outlook.com"
+    "name": "Jaydan Zabar",
+    "email": "jaydan.zabar@gmail.com",
+    "url": "https://github.com/JaydanZ"
   },
   "scripts": {
     "dev": "vite",
@@ -20,7 +16,9 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "lint": "eslint src --max-warnings=0",
-    "typecheck": "tsc --project tsconfig.json --noEmit"
+    "typecheck": "tsc --project tsconfig.json --noEmit",
+    "generate-routes": "tsr generate",
+    "watch-routes": "tsr watch"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.10.1",
@@ -29,6 +27,8 @@
     "react-dom": "^19.2.0"
   },
   "devDependencies": {
+    "@tanstack/router-cli": "^1.134.20",
+    "@tanstack/router-plugin": "^1.135.0",
     "@testing-library/jest-dom": "^6.8.0",
     "@testing-library/react": "^14.3.1",
     "@types/node": "^20.19.17",
