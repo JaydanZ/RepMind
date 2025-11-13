@@ -12,6 +12,9 @@ export default {
           400: '#1E2615',
           500: '#0C0D0A'
         }
+      },
+      fontFamily: {
+        'main-font': ['"Roboto"', 'sans-serif']
       }
     }
   },
