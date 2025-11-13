@@ -24,7 +24,8 @@
     "@reduxjs/toolkit": "^2.10.1",
     "@tanstack/react-router": "^1.134.12",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "react-dom": "^19.2.0",
+    "react-redux": "^9.2.0"
   },
   "devDependencies": {
     "@tanstack/router-cli": "^1.134.20",
