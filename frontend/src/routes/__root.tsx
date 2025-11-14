@@ -7,7 +7,17 @@ export const Route = createRootRoute({
 
 function RootComponent() {
   return (
-    <div className="relative min-h-dvh bg-app-colors-100">
+    <div className="relative min-h-dvh bg-app-colors-500">
+      <nav className="flex flex-nowrap fixed top-0 z-100 w-full items-center justify-between bg-app-colors-500 py-6 px-12">
+        {/* Left elements */}
+        <ul className="flex flex-row list-style-none me-auto">
+          <li className="text-app-colors-300 font-main-font font-medium text-[1.5rem]">
+            RepMind
+          </li>
+        </ul>
+        {/* Right elements */}
+        <div className="flex flex-row items-center "></div>
+      </nav>
       <Outlet />
     </div>
   )

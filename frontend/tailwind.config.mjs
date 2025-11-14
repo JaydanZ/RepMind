@@ -8,9 +8,9 @@ export default {
         'app-colors': {
           100: '#A9D9D4',
           200: '#80BFB4',
-          300: '#80BF6F',
+          300: '#94ea43',
           400: '#1E2615',
-          500: '#0C0D0A'
+          500: '#0f0f0f'
         }
       },
       fontFamily: {
