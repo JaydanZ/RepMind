@@ -1,8 +1,10 @@
 /// <reference types="vitest" />
+/// <reference types="vite/client" />
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react-swc'
 import tsconfigPaths from 'vite-tsconfig-paths'
 import { tanstackRouter } from '@tanstack/router-plugin/vite'
+import path from 'path'
 
 // https://vitejs.dev/config https://vitest.dev/config
 export default defineConfig({
@@ -14,10 +16,12 @@ export default defineConfig({
       autoCodeSplitting: true
     })
   ],
-  test: {
-    globals: true,
-    environment: 'happy-dom',
-    setupFiles: '.vitest/setup',
-    include: ['**/test.{ts,tsx}']
+  css: {
+    postcss: './postcss.config.mjs'
+  },
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src')
+    }
   }
 })
