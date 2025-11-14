@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { Outlet, createRootRoute } from '@tanstack/react-router'
+import { Button } from '@/components/ui/button'
 
 export const Route = createRootRoute({
   component: RootComponent
@@ -16,7 +17,11 @@ function RootComponent() {
           </li>
         </ul>
         {/* Right elements */}
-        <div className="flex flex-row items-center "></div>
+        <div className="flex flex-row items-center ">
+          <Button variant="default" size="lg">
+            Login
+          </Button>
+        </div>
       </nav>
       <Outlet />
     </div>

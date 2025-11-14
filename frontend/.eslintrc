@@ -35,6 +35,7 @@
     "@typescript-eslint/no-non-null-assertion": "off",
     "tailwindcss/classnames-order": "off",
     "tailwindcss/no-custom-classname": "off",
+    "tailwindcss/enforces-shorthand": "off",
     "tailwindcss/no-contradicting-classname": "error"
   }
 }
