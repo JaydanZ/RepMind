@@ -21,6 +21,7 @@
     "watch-routes": "tsr watch"
   },
   "dependencies": {
+    "@radix-ui/react-label": "^2.1.8",
     "@radix-ui/react-slot": "^1.2.4",
     "@reduxjs/toolkit": "^2.10.1",
     "@tanstack/react-router": "^1.134.12",
