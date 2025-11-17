@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
+import { useForm } from '@tanstack/react-form'
 import {
   Card,
   CardHeader,
@@ -10,12 +11,29 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@radix-ui/react-label'
 import { Button } from '@/components/ui/button'
+import { signupUser } from '@/utils/authAPI'
+import { SignupUser } from '@/types/auth'
+
+const MIN_USERNAME_LENGTH = 4
+const MIN_PASSWORD_LENGTH = 8
 
 export const Route = createFileRoute('/registerUser')({
   component: RouteComponent
 })
 
 function RouteComponent() {
+  const form = useForm({
+    defaultValues: {
+      username: '',
+      email: '',
+      password: '',
+      confirmPassword: ''
+    },
+    onSubmit: async ({ value }) => {
+      console.log(value)
+    }
+  })
+
   return (
     <div className="flex flex-col w-full max-w-[1920px] h-dvh justify-center items-center">
       <Card>
@@ -25,40 +43,147 @@ function RouteComponent() {
             Create an account to unlock the full features of RepMind
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <form>
+        <CardContent className="pb-3">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault()
+              form.handleSubmit()
+            }}
+          >
             <div className="flex flex-col gap-6">
-              <div className="grid gap-2">
-                <Label htmlFor="username">Username</Label>
-                <Input id="username" type="text" placeholder="user" required />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="user@example.com"
-                  required
-                />
-              </div>
+              <form.Field
+                name="username"
+                validators={{
+                  onChange: ({ value }) => {
+                    const formattedUsername = value.trim()
+                    if (formattedUsername.length === 0)
+                      return 'Username is required'
+                    if (formattedUsername.length < MIN_USERNAME_LENGTH)
+                      return `Username must be greater than ${MIN_USERNAME_LENGTH} Characters.`
+                    return undefined
+                  }
+                }}
+              >
+                {(field) => (
+                  <div className="grid gap-2">
+                    <Label htmlFor={field.name}>Username</Label>
+                    <Input
+                      id={field.name}
+                      value={field.state.value}
+                      type="text"
+                      placeholder="user"
+                      onChange={(e) => field.handleChange(e.target.value)}
+                    />
+                    {field.state.meta.errors.length > 0 && (
+                      <p className="text-red-500 text-sm">
+                        {field.state.meta.errors.join(', ')}
+                      </p>
+                    )}
+                  </div>
+                )}
+              </form.Field>
+              <form.Field
+                name="email"
+                validators={{
+                  onChange: ({ value }) => {
+                    const formattedEmail = value.trim()
+                    const emailRegex = /^[^@]+@[^@]+\.[^@]+$/
+                    if (formattedEmail.length === 0) return 'Email is required'
+                    if (!emailRegex.test(formattedEmail))
+                      return 'Email is invalid'
+                    return undefined
+                  }
+                }}
+              >
+                {(field) => (
+                  <div className="grid gap-2">
+                    <Label htmlFor={field.name}>Email</Label>
+                    <Input
+                      id={field.name}
+                      value={field.state.value}
+                      type="email"
+                      placeholder="user@example.com"
+                      onChange={(e) => field.handleChange(e.target.value)}
+                    />
+                    {field.state.meta.errors.length > 0 && (
+                      <p className="text-red-500 text-sm">
+                        {field.state.meta.errors.join(', ')}
+                      </p>
+                    )}
+                  </div>
+                )}
+              </form.Field>
               <div className="grid gap-2 py-5">
-                <div className="grid gap-2">
-                  <Label htmlFor="password">Password</Label>
-                  <Input id="password" type="password" required />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="confirm-password">Confirm Password</Label>
-                  <Input id="confirm-password" type="password" required />
-                </div>
+                <form.Field
+                  name="password"
+                  validators={{
+                    onChange: ({ value }) => {
+                      const formattedPassword = value.trim()
+                      if (formattedPassword.length === 0)
+                        return 'Password is required'
+                      if (formattedPassword.length < MIN_PASSWORD_LENGTH)
+                        return `Password must be greater than ${MIN_PASSWORD_LENGTH} characters`
+                      return undefined
+                    }
+                  }}
+                >
+                  {(field) => (
+                    <div className="grid gap-2">
+                      <Label htmlFor={field.name}>Password</Label>
+                      <Input
+                        id={field.name}
+                        value={field.state.value}
+                        type="password"
+                        onChange={(e) => field.handleChange(e.target.value)}
+                      />
+                      {field.state.meta.errors.length > 0 && (
+                        <p className="text-red-500 text-sm">
+                          {field.state.meta.errors.join(', ')}
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </form.Field>
+                <form.Field
+                  name="confirmPassword"
+                  validators={{
+                    onChange: ({ value, fieldApi }) => {
+                      const formattedConfirmPass = value.trim()
+                      if (
+                        formattedConfirmPass !==
+                        fieldApi.form.getFieldValue('password')
+                      )
+                        return 'Passwords do not match'
+                      return undefined
+                    }
+                  }}
+                >
+                  {(field) => (
+                    <div className="grid gap-2">
+                      <Label htmlFor={field.name}>Confirm Password</Label>
+                      <Input
+                        id={field.name}
+                        value={field.state.value}
+                        type="password"
+                        onChange={(e) => field.handleChange(e.target.value)}
+                      />
+                      {field.state.meta.errors.length > 0 && (
+                        <p className="text-red-500 text-sm">
+                          {field.state.meta.errors.join(', ')}
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </form.Field>
               </div>
             </div>
+            <Button type="submit" className="w-full mt-5">
+              Signup
+            </Button>
           </form>
         </CardContent>
         <CardFooter className="flex flex-col">
-          <Button type="submit" className="w-full">
-            Signup
-          </Button>
-          <Label className="text-white/60 text-sm py-5">
+          <Label className="text-white/60 text-sm pb-3">
             Already have an account?
           </Label>
           <Link to="/login" className="w-full">
