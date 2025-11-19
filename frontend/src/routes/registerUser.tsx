@@ -30,7 +30,18 @@ function RouteComponent() {
       confirmPassword: ''
     },
     onSubmit: async ({ value }) => {
-      console.log(value)
+      const userData: SignupUser = {
+        username: value.username,
+        email: value.email,
+        password: value.password
+      }
+
+      try {
+        const response = await signupUser(userData)
+        console.log(response)
+      } catch (error) {
+        console.error(error)
+      }
     }
   })
 
