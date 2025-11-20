@@ -33,6 +33,8 @@ function RouteComponent() {
 
       try {
         const response = await loginUser(userData)
+
+        // Store bearer token in local storage
         console.log(response)
       } catch (error) {
         console.error(error)

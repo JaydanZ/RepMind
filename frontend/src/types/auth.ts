@@ -6,3 +6,11 @@ export interface UserCredentials {
 export interface SignupUser extends UserCredentials {
   username: string
 }
+
+export interface AuthState {
+  loading: boolean
+  userInfo: object
+  userToken: string | null | undefined
+  error: string | null
+  success: boolean
+}
