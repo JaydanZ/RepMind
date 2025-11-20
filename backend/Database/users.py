@@ -1,4 +1,5 @@
 import bcrypt
+import json
 from postgrest.exceptions import APIError
 from ..models.users import CreateUser
 from .supabase import supabase
@@ -34,5 +35,12 @@ def find_user_by_username(username: str):
             raise error
 
     
-def find_user_by_email(email: str):
-    return
+def find_user_by_email(email: str) -> dict | None:
+    try: 
+        response = supabase.table('users').select("*").eq('email',email).single().execute()
+        return response.data.copy()
+    except APIError as error:
+        if error.code == "PGRST116":
+            return None
+        else:
+            raise error

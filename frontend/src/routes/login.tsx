@@ -11,6 +11,8 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@radix-ui/react-label'
 import { Button } from '@/components/ui/button'
+import { UserCredentials } from '@/types/auth'
+import { loginUser } from '@/utils/authAPI'
 
 export const Route = createFileRoute('/login')({
   component: RouteComponent
@@ -23,8 +25,18 @@ function RouteComponent() {
       password: ''
     },
 
-    onSubmit: async (value) => {
-      console.log(value)
+    onSubmit: async ({ value }) => {
+      const userData: UserCredentials = {
+        email: value.email,
+        password: value.password
+      }
+
+      try {
+        const response = await loginUser(userData)
+        console.log(response)
+      } catch (error) {
+        console.error(error)
+      }
     }
   })
   return (

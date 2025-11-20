@@ -1,12 +1,12 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .config import get_settings
-from .routes import users_router
+from .routes import auth_router
 
 app = FastAPI()
 
 ## Routes
-app.include_router(users_router)
+app.include_router(auth_router)
 
 
 client_url = get_settings()

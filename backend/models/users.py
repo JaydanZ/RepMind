@@ -6,3 +6,9 @@ class CreateUser(BaseModel):
     username: str
     email: EmailStr
     password: str
+
+class LoginUser(BaseModel):
+    model_config = {"extra": "forbid"}
+
+    email: EmailStr
+    password: str
