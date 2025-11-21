@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { useForm } from '@tanstack/react-form'
 import { useAsyncDispatch } from '@/store/store'
 import { userLogin } from '@/features/auth/authSlice'
@@ -22,6 +22,7 @@ export const Route = createFileRoute('/login')({
 
 function RouteComponent() {
   const dispatch = useAsyncDispatch()
+  const navigate = useNavigate()
 
   const form = useForm({
     defaultValues: {
@@ -47,9 +48,11 @@ function RouteComponent() {
           }
         }
 
-        console.log(response)
         // Store bearer token in local storage
         await dispatch(userLogin(dataResponse))
+
+        // Navigate to home page {FUTURE UPDATE: Navigate user to user dashboard}
+        navigate({ to: '/' })
       } catch (error) {
         console.error(error)
       }
