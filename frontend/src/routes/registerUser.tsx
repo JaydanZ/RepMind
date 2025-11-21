@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { useForm } from '@tanstack/react-form'
 import {
   Card,
@@ -22,6 +22,7 @@ export const Route = createFileRoute('/registerUser')({
 })
 
 function RouteComponent() {
+  const navigate = useNavigate()
   const form = useForm({
     defaultValues: {
       username: '',
@@ -37,8 +38,9 @@ function RouteComponent() {
       }
 
       try {
-        const response = await signupUser(userData)
-        console.log(response)
+        await signupUser(userData)
+        // successfully registered user, navigate to login page
+        navigate({ to: '/login' })
       } catch (error) {
         console.error(error)
       }

@@ -19,6 +19,7 @@ MIN_PASSWORD_LENGTH = 8
 
 @auth_router.post("/createuser", status_code=201)
 def create_user(user: CreateUser):
+    print(user)
 
     ## Validate user info
     if user.username is None or user.email is None or user.password is None:
@@ -28,8 +29,8 @@ def create_user(user: CreateUser):
         raise HTTPException(status_code=400, detail="User data failed to meet requirements")
     
     ## Check if user already exists
-    existing_user = find_user_by_username(user.username)
-    if existing_user is None:
+    existing_user = find_user_by_email(user.email)
+    if existing_user is not None:
         raise HTTPException(status_code=400, detail="User already exists")
 
     insert_user(user)
