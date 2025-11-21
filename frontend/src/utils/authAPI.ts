@@ -17,6 +17,5 @@ export const loginUser = async (userCredentials: UserCredentials) => {
     `${BACKEND_API}/auth/login`,
     userCredentials
   )
-
   return response
 }

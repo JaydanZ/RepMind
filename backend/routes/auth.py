@@ -5,7 +5,7 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from ..utils.createAccessToken import create_access_token
 from ..Database.users import insert_user, find_user_by_email, find_user_by_username
 from ..models.users import CreateUser, LoginUser
-from ..models.auth import Token
+from ..models.auth import Token, AuthorizedReturn
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/token")
 
@@ -58,6 +58,8 @@ def login_user(user: LoginUser):
     
     ## Generate token for user
     token = create_access_token(data={"sub": user.email})
+
+    token_data = Token(access_token=token, token_type="bearer")
     
-    return Token(access_token=token, token_type="bearer")
+    return AuthorizedReturn(token_data=token_data, username=existing_user["username"], email=existing_user["email"])
 

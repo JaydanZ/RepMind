@@ -1,5 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useForm } from '@tanstack/react-form'
+import { useAsyncDispatch } from '@/store/store'
+import { userLogin } from '@/features/auth/authSlice'
 import {
   Card,
   CardHeader,
@@ -19,6 +21,8 @@ export const Route = createFileRoute('/login')({
 })
 
 function RouteComponent() {
+  const dispatch = useAsyncDispatch()
+
   const form = useForm({
     defaultValues: {
       email: '',
@@ -34,8 +38,18 @@ function RouteComponent() {
       try {
         const response = await loginUser(userData)
 
-        // Store bearer token in local storage
+        const dataResponse = {
+          email: response.data.email,
+          username: response.data.username,
+          token_data: {
+            access_token: response.data.token_data.access_token,
+            token_type: response.data.token_data.token_type
+          }
+        }
+
         console.log(response)
+        // Store bearer token in local storage
+        await dispatch(userLogin(dataResponse))
       } catch (error) {
         console.error(error)
       }
