@@ -12,10 +12,14 @@ interface LoginResponse {
   token_data: TokenData
 }
 
+// Initialize userToken from local storage on page load
+const tokenInStorage = localStorage.getItem('userToken')
+const userToken = tokenInStorage ? tokenInStorage : null
+
 const initialState: AuthState = {
   loading: false,
   userInfo: {},
-  userToken: null,
+  userToken,
   error: null,
   success: false
 }
