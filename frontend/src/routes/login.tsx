@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { useForm } from '@tanstack/react-form'
-import axios, { AxiosError } from 'axios'
+import axios from 'axios'
 import { useAsyncDispatch } from '@/store/store'
 import { userLogin } from '@/features/auth/authSlice'
 import {
@@ -15,6 +15,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@radix-ui/react-label'
 import { Button } from '@/components/ui/button'
+import { Spinner } from '@/components/ui/spinner'
 import { UserCredentials } from '@/types/auth'
 import { loginUser } from '@/utils/authAPI'
 
@@ -26,6 +27,7 @@ function RouteComponent() {
   const dispatch = useAsyncDispatch()
   const navigate = useNavigate()
   const [responseError, setResponseError] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
 
   const form = useForm({
     defaultValues: {
@@ -34,12 +36,13 @@ function RouteComponent() {
     },
 
     onSubmit: async ({ value }) => {
+      setResponseError('')
+      setIsLoading(true)
+
       const userData: UserCredentials = {
         email: value.email,
         password: value.password
       }
-
-      setResponseError('')
 
       try {
         const response = await loginUser(userData)
@@ -57,10 +60,10 @@ function RouteComponent() {
         await dispatch(userLogin(dataResponse))
 
         // Navigate to home page {FUTURE UPDATE: Navigate user to user dashboard}
+        setIsLoading(false)
         navigate({ to: '/' })
       } catch (error: unknown) {
         if (axios.isAxiosError(error)) {
-          console.log(error.response?.data)
           if (error.response) {
             setResponseError(error.response.data.detail)
           }
@@ -147,8 +150,8 @@ function RouteComponent() {
                 )}
               </form.Field>
             </div>
-            <Button type="submit" className="w-full mt-5">
-              Login
+            <Button type="submit" className="w-full mt-5" disabled={isLoading}>
+              {isLoading && <Spinner />} Login
             </Button>
           </form>
         </CardContent>

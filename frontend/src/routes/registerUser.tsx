@@ -1,5 +1,7 @@
+import { useState } from 'react'
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { useForm } from '@tanstack/react-form'
+import axios from 'axios'
 import {
   Card,
   CardHeader,
@@ -11,6 +13,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@radix-ui/react-label'
 import { Button } from '@/components/ui/button'
+import { Spinner } from '@/components/ui/spinner'
 import { signupUser } from '@/utils/authAPI'
 import { SignupUser } from '@/types/auth'
 
@@ -23,6 +26,9 @@ export const Route = createFileRoute('/registerUser')({
 
 function RouteComponent() {
   const navigate = useNavigate()
+  const [responseError, setResponseError] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+
   const form = useForm({
     defaultValues: {
       username: '',
@@ -31,6 +37,9 @@ function RouteComponent() {
       confirmPassword: ''
     },
     onSubmit: async ({ value }) => {
+      setResponseError('')
+      setIsLoading(true)
+
       const userData: SignupUser = {
         username: value.username,
         email: value.email,
@@ -40,9 +49,16 @@ function RouteComponent() {
       try {
         await signupUser(userData)
         // successfully registered user, navigate to login page
+        setIsLoading(false)
         navigate({ to: '/login' })
       } catch (error) {
-        console.error(error)
+        if (axios.isAxiosError(error)) {
+          if (error.response) {
+            setResponseError(error.response.data.detail)
+          }
+        } else {
+          console.error(error)
+        }
       }
     }
   })
@@ -190,8 +206,8 @@ function RouteComponent() {
                 </form.Field>
               </div>
             </div>
-            <Button type="submit" className="w-full mt-5">
-              Signup
+            <Button type="submit" className="w-full mt-5" disabled={isLoading}>
+              {isLoading && <Spinner />} Signup
             </Button>
           </form>
         </CardContent>
@@ -204,6 +220,9 @@ function RouteComponent() {
               Login
             </Button>
           </Link>
+          {responseError.length > 0 && (
+            <p className="text-red-500 text-[0.9rem] pt-5">{`Error: ${responseError}`}</p>
+          )}
         </CardFooter>
       </Card>
     </div>
