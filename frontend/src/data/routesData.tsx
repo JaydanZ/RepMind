@@ -7,7 +7,7 @@ import { IoPersonOutline } from 'react-icons/io5'
 
 interface routeData {
   id: string
-  href: string
+  href?: string
   icon: React.ReactNode
   params: object
 }
@@ -39,7 +39,6 @@ export const LOGGED_IN_ROUTES: routeData[] = [
   },
   {
     id: 'Logout',
-    href: '/logout',
     icon: <AiOutlineLogout />,
     params: {}
   }

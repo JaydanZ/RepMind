@@ -1,19 +1,20 @@
 import { Outlet, createRootRoute, Link } from '@tanstack/react-router'
+import { useSelector, useDispatch } from 'react-redux'
 import { Button } from '@/components/ui/button'
 import useIsMobile from '@/hooks/useIsMobile'
 import { LOGGED_IN_ROUTES, LOGGED_OUT_ROUTES } from '@/data/routesData'
 import clsx from 'clsx'
+import { RootState } from '@/store/store'
+import { logout } from '@/features/auth/authSlice'
 
 export const Route = createRootRoute({
   component: RootComponent
 })
 
 function RootComponent() {
+  const dispatch = useDispatch()
+  const authStatus = useSelector((state: RootState) => state.auth.userToken)
   const isMobile = useIsMobile()
-
-  const authStatus = {
-    loggedIn: false
-  }
 
   return (
     <div className="relative min-h-dvh bg-app-colors-500">
@@ -21,22 +22,37 @@ function RootComponent() {
         <nav
           className={clsx(
             'flex flex-row fixed bottom-0 w-full z-100 bg-app-colors-500 pb-8',
-            authStatus.loggedIn ? 'justify-evenly' : 'justify-center'
+            authStatus ? 'justify-evenly' : 'justify-center'
           )}
         >
-          {authStatus.loggedIn
+          {authStatus
             ? LOGGED_IN_ROUTES.map((route, key) => (
-                <Button
-                  variant="ghost"
-                  size="lg"
-                  key={key}
-                  className="flex flex-col"
-                >
-                  {route.icon}
-                  <Link to={route.href} params={route.params}>
-                    {route.id}
-                  </Link>
-                </Button>
+                <>
+                  {route.href ? (
+                    <Button
+                      variant="ghost"
+                      size="lg"
+                      key={key}
+                      className="flex flex-col"
+                    >
+                      {route.icon}
+                      <Link to={route.href} params={route.params}>
+                        {route.id}
+                      </Link>
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="ghost"
+                      size="lg"
+                      key={key}
+                      className="flex flex-col"
+                      onClick={() => dispatch(logout())}
+                    >
+                      {route.icon}
+                      {route.id}
+                    </Button>
+                  )}
+                </>
               ))
             : LOGGED_OUT_ROUTES.map((route, key) => (
                 <Button
@@ -62,14 +78,36 @@ function RootComponent() {
           </ul>
           {/* Right elements */}
           <div className="flex flex-row items-center pr-12">
-            {authStatus.loggedIn
+            {authStatus
               ? LOGGED_IN_ROUTES.map((route, key) => (
-                  <Button variant="ghost" size="lg" key={key} className="ml-8">
-                    {route.icon}
-                    <Link to={route.href} params={route.params}>
-                      {route.id}
-                    </Link>
-                  </Button>
+                  <>
+                    {route.href ? (
+                      <Button
+                        variant="ghost"
+                        size="lg"
+                        key={key}
+                        className="ml-8"
+                      >
+                        {route.icon}
+                        {route.href && (
+                          <Link to={route.href} params={route.params}>
+                            {route.id}
+                          </Link>
+                        )}
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="ghost"
+                        size="lg"
+                        key={key}
+                        className="flex flex-row"
+                        onClick={() => dispatch(logout())}
+                      >
+                        {route.icon}
+                        {route.id}
+                      </Button>
+                    )}
+                  </>
                 ))
               : LOGGED_OUT_ROUTES.map((route, key) => (
                   <Button variant="ghost" size="lg" key={key} className="ml-8">

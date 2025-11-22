@@ -1,17 +1,13 @@
-from functools import lru_cache
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from .config import get_settings
+from .routes import auth_router
 
 app = FastAPI()
 
-class Settings(BaseSettings):
-    CLIENT_URL: str
-    model_config = SettingsConfigDict(env_file=".env")
+## Routes
+app.include_router(auth_router)
 
-@lru_cache
-def get_settings():
-    return Settings()
 
 client_url = get_settings()
 origins = [client_url.CLIENT_URL]
