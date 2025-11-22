@@ -1,5 +1,7 @@
+import { useState } from 'react'
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { useForm } from '@tanstack/react-form'
+import axios, { AxiosError } from 'axios'
 import { useAsyncDispatch } from '@/store/store'
 import { userLogin } from '@/features/auth/authSlice'
 import {
@@ -23,6 +25,7 @@ export const Route = createFileRoute('/login')({
 function RouteComponent() {
   const dispatch = useAsyncDispatch()
   const navigate = useNavigate()
+  const [responseError, setResponseError] = useState('')
 
   const form = useForm({
     defaultValues: {
@@ -35,6 +38,8 @@ function RouteComponent() {
         email: value.email,
         password: value.password
       }
+
+      setResponseError('')
 
       try {
         const response = await loginUser(userData)
@@ -53,8 +58,15 @@ function RouteComponent() {
 
         // Navigate to home page {FUTURE UPDATE: Navigate user to user dashboard}
         navigate({ to: '/' })
-      } catch (error) {
-        console.error(error)
+      } catch (error: unknown) {
+        if (axios.isAxiosError(error)) {
+          console.log(error.response?.data)
+          if (error.response) {
+            setResponseError(error.response.data.detail)
+          }
+        } else {
+          console.error(error)
+        }
       }
     }
   })
@@ -150,6 +162,9 @@ function RouteComponent() {
               Signup
             </Button>
           </Link>
+          {responseError.length > 0 && (
+            <p className="text-red-500 text-[0.9rem] pt-5">{`Error: ${responseError}`}</p>
+          )}
         </CardFooter>
       </Card>
     </div>
