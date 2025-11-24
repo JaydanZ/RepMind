@@ -6,5 +6,6 @@ class Token(BaseModel):
 
 class AuthorizedReturn(BaseModel):
     token_data: Token
+    refresh_token_data: str
     username: str
     email: EmailStr
