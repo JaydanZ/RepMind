@@ -14,8 +14,8 @@ interface LoginResponse {
 }
 
 // Initialize userToken from cookie store on page load
-const tokenInStorage = await cookieStore.get('auth_token')
-const userToken = tokenInStorage ? tokenInStorage?.value : null
+const tokenInStore = await cookieStore.get('auth_token')
+const userToken = tokenInStore ? tokenInStore?.value : null
 
 const initialState: AuthState = {
   loading: false,
@@ -30,7 +30,7 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     logout: (state) => {
-      localStorage.removeItem('userToken')
+      cookieStore.delete('auth_token')
       state.loading = false
       state.userInfo = {}
       state.userToken = null

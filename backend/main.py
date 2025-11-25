@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .config import get_settings
 from .routes import auth_router, profile_router
+from .middleware import TokenAuthMiddleware
 
 app = FastAPI()
 
@@ -20,6 +21,8 @@ app.add_middleware(
     allow_methods=["GET","POST","PUT","DELETE","PATCH"],
     allow_headers=["content-type","x-requested-with", "Authorization"]
 )
+
+app.add_middleware(TokenAuthMiddleware)
 
 @app.get("/")
 async def root():

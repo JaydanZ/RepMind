@@ -14,10 +14,8 @@ function RouteComponent() {
 
   useLayoutEffect(() => {
     const fetchData = async () => {
-      if (accessToken) {
-        const response = await getProfileData(accessToken)
-        setData(response)
-      }
+      const response = await getProfileData(accessToken)
+      setData(response)
     }
     fetchData()
   }, [])
