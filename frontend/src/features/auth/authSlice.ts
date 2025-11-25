@@ -13,7 +13,7 @@ interface LoginResponse {
   refresh_token: string
 }
 
-// Initialize userToken from local storage on page load
+// Initialize userToken from cookie store on page load
 const tokenInStorage = await cookieStore.get('auth_token')
 const userToken = tokenInStorage ? tokenInStorage?.value : null
 
