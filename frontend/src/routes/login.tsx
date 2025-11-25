@@ -50,6 +50,7 @@ function RouteComponent() {
         const dataResponse = {
           email: response.data.email,
           username: response.data.username,
+          refresh_token: response.data.refresh_token_data,
           token_data: {
             access_token: response.data.token_data.access_token,
             token_type: response.data.token_data.token_type

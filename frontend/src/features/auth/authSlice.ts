@@ -10,11 +10,12 @@ interface LoginResponse {
   email: string
   username: string
   token_data: TokenData
+  refresh_token: string
 }
 
 // Initialize userToken from local storage on page load
-const tokenInStorage = localStorage.getItem('userToken')
-const userToken = tokenInStorage ? tokenInStorage : null
+const tokenInStorage = await cookieStore.get('auth_token')
+const userToken = tokenInStorage ? tokenInStorage?.value : null
 
 const initialState: AuthState = {
   loading: false,
@@ -56,8 +57,10 @@ const authSlice = createSlice({
 export const userLogin = createAsyncThunk(
   'auth/storeToken',
   async (data: LoginResponse) => {
-    // store token in local storage
-    localStorage.setItem('userToken', data.token_data.access_token)
+    // store token & refresh token in http cookies
+    await cookieStore.set('auth_token', data.token_data.access_token)
+    await cookieStore.set('refresh_token', data.refresh_token)
+
     return data
   }
 )
