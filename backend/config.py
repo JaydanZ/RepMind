@@ -9,6 +9,9 @@ class Settings(BaseSettings):
     SUPABASE_KEY: str
     model_config = SettingsConfigDict(env_file=".env")
 
+## NON AUTHENTICATED ROUTES GO HERE
+non_auth_routes = ["/auth"]
+
 @lru_cache
 def get_settings():
     return Settings()

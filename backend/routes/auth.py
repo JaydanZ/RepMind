@@ -1,10 +1,9 @@
 import bcrypt
-import jwt
 from fastapi import APIRouter, HTTPException
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
 from ..utils.createToken import create_access_token, create_refresh_token
-from ..Database.users import insert_user, find_user_by_email, find_user_by_username
+from ..Database.users import insert_user, find_user_by_email
 from ..models.users import CreateUser, LoginUser
 from ..models.auth import Token, AuthorizedReturn
 

@@ -1,6 +1,8 @@
 import { useState, useLayoutEffect } from 'react'
+import { useSelector } from 'react-redux'
 import { createFileRoute } from '@tanstack/react-router'
 import { getProfileData } from '@/utils/profileAPI'
+import { RootState } from '@/store/store'
 
 export const Route = createFileRoute('/profile')({
   component: RouteComponent
@@ -8,11 +10,14 @@ export const Route = createFileRoute('/profile')({
 
 function RouteComponent() {
   const [data, setData] = useState()
+  const accessToken = useSelector((state: RootState) => state.auth.userToken)
 
   useLayoutEffect(() => {
     const fetchData = async () => {
-      const response = await getProfileData()
-      setData(response)
+      if (accessToken) {
+        const response = await getProfileData(accessToken)
+        setData(response)
+      }
     }
     fetchData()
   }, [])
