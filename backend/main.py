@@ -12,19 +12,19 @@ origins = [client_url.CLIENT_URL]
 ## Setup API
 app = FastAPI()
 
-## Routes
-app.include_router(auth_router)
-app.include_router(profile_router)
-
 ## Middleware
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["GET","POST","PUT","DELETE","PATCH"],
-    allow_headers=["content-type","x-requested-with", "Authorization"]
+    allow_methods=["*"],
+    allow_headers=["*"]
 )
 app.add_middleware(TokenAuthMiddleware)
+
+## Routes
+app.include_router(auth_router)
+app.include_router(profile_router)
 
 @app.get("/")
 async def root():

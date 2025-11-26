@@ -12,13 +12,17 @@ ALGORITHM = 'HS256'
 
 class TokenAuthMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint ) -> Response:
+        ##print(f"all headers: {dict(request.headers)}")
+
         ## Check if route requires token
         if request.url.path in non_auth_routes:
-            response = await call_next(request)
-            return response
+            return await call_next(request)
+        
+        if request.method == "OPTIONS":
+            return await call_next(request)
 
         ## Check if user has token or is valid
-        access_token = request.headers.get("Authorization")
+        access_token = request.headers.get("authorization")
 
         if not access_token or not access_token.startswith("Bearer "):
             return JSONResponse(
