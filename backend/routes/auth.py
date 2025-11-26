@@ -1,11 +1,13 @@
 import bcrypt
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
 from ..utils.createToken import create_access_token, create_refresh_token
 from ..Database.users import insert_user, find_user_by_email
 from ..models.users import CreateUser, LoginUser
 from ..models.auth import Token, AuthorizedReturn
+
+from ..Database.redisClient import redis_client
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/token")
 
@@ -37,7 +39,7 @@ def create_user(user: CreateUser):
     
     return {"message": "User successfully created"}
 
-@auth_router.post("/login", status_code=200)
+@auth_router.post("/login", status_code=201)
 def login_user(user: LoginUser):
 
     ## Validate user info
@@ -60,7 +62,14 @@ def login_user(user: LoginUser):
     token = create_access_token(data={"sub": user.email})
     refresh_token = create_refresh_token(data={"sub": user.email})
 
+    ## Store refresh token in redis
+    redis_client.set(user.email, refresh_token)
+
     token_data = Token(access_token=token, token_type="bearer")
     
     return AuthorizedReturn(token_data=token_data, refresh_token_data=refresh_token, username=existing_user["username"], email=existing_user["email"])
 
+@auth_router.post('/token', status_code=201)
+def generate_new_access_token(request: Request):
+
+    return

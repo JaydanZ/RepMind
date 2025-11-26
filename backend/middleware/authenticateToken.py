@@ -1,5 +1,5 @@
 import jwt
-from fastapi import Request, HTTPException, status
+from fastapi import Request, status
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 from starlette.responses import Response, JSONResponse
 from ..config import non_auth_routes
@@ -26,8 +26,8 @@ class TokenAuthMiddleware(BaseHTTPMiddleware):
             )
     
         token = access_token.split(" ")[1]
-        ## Validate the access token / check if it has expired
 
+        ## Validate the access token / check if it has expired
         try:
             payload = jwt.decode(token, JWT_SECRET_KEY)
             request.state.user_token = payload

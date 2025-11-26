@@ -3,6 +3,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     CLIENT_URL: str
+    REDIS_HOST: str
     JWT_SECRET_KEY: str
     JWT_REFRESH_SECRET: str
     SUPABASE_URL: str
