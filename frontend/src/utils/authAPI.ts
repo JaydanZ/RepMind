@@ -19,3 +19,10 @@ export const loginUser = async (userCredentials: UserCredentials) => {
   )
   return response
 }
+
+export const genNewAccessToken = async (token: string | null | undefined) => {
+  const response = await axios.post(`${BACKEND_API}/auth/token`, {
+    refresh_token: token
+  })
+  return response.data
+}

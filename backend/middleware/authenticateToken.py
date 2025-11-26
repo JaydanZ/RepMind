@@ -8,6 +8,7 @@ from ..config import get_settings
 ## Setup env vars
 envVars = get_settings()
 JWT_SECRET_KEY = envVars.JWT_SECRET_KEY
+ALGORITHM = 'HS256'
 
 class TokenAuthMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint ) -> Response:
@@ -29,7 +30,7 @@ class TokenAuthMiddleware(BaseHTTPMiddleware):
 
         ## Validate the access token / check if it has expired
         try:
-            payload = jwt.decode(token, JWT_SECRET_KEY)
+            payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=ALGORITHM)
             request.state.user_token = payload
         except jwt.ExpiredSignatureError:
             return JSONResponse(

@@ -19,5 +19,5 @@ def create_access_token(data: dict):
 
 def create_refresh_token(data: dict):
     data_to_encode = data.copy()
-    refresh_token = jwt.encode(data_to_encode,JWT_REFRESH_SECRET)
+    refresh_token = jwt.encode(data_to_encode,JWT_REFRESH_SECRET, algorithm=ALGORITHM)
     return refresh_token

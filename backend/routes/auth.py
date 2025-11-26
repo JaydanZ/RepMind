@@ -1,15 +1,17 @@
+import jwt
 import bcrypt
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
 from ..utils.createToken import create_access_token, create_refresh_token
+from ..utils.validateToken import validateRefreshToken
 from ..Database.users import insert_user, find_user_by_email
 from ..models.users import CreateUser, LoginUser
-from ..models.auth import Token, AuthorizedReturn
+from ..models.auth import Token, AuthorizedReturn, RefreshToken
 
 from ..Database.redisClient import redis_client
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/token")
+##oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/token")
 
 auth_router = APIRouter(
     prefix='/auth',
@@ -65,11 +67,24 @@ def login_user(user: LoginUser):
     ## Store refresh token in redis
     redis_client.set(user.email, refresh_token)
 
-    token_data = Token(access_token=token, token_type="bearer")
+    token_data = Token(access_token=token, generated_by_refresh_token=False)
     
     return AuthorizedReturn(token_data=token_data, refresh_token_data=refresh_token, username=existing_user["username"], email=existing_user["email"])
 
 @auth_router.post('/token', status_code=201)
-def generate_new_access_token(request: Request):
+def generate_new_access_token(refresh_token: RefreshToken):
+    if refresh_token is None:
+        raise HTTPException(status_code=401, detail="Invalid or no refresh token was provided")
 
-    return
+    ## Need to validate access token 
+    payload = validateRefreshToken(refresh_token.refresh_token)
+    userEmail = payload["sub"]
+    storedRefreshToken = redis_client.get(userEmail)
+
+    if refresh_token.refresh_token != storedRefreshToken:
+        raise HTTPException(status_code=401, detail="Refresh token does not exist")
+    
+    ## Token has been validated, generate new access token
+    token = create_access_token(data={"sub": userEmail})
+
+    return Token(access_token=token, generated_by_refresh_token=True)
