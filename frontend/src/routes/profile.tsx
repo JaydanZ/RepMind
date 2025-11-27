@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useGetProfileDataQuery } from '@/utils/protectedRoutesAPI'
+import { useGetProfileDataQuery } from '@/services/protectedRoutesAPI'
 
 export const Route = createFileRoute('/profile')({
   component: RouteComponent

@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import { logoutUser } from '@/utils/authAPI'
 import { AuthState } from '@/types/auth'
 
 interface TokenData {
@@ -28,15 +29,7 @@ const initialState: AuthState = {
 const authSlice = createSlice({
   name: 'auth',
   initialState,
-  reducers: {
-    logout: (state) => {
-      cookieStore.delete('auth_token')
-      state.loading = false
-      state.userInfo = {}
-      state.userToken = null
-      state.error = null
-    }
-  },
+  reducers: {},
   extraReducers: (builder) => {
     // Handle token storage after login
     builder.addCase(userLogin.fulfilled, (state, action) => {
@@ -44,7 +37,6 @@ const authSlice = createSlice({
         username: action.payload.username,
         email: action.payload.email
       }
-
       state.userToken = action.payload.token_data.access_token
     })
     builder.addCase(userLogin.pending, (state) => {
@@ -56,7 +48,33 @@ const authSlice = createSlice({
     builder.addCase(refreshAccessToken.fulfilled, (state, action) => {
       state.userToken = action.payload
     })
+
+    // Handle user logout
+    builder.addCase(userLogout.fulfilled, (state) => {
+      state.loading = false
+      state.userInfo = {}
+      state.userToken = null
+      state.error = null
+    })
+
+    builder.addCase(userLogout.rejected, (state, action) => {
+      console.error(action.payload)
+    })
   }
+})
+
+export const userLogout = createAsyncThunk('auth/removeToken', async () => {
+  // Make call to api to invalidate refresh token
+  const response = await logoutUser()
+
+  // If there was an error, cancel logout action
+  if (response.error) Promise.reject(response.error)
+
+  // If response was successful, remove the tokens from the cookie store
+  await cookieStore.delete('auth_token')
+  await cookieStore.delete('refresh_token')
+
+  return
 })
 
 export const refreshAccessToken = createAsyncThunk(
@@ -78,7 +96,5 @@ export const userLogin = createAsyncThunk(
     return data
   }
 )
-
-export const { logout } = authSlice.actions
 
 export default authSlice.reducer

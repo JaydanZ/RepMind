@@ -1,6 +1,6 @@
 import { useDispatch } from 'react-redux'
 import { configureStore } from '@reduxjs/toolkit'
-import { protectedApiSlice } from '@/utils/protectedRoutesAPI'
+import { protectedApiSlice } from '@/services/protectedRoutesAPI'
 import authReducer from '@/features/auth/authSlice'
 
 export const store = configureStore({
