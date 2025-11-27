@@ -40,6 +40,7 @@ def create_user(user: CreateUser):
     
     return {"message": "User successfully created"}
 
+
 @auth_router.post("/login", status_code=201)
 def login_user(user: LoginUser):
 
@@ -70,12 +71,32 @@ def login_user(user: LoginUser):
     
     return AuthorizedReturn(token_data=token_data, refresh_token_data=refresh_token, username=existing_user["username"], email=existing_user["email"])
 
+
+@auth_router.post("/logout", status_code=200)
+def logout_user(refresh_token: RefreshToken):
+    if refresh_token is None:
+        raise HTTPException(status_code=401, detail="Invalid or no refresh token was provided")
+    
+    ## Need to validate refresh token 
+    payload = validateRefreshToken(refresh_token.refresh_token)
+    userEmail = payload["sub"]
+    storedRefreshToken = redis_client.get(userEmail)
+
+    if refresh_token.refresh_token != storedRefreshToken:
+        raise HTTPException(status_code=401, detail="Refresh token does not exist")
+    
+    ## Now we can delete the refresh token from our redis cache
+    redis_client.delete(userEmail)
+
+    return { "Message": "User logged out successfully" }
+
+
 @auth_router.post('/token', status_code=201)
 def generate_new_access_token(refresh_token: RefreshToken):
     if refresh_token is None:
         raise HTTPException(status_code=401, detail="Invalid or no refresh token was provided")
 
-    ## Need to validate access token 
+    ## Need to validate refresh token 
     payload = validateRefreshToken(refresh_token.refresh_token)
     userEmail = payload["sub"]
     storedRefreshToken = redis_client.get(userEmail)
