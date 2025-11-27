@@ -7,12 +7,21 @@ from ..config import get_settings
 
 ## Setup env vars
 envVars = get_settings()
+allowed_origin = envVars.CLIENT_URL
 JWT_SECRET_KEY = envVars.JWT_SECRET_KEY
 ALGORITHM = 'HS256'
 
+def handleTokenError(detail: str):
+    response = JSONResponse(
+                content={"detail": detail},
+                status_code=status.HTTP_401_UNAUTHORIZED
+            )
+    response.headers['Access-Control-Allow-Origin'] = allowed_origin
+    response.headers["Access-Control-Allow-Credentials"] = "true"
+    return response
+
 class TokenAuthMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint ) -> Response:
-        ##print(f"all headers: {dict(request.headers)}")
 
         ## Check if route requires token
         if request.url.path in non_auth_routes:
@@ -25,10 +34,7 @@ class TokenAuthMiddleware(BaseHTTPMiddleware):
         access_token = request.headers.get("authorization")
 
         if not access_token or not access_token.startswith("Bearer "):
-            return JSONResponse(
-                {"detail": "Authentication Required"},
-                status_code=status.HTTP_401_UNAUTHORIZED
-            )
+            return handleTokenError("Authentication Required")
     
         token = access_token.split(" ")[1]
 
@@ -37,15 +43,11 @@ class TokenAuthMiddleware(BaseHTTPMiddleware):
             payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=ALGORITHM)
             request.state.user_token = payload
         except jwt.ExpiredSignatureError:
-            return JSONResponse(
-                {"detail": "Token Expired"},
-                status_code=status.HTTP_401_UNAUTHORIZED
-            )
+            return handleTokenError("Token Expired")
         except jwt.InvalidTokenError:
-            return JSONResponse(
-                {"detail": "Invalid Token"},
-                status_code=status.HTTP_401_UNAUTHORIZED
-            )
+            return handleTokenError("Invalid Token")
 
         response = await call_next(request)
         return response
+    
+
