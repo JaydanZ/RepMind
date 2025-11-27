@@ -56,8 +56,10 @@ function RouteComponent() {
           if (error.response) {
             setResponseError(error.response.data.detail)
           }
+          setIsLoading(false)
         } else {
           console.error(error)
+          setIsLoading(false)
         }
       }
     }

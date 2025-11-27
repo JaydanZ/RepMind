@@ -20,9 +20,17 @@ export const loginUser = async (userCredentials: UserCredentials) => {
   return response
 }
 
-export const genNewAccessToken = async (token: string | null | undefined) => {
-  const response = await axios.post(`${BACKEND_API}/auth/token`, {
-    refresh_token: token
-  })
-  return response.data
+export const genNewAccessToken = async () => {
+  const refreshTokenInStore = await cookieStore.get('refresh_token')
+  const refresh_token = refreshTokenInStore ? refreshTokenInStore.value : null
+
+  try {
+    const response = await axios.post(`${BACKEND_API}/auth/token`, {
+      refresh_token: refresh_token
+    })
+    return response.data
+  } catch (axiosError) {
+    console.error(axiosError)
+    return
+  }
 }

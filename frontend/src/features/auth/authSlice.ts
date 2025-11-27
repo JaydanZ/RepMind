@@ -51,8 +51,22 @@ const authSlice = createSlice({
       state.loading = true
       state.error = null
     })
+
+    // Handle token storage after refresh
+    builder.addCase(refreshAccessToken.fulfilled, (state, action) => {
+      state.userToken = action.payload
+    })
   }
 })
+
+export const refreshAccessToken = createAsyncThunk(
+  'auth/refreshAccessToken',
+  async (token: string) => {
+    // store new access token
+    await cookieStore.set('auth_token', token)
+    return token
+  }
+)
 
 export const userLogin = createAsyncThunk(
   'auth/storeToken',
