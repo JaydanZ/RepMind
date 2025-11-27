@@ -1,6 +1,5 @@
-import jwt
 import bcrypt
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, HTTPException
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
 from ..utils.createToken import create_access_token, create_refresh_token
