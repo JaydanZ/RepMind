@@ -14,7 +14,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@radix-ui/react-label'
 import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
-import { signupUser } from '@/utils/authAPI'
+import { signupUser } from '@/services/authAPI'
 import { SignupUser } from '@/types/auth'
 
 const MIN_USERNAME_LENGTH = 4
@@ -56,8 +56,10 @@ function RouteComponent() {
           if (error.response) {
             setResponseError(error.response.data.detail)
           }
+          setIsLoading(false)
         } else {
           console.error(error)
+          setIsLoading(false)
         }
       }
     }

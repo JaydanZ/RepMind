@@ -11,6 +11,6 @@ export interface AuthState {
   loading: boolean
   userInfo: object
   userToken: string | null | undefined
-  error: string | null
+  error: object | null
   success: boolean
 }

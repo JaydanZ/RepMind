@@ -17,7 +17,7 @@ import { Label } from '@radix-ui/react-label'
 import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
 import { UserCredentials } from '@/types/auth'
-import { loginUser } from '@/utils/authAPI'
+import { loginUser } from '@/services/authAPI'
 
 export const Route = createFileRoute('/login')({
   component: RouteComponent
@@ -50,6 +50,7 @@ function RouteComponent() {
         const dataResponse = {
           email: response.data.email,
           username: response.data.username,
+          refresh_token: response.data.refresh_token_data,
           token_data: {
             access_token: response.data.token_data.access_token,
             token_type: response.data.token_data.token_type
@@ -67,8 +68,10 @@ function RouteComponent() {
           if (error.response) {
             setResponseError(error.response.data.detail)
           }
+          setIsLoading(false)
         } else {
           console.error(error)
+          setIsLoading(false)
         }
       }
     }

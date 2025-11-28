@@ -2,12 +2,15 @@ import bcrypt
 from fastapi import APIRouter, HTTPException
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
-from ..utils.createAccessToken import create_access_token
-from ..Database.users import insert_user, find_user_by_email, find_user_by_username
+from ..utils.createToken import create_access_token, create_refresh_token
+from ..utils.validateToken import validateRefreshToken
+from ..Database.users import insert_user, find_user_by_email
 from ..models.users import CreateUser, LoginUser
-from ..models.auth import Token, AuthorizedReturn
+from ..models.auth import Token, AuthorizedReturn, RefreshToken
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/token")
+from ..Database.redisClient import redis_client
+
+##oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/token")
 
 auth_router = APIRouter(
     prefix='/auth',
@@ -19,7 +22,6 @@ MIN_PASSWORD_LENGTH = 8
 
 @auth_router.post("/createuser", status_code=201)
 def create_user(user: CreateUser):
-    print(user)
 
     ## Validate user info
     if user.username is None or user.email is None or user.password is None:
@@ -38,7 +40,8 @@ def create_user(user: CreateUser):
     
     return {"message": "User successfully created"}
 
-@auth_router.post("/login", status_code=200)
+
+@auth_router.post("/login", status_code=201)
 def login_user(user: LoginUser):
 
     ## Validate user info
@@ -59,8 +62,49 @@ def login_user(user: LoginUser):
     
     ## Generate token for user
     token = create_access_token(data={"sub": user.email})
+    refresh_token = create_refresh_token(data={"sub": user.email})
 
-    token_data = Token(access_token=token, token_type="bearer")
+    ## Store refresh token in redis
+    redis_client.set(user.email, refresh_token)
+
+    token_data = Token(access_token=token, generated_by_refresh_token=False)
     
-    return AuthorizedReturn(token_data=token_data, username=existing_user["username"], email=existing_user["email"])
+    return AuthorizedReturn(token_data=token_data, refresh_token_data=refresh_token, username=existing_user["username"], email=existing_user["email"])
 
+
+@auth_router.post("/logout", status_code=200)
+def logout_user(refresh_token: RefreshToken):
+    if refresh_token is None:
+        raise HTTPException(status_code=401, detail="Invalid or no refresh token was provided")
+    
+    ## Need to validate refresh token 
+    payload = validateRefreshToken(refresh_token.refresh_token)
+    userEmail = payload["sub"]
+    storedRefreshToken = redis_client.get(userEmail)
+
+    if refresh_token.refresh_token != storedRefreshToken:
+        raise HTTPException(status_code=401, detail="Refresh token does not exist")
+    
+    ## Now we can delete the refresh token from our redis cache
+    redis_client.delete(userEmail)
+
+    return { "Message": "User logged out successfully" }
+
+
+@auth_router.post('/token', status_code=201)
+def generate_new_access_token(refresh_token: RefreshToken):
+    if refresh_token is None:
+        raise HTTPException(status_code=401, detail="Invalid or no refresh token was provided")
+
+    ## Need to validate refresh token 
+    payload = validateRefreshToken(refresh_token.refresh_token)
+    userEmail = payload["sub"]
+    storedRefreshToken = redis_client.get(userEmail)
+
+    if refresh_token.refresh_token != storedRefreshToken:
+        raise HTTPException(status_code=401, detail="Refresh token does not exist")
+    
+    ## Token has been validated, generate new access token
+    token = create_access_token(data={"sub": userEmail})
+
+    return Token(access_token=token, generated_by_refresh_token=True)

@@ -1,20 +1,45 @@
-import { Outlet, createRootRoute, Link } from '@tanstack/react-router'
-import { useSelector, useDispatch } from 'react-redux'
-import { Button } from '@/components/ui/button'
+import {
+  Outlet,
+  createRootRoute,
+  Link,
+  useNavigate
+} from '@tanstack/react-router'
+
+import { useSelector } from 'react-redux'
+import { RootState } from '@/store/store'
+import { useAsyncDispatch } from '@/store/store'
+import { userLogout } from '@/features/auth/authSlice'
+
 import useIsMobile from '@/hooks/useIsMobile'
 import { LOGGED_IN_ROUTES, LOGGED_OUT_ROUTES } from '@/data/routesData'
 import clsx from 'clsx'
-import { RootState } from '@/store/store'
-import { logout } from '@/features/auth/authSlice'
+import { Button } from '@/components/ui/button'
 
 export const Route = createRootRoute({
   component: RootComponent
 })
 
 function RootComponent() {
-  const dispatch = useDispatch()
+  const navigate = useNavigate()
+
+  const dispatch = useAsyncDispatch()
   const authStatus = useSelector((state: RootState) => state.auth.userToken)
+  const authErrors = useSelector((state: RootState) => state.auth.error)
   const isMobile = useIsMobile()
+
+  const handleLogout = async () => {
+    try {
+      // Dispatch user logout reducer
+      await dispatch(userLogout())
+
+      if (!authErrors) {
+        // If successful, redirect user to home page
+        navigate({ to: '/' })
+      }
+    } catch (error) {
+      console.error(error)
+    }
+  }
 
   return (
     <div className="relative min-h-dvh bg-app-colors-500">
@@ -46,7 +71,7 @@ function RootComponent() {
                       size="lg"
                       key={key}
                       className="flex flex-col"
-                      onClick={() => dispatch(logout())}
+                      onClick={handleLogout}
                     >
                       {route.icon}
                       {route.id}
@@ -101,7 +126,7 @@ function RootComponent() {
                         size="lg"
                         key={key}
                         className="flex flex-row"
-                        onClick={() => dispatch(logout())}
+                        onClick={handleLogout}
                       >
                         {route.icon}
                         {route.id}
