@@ -24,14 +24,10 @@ export const logoutUser = async () => {
   const refreshTokenInStore = await cookieStore.get('refresh_token')
   const refresh_token = refreshTokenInStore ? refreshTokenInStore.value : null
 
-  try {
-    const response = await axios.post(`${BACKEND_API}/auth/logout`, {
-      refresh_token: refresh_token
-    })
-    return response.data
-  } catch (error) {
-    return error
-  }
+  const response = await axios.post(`${BACKEND_API}/auth/logout`, {
+    refresh_token: refresh_token
+  })
+  return response.data
 }
 
 export const genNewAccessToken = async () => {

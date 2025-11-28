@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import { logoutUser } from '@/utils/authAPI'
+import { isAxiosError } from 'axios'
+import { logoutUser } from '@/services/authAPI'
 import { AuthState } from '@/types/auth'
 
 interface TokenData {
@@ -56,26 +57,35 @@ const authSlice = createSlice({
       state.userToken = null
       state.error = null
     })
-
     builder.addCase(userLogout.rejected, (state, action) => {
-      console.error(action.payload)
+      if (action.payload) {
+        state.error = action.payload
+      }
     })
   }
 })
 
-export const userLogout = createAsyncThunk('auth/removeToken', async () => {
-  // Make call to api to invalidate refresh token
-  const response = await logoutUser()
-
-  // If there was an error, cancel logout action
-  if (response.error) Promise.reject(response.error)
-
-  // If response was successful, remove the tokens from the cookie store
-  await cookieStore.delete('auth_token')
-  await cookieStore.delete('refresh_token')
-
-  return
-})
+export const userLogout = createAsyncThunk(
+  'auth/removeToken',
+  async (args, { rejectWithValue }) => {
+    // Make call to api to invalidate refresh token
+    try {
+      await logoutUser()
+      // If response was successful, remove the tokens from the cookie store
+      await cookieStore.delete('auth_token')
+      await cookieStore.delete('refresh_token')
+      return
+    } catch (error) {
+      // If there was an error, cancel logout action
+      if (isAxiosError(error)) {
+        return rejectWithValue({
+          errorMessage: error.message,
+          errorCode: error.code
+        })
+      }
+    }
+  }
+)
 
 export const refreshAccessToken = createAsyncThunk(
   'auth/refreshAccessToken',

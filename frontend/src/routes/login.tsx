@@ -17,7 +17,7 @@ import { Label } from '@radix-ui/react-label'
 import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
 import { UserCredentials } from '@/types/auth'
-import { loginUser } from '@/utils/authAPI'
+import { loginUser } from '@/services/authAPI'
 
 export const Route = createFileRoute('/login')({
   component: RouteComponent

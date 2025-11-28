@@ -6,7 +6,7 @@ import {
 } from '@reduxjs/toolkit/query/react'
 import { RootState } from '@/store/store'
 import { refreshAccessToken } from '@/features/auth/authSlice'
-import { genNewAccessToken } from '../utils/authAPI'
+import { genNewAccessToken } from './authAPI'
 
 const BACKEND_API = import.meta.env.VITE_BACKEND_API_URL
 

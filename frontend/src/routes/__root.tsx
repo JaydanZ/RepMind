@@ -24,14 +24,21 @@ function RootComponent() {
 
   const dispatch = useAsyncDispatch()
   const authStatus = useSelector((state: RootState) => state.auth.userToken)
+  const authErrors = useSelector((state: RootState) => state.auth.error)
   const isMobile = useIsMobile()
 
   const handleLogout = async () => {
-    // Dispatch user logout reducer
-    await dispatch(userLogout())
+    try {
+      // Dispatch user logout reducer
+      await dispatch(userLogout())
 
-    // If successful, redirect user to home page
-    navigate({ to: '/' })
+      if (!authErrors) {
+        // If successful, redirect user to home page
+        navigate({ to: '/' })
+      }
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   return (
