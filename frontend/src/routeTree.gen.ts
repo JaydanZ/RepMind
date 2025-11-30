@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as RegisterUserRouteImport } from './routes/registerUser'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as AiProgramFactoryRouteImport } from './routes/aiProgramFactory'
 import { Route as IndexRouteImport } from './routes/index'
 
 const RegisterUserRoute = RegisterUserRouteImport.update({
@@ -29,6 +30,11 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AiProgramFactoryRoute = AiProgramFactoryRouteImport.update({
+  id: '/aiProgramFactory',
+  path: '/aiProgramFactory',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -37,12 +43,14 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/aiProgramFactory': typeof AiProgramFactoryRoute
   '/login': typeof LoginRoute
   '/profile': typeof ProfileRoute
   '/registerUser': typeof RegisterUserRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/aiProgramFactory': typeof AiProgramFactoryRoute
   '/login': typeof LoginRoute
   '/profile': typeof ProfileRoute
   '/registerUser': typeof RegisterUserRoute
@@ -50,20 +58,28 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/aiProgramFactory': typeof AiProgramFactoryRoute
   '/login': typeof LoginRoute
   '/profile': typeof ProfileRoute
   '/registerUser': typeof RegisterUserRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/profile' | '/registerUser'
+  fullPaths: '/' | '/aiProgramFactory' | '/login' | '/profile' | '/registerUser'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/profile' | '/registerUser'
-  id: '__root__' | '/' | '/login' | '/profile' | '/registerUser'
+  to: '/' | '/aiProgramFactory' | '/login' | '/profile' | '/registerUser'
+  id:
+    | '__root__'
+    | '/'
+    | '/aiProgramFactory'
+    | '/login'
+    | '/profile'
+    | '/registerUser'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AiProgramFactoryRoute: typeof AiProgramFactoryRoute
   LoginRoute: typeof LoginRoute
   ProfileRoute: typeof ProfileRoute
   RegisterUserRoute: typeof RegisterUserRoute
@@ -92,6 +108,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/aiProgramFactory': {
+      id: '/aiProgramFactory'
+      path: '/aiProgramFactory'
+      fullPath: '/aiProgramFactory'
+      preLoaderRoute: typeof AiProgramFactoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -104,6 +127,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AiProgramFactoryRoute: AiProgramFactoryRoute,
   LoginRoute: LoginRoute,
   ProfileRoute: ProfileRoute,
   RegisterUserRoute: RegisterUserRoute,

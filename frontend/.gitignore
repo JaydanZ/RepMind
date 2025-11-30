@@ -18,6 +18,7 @@ dist-ssr
 /build
 
 # misc
+/.tanstack
 .DS_Store
 *.pem
 
