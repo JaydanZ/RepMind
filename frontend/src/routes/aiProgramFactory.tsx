@@ -7,7 +7,7 @@ export const Route = createFileRoute('/aiProgramFactory')({
 
 function RouteComponent() {
   return (
-    <div className="flex h-dvh justify-center items-center bg-app-colors-300">
+    <div className="flex h-dvh justify-center items-center bg-neutral-900">
       <ProgramFactory />
     </div>
   )

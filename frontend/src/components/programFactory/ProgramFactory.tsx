@@ -40,13 +40,13 @@ export const ProgramFactory = () => {
 
   return (
     <div className="flex flex-col justify-center items-center">
-      <Card className="flex flex-col w-[450px] h-[550px] justify-between">
+      <Card className="flex flex-col min-w-[450px] min-h-[550px] justify-between">
         <CardHeader>
           <CardTitle className="text-[2rem]">
             {pageNumber === 0 ? (
               <div>What are your fitness goals?</div>
             ) : pageNumber === 1 ? (
-              <div>How many years of experience do you have working out?</div>
+              <div>Years of experience working out?</div>
             ) : pageNumber === 2 ? (
               <div>How many days in a week can you workout?</div>
             ) : pageNumber === 3 ? (
@@ -113,7 +113,77 @@ export const ProgramFactory = () => {
                 )}
               </form.Field>
             ) : pageNumber === 1 ? (
-              <div>Years of experience working out options</div>
+              <form.Field name="yearsOfExperience">
+                {(field) => (
+                  <div>
+                    <div className="flex items-center gap-3">
+                      <label className="flex flex-row hover:cursor-pointer justify-between items-center w-full p-5 my-2 bg-neutral-900 border-2 rounded-lg font-medium has-[:checked]:border-app-colors-300 has-[:checked]:text-app-colors-300 has-[:checked]:bg-app-colors-300/5 hover:bg-neutral-800">
+                        No experience
+                        <input
+                          type="radio"
+                          id="No experience"
+                          value="No experience"
+                          checked={field.state.value === 'No experience'}
+                          onChange={(e) => field.handleChange(e.target.value)}
+                          className="w-4 h-4 appearance-none rounded-full border-2 border-solid border-neutral-600 bg-neutral-600 checked:border-app-colors-300 checked:bg-app-colors-300"
+                        />
+                      </label>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <label className="flex flex-row hover:cursor-pointer justify-between items-center w-full p-5 my-2 bg-neutral-900 border-2 rounded-lg font-medium has-[:checked]:border-app-colors-300 has-[:checked]:text-app-colors-300 has-[:checked]:bg-app-colors-300/5 hover:bg-neutral-800">
+                        0 - 1 Years
+                        <input
+                          type="radio"
+                          id="0 - 1 Years"
+                          value="0 - 1 Years"
+                          checked={field.state.value === '0 - 1 Years'}
+                          onChange={(e) => field.handleChange(e.target.value)}
+                          className="w-4 h-4 appearance-none rounded-full border-2 border-solid border-neutral-600 bg-neutral-600 checked:border-app-colors-300 checked:bg-app-colors-300"
+                        />
+                      </label>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <label className="flex flex-row hover:cursor-pointer justify-between items-center w-full p-5 my-2 bg-neutral-900 border-2 rounded-lg font-medium has-[:checked]:border-app-colors-300 has-[:checked]:text-app-colors-300 has-[:checked]:bg-app-colors-300/5 hover:bg-neutral-800">
+                        2 - 3 Years
+                        <input
+                          type="radio"
+                          id="2 - 3 Years"
+                          value="2 - 3 Years"
+                          checked={field.state.value === '2 - 3 Years'}
+                          onChange={(e) => field.handleChange(e.target.value)}
+                          className="w-4 h-4 appearance-none rounded-full border-2 border-solid border-neutral-600 bg-neutral-600 checked:border-app-colors-300 checked:bg-app-colors-300"
+                        />
+                      </label>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <label className="flex flex-row hover:cursor-pointer justify-between items-center w-full p-5 my-2 bg-neutral-900 border-2 rounded-lg font-medium has-[:checked]:border-app-colors-300 has-[:checked]:text-app-colors-300 has-[:checked]:bg-app-colors-300/5 hover:bg-neutral-800">
+                        3 - 5 Years
+                        <input
+                          type="radio"
+                          id="3 - 5 Years"
+                          value="3 - 5 Years"
+                          checked={field.state.value === '3 - 5 Years'}
+                          onChange={(e) => field.handleChange(e.target.value)}
+                          className="w-4 h-4 appearance-none rounded-full border-2 border-solid border-neutral-600 bg-neutral-600 checked:border-app-colors-300 checked:bg-app-colors-300"
+                        />
+                      </label>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <label className="flex flex-row hover:cursor-pointer justify-between items-center w-full p-5 my-2 bg-neutral-900 border-2 rounded-lg font-medium has-[:checked]:border-app-colors-300 has-[:checked]:text-app-colors-300 has-[:checked]:bg-app-colors-300/5 hover:bg-neutral-800">
+                        Over 5 Years
+                        <input
+                          type="radio"
+                          id="Over 5 Years"
+                          value="Over 5 Years"
+                          checked={field.state.value === 'Over 5 Years'}
+                          onChange={(e) => field.handleChange(e.target.value)}
+                          className="w-4 h-4 appearance-none rounded-full border-2 border-solid border-neutral-600 bg-neutral-600 checked:border-app-colors-300 checked:bg-app-colors-300"
+                        />
+                      </label>
+                    </div>
+                  </div>
+                )}
+              </form.Field>
             ) : pageNumber === 2 ? (
               <div>days in a week options</div>
             ) : pageNumber === 3 ? (
@@ -125,20 +195,24 @@ export const ProgramFactory = () => {
         </CardContent>
         <CardFooter className="pt">
           <div className="flex flex-row w-full justify-between">
-            <Button
-              variant="secondary"
-              size="lg"
-              onClick={() => handlePageNumChange(-1)}
-            >
-              Back
-            </Button>
-            <Button
-              variant="default"
-              size="lg"
-              onClick={() => handlePageNumChange(+1)}
-            >
-              Next
-            </Button>
+            {pageNumber > 0 && (
+              <Button
+                variant="secondary"
+                size="lg"
+                onClick={() => handlePageNumChange(-1)}
+              >
+                Back
+              </Button>
+            )}
+            {pageNumber !== MAX_PAGE_NUM && (
+              <Button
+                variant="default"
+                size="lg"
+                onClick={() => handlePageNumChange(+1)}
+              >
+                Next
+              </Button>
+            )}
           </div>
         </CardFooter>
       </Card>
