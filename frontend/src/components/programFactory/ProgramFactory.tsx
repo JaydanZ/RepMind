@@ -6,7 +6,8 @@ import {
   CardHeader,
   CardTitle,
   CardFooter,
-  CardContent
+  CardContent,
+  CardDescription
 } from '../ui/card'
 import { Button } from '../ui/button'
 
@@ -30,6 +31,7 @@ const daysInWeekList = [
   '5 Days',
   '6-7 Days'
 ]
+
 export const ProgramFactory = () => {
   const [pageNumber, setPageNumber] = useState<number>(0)
 
@@ -60,9 +62,24 @@ export const ProgramFactory = () => {
         <CardHeader>
           <CardTitle className="text-[2rem]">
             {pageNumber === 0 ? (
-              <div>What are your fitness goals?</div>
+              <div>Fitness Goals</div>
             ) : pageNumber === 1 ? (
-              <div>Years of experience working out?</div>
+              <div>Years of Experience</div>
+            ) : pageNumber === 2 ? (
+              <div>Workout Frequency</div>
+            ) : pageNumber === 3 ? (
+              <div>Age and Weight</div>
+            ) : (
+              <div>Summary</div>
+            )}
+          </CardTitle>
+          <CardDescription>
+            {pageNumber === 0 ? (
+              <div>
+                What fitness goals are you trying to achieve with the program?
+              </div>
+            ) : pageNumber === 1 ? (
+              <div>How many years of experience do you have working out?</div>
             ) : pageNumber === 2 ? (
               <div>How many days in a week can you workout?</div>
             ) : pageNumber === 3 ? (
@@ -70,7 +87,7 @@ export const ProgramFactory = () => {
             ) : (
               <div>Summary</div>
             )}
-          </CardTitle>
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form
