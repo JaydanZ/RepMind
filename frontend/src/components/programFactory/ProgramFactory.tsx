@@ -8,12 +8,28 @@ import {
   CardFooter,
   CardContent
 } from '../ui/card'
-import { RadioGroup, RadioGroupItem } from '@radix-ui/react-radio-group'
-import { Label } from '../ui/label'
 import { Button } from '../ui/button'
 
 const MAX_PAGE_NUM = 4
 
+const fitnessGoalList = ['Gain muscle and lose fat', 'Lose fat', 'Gain muscle']
+
+const yearsOfExperienceList = [
+  'No Experience',
+  '0 - 1 Years',
+  '2 - 3 Years',
+  '3 - 5 Years',
+  'Over 5 Years'
+]
+
+const daysInWeekList = [
+  '1 Day',
+  '2 Days',
+  '3 Days',
+  '4 Days',
+  '5 Days',
+  '6-7 Days'
+]
 export const ProgramFactory = () => {
   const [pageNumber, setPageNumber] = useState<number>(0)
 
@@ -64,51 +80,24 @@ export const ProgramFactory = () => {
             }}
           >
             {pageNumber === 0 ? (
-              //<div>List of fitness goals</div>
               <form.Field name="fitnessGoal">
                 {(field) => (
                   <div>
-                    <div className="flex items-center gap-3">
-                      <label className="flex flex-row hover:cursor-pointer justify-between items-center w-full p-5 my-2 bg-neutral-900 border-2 rounded-lg font-medium has-[:checked]:border-app-colors-300 has-[:checked]:text-app-colors-300 has-[:checked]:bg-app-colors-300/5 hover:bg-neutral-800">
-                        Gain muscle and lose fat
-                        <input
-                          type="radio"
-                          id="gain-muscle-lose-fat"
-                          value="gain muscle and lose fat"
-                          checked={
-                            field.state.value === 'gain muscle and lose fat'
-                          }
-                          onChange={(e) => field.handleChange(e.target.value)}
-                          className="w-4 h-4 appearance-none rounded-full border-2 border-solid border-neutral-600 bg-neutral-600 checked:border-app-colors-300 checked:bg-app-colors-300"
-                        />
-                      </label>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <label className="flex flex-row hover:cursor-pointer justify-between items-center w-full p-5 my-2 bg-neutral-900 border-2 rounded-lg font-medium has-[:checked]:border-app-colors-300 has-[:checked]:text-app-colors-300 has-[:checked]:bg-app-colors-300/5 hover:bg-neutral-800">
-                        Lose fat
-                        <input
-                          type="radio"
-                          id="lose-fat"
-                          value="lose fat"
-                          checked={field.state.value === 'lose fat'}
-                          onChange={(e) => field.handleChange(e.target.value)}
-                          className="w-4 h-4 appearance-none rounded-full border-2 border-solid border-neutral-600 bg-neutral-600 checked:border-app-colors-300 checked:bg-app-colors-300"
-                        />
-                      </label>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <label className="flex flex-row hover:cursor-pointer justify-between items-center w-full p-5 my-2 bg-neutral-900 border-2 rounded-lg font-medium has-[:checked]:border-app-colors-300 has-[:checked]:text-app-colors-300 has-[:checked]:bg-app-colors-300/5 hover:bg-neutral-800">
-                        Gain muscle
-                        <input
-                          type="radio"
-                          id="gain-muscle"
-                          value="gain muscle"
-                          checked={field.state.value === 'gain muscle'}
-                          onChange={(e) => field.handleChange(e.target.value)}
-                          className="w-4 h-4 appearance-none rounded-full border-2 border-solid border-neutral-600 bg-neutral-600 checked:border-app-colors-300 checked:bg-app-colors-300"
-                        />
-                      </label>
-                    </div>
+                    {fitnessGoalList.map((goal, index) => (
+                      <div className="flex items-center gap-3" key={index}>
+                        <label className="flex flex-row hover:cursor-pointer justify-between items-center w-full p-5 my-2 bg-neutral-900 border-2 rounded-lg font-medium has-[:checked]:border-app-colors-300 has-[:checked]:text-app-colors-300 has-[:checked]:bg-app-colors-300/5 hover:bg-neutral-800">
+                          {goal}
+                          <input
+                            type="radio"
+                            id={goal}
+                            value={goal}
+                            checked={field.state.value === goal}
+                            onChange={(e) => field.handleChange(e.target.value)}
+                            className="w-4 h-4 appearance-none rounded-full border-2 border-solid border-neutral-600 bg-neutral-600 checked:border-app-colors-300 checked:bg-app-colors-300"
+                          />
+                        </label>
+                      </div>
+                    ))}
                   </div>
                 )}
               </form.Field>
@@ -116,80 +105,55 @@ export const ProgramFactory = () => {
               <form.Field name="yearsOfExperience">
                 {(field) => (
                   <div>
-                    <div className="flex items-center gap-3">
-                      <label className="flex flex-row hover:cursor-pointer justify-between items-center w-full p-5 my-2 bg-neutral-900 border-2 rounded-lg font-medium has-[:checked]:border-app-colors-300 has-[:checked]:text-app-colors-300 has-[:checked]:bg-app-colors-300/5 hover:bg-neutral-800">
-                        No experience
-                        <input
-                          type="radio"
-                          id="No experience"
-                          value="No experience"
-                          checked={field.state.value === 'No experience'}
-                          onChange={(e) => field.handleChange(e.target.value)}
-                          className="w-4 h-4 appearance-none rounded-full border-2 border-solid border-neutral-600 bg-neutral-600 checked:border-app-colors-300 checked:bg-app-colors-300"
-                        />
-                      </label>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <label className="flex flex-row hover:cursor-pointer justify-between items-center w-full p-5 my-2 bg-neutral-900 border-2 rounded-lg font-medium has-[:checked]:border-app-colors-300 has-[:checked]:text-app-colors-300 has-[:checked]:bg-app-colors-300/5 hover:bg-neutral-800">
-                        0 - 1 Years
-                        <input
-                          type="radio"
-                          id="0 - 1 Years"
-                          value="0 - 1 Years"
-                          checked={field.state.value === '0 - 1 Years'}
-                          onChange={(e) => field.handleChange(e.target.value)}
-                          className="w-4 h-4 appearance-none rounded-full border-2 border-solid border-neutral-600 bg-neutral-600 checked:border-app-colors-300 checked:bg-app-colors-300"
-                        />
-                      </label>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <label className="flex flex-row hover:cursor-pointer justify-between items-center w-full p-5 my-2 bg-neutral-900 border-2 rounded-lg font-medium has-[:checked]:border-app-colors-300 has-[:checked]:text-app-colors-300 has-[:checked]:bg-app-colors-300/5 hover:bg-neutral-800">
-                        2 - 3 Years
-                        <input
-                          type="radio"
-                          id="2 - 3 Years"
-                          value="2 - 3 Years"
-                          checked={field.state.value === '2 - 3 Years'}
-                          onChange={(e) => field.handleChange(e.target.value)}
-                          className="w-4 h-4 appearance-none rounded-full border-2 border-solid border-neutral-600 bg-neutral-600 checked:border-app-colors-300 checked:bg-app-colors-300"
-                        />
-                      </label>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <label className="flex flex-row hover:cursor-pointer justify-between items-center w-full p-5 my-2 bg-neutral-900 border-2 rounded-lg font-medium has-[:checked]:border-app-colors-300 has-[:checked]:text-app-colors-300 has-[:checked]:bg-app-colors-300/5 hover:bg-neutral-800">
-                        3 - 5 Years
-                        <input
-                          type="radio"
-                          id="3 - 5 Years"
-                          value="3 - 5 Years"
-                          checked={field.state.value === '3 - 5 Years'}
-                          onChange={(e) => field.handleChange(e.target.value)}
-                          className="w-4 h-4 appearance-none rounded-full border-2 border-solid border-neutral-600 bg-neutral-600 checked:border-app-colors-300 checked:bg-app-colors-300"
-                        />
-                      </label>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <label className="flex flex-row hover:cursor-pointer justify-between items-center w-full p-5 my-2 bg-neutral-900 border-2 rounded-lg font-medium has-[:checked]:border-app-colors-300 has-[:checked]:text-app-colors-300 has-[:checked]:bg-app-colors-300/5 hover:bg-neutral-800">
-                        Over 5 Years
-                        <input
-                          type="radio"
-                          id="Over 5 Years"
-                          value="Over 5 Years"
-                          checked={field.state.value === 'Over 5 Years'}
-                          onChange={(e) => field.handleChange(e.target.value)}
-                          className="w-4 h-4 appearance-none rounded-full border-2 border-solid border-neutral-600 bg-neutral-600 checked:border-app-colors-300 checked:bg-app-colors-300"
-                        />
-                      </label>
-                    </div>
+                    {yearsOfExperienceList.map((years, index) => (
+                      <div className="flex items-center gap-3" key={index}>
+                        <label className="flex flex-row hover:cursor-pointer justify-between items-center w-full p-5 my-2 bg-neutral-900 border-2 rounded-lg font-medium has-[:checked]:border-app-colors-300 has-[:checked]:text-app-colors-300 has-[:checked]:bg-app-colors-300/5 hover:bg-neutral-800">
+                          {years}
+                          <input
+                            type="radio"
+                            id={years}
+                            value={years}
+                            checked={field.state.value === years}
+                            onChange={(e) => field.handleChange(e.target.value)}
+                            className="w-4 h-4 appearance-none rounded-full border-2 border-solid border-neutral-600 bg-neutral-600 checked:border-app-colors-300 checked:bg-app-colors-300"
+                          />
+                        </label>
+                      </div>
+                    ))}
                   </div>
                 )}
               </form.Field>
             ) : pageNumber === 2 ? (
-              <div>days in a week options</div>
+              <form.Field name="numDaysInWeek">
+                {(field) => (
+                  <div>
+                    {daysInWeekList.map((days, index) => (
+                      <div className="flex items-center gap-3" key={index}>
+                        <label className="flex flex-row hover:cursor-pointer justify-between items-center w-full p-5 my-2 bg-neutral-900 border-2 rounded-lg font-medium has-[:checked]:border-app-colors-300 has-[:checked]:text-app-colors-300 has-[:checked]:bg-app-colors-300/5 hover:bg-neutral-800">
+                          {days}
+                          <input
+                            type="radio"
+                            id={days}
+                            value={days}
+                            checked={field.state.value === days}
+                            onChange={(e) => field.handleChange(e.target.value)}
+                            className="w-4 h-4 appearance-none rounded-full border-2 border-solid border-neutral-600 bg-neutral-600 checked:border-app-colors-300 checked:bg-app-colors-300"
+                          />
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </form.Field>
             ) : pageNumber === 3 ? (
               <div>Age Weight and Gender input fields</div>
             ) : (
-              <div>Summary</div>
+              <div>
+                Summary
+                <Button variant="default" type="submit">
+                  Submit
+                </Button>
+              </div>
             )}
           </form>
         </CardContent>
