@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, Activity } from 'react'
 import { useForm } from '@tanstack/react-form'
 
 import {
@@ -9,6 +9,8 @@ import {
   CardContent,
   CardDescription
 } from '../ui/card'
+import { Input } from '../ui/input'
+import { Label } from '../ui/label'
 import { Button } from '../ui/button'
 
 const MAX_PAGE_NUM = 4
@@ -34,6 +36,7 @@ const daysInWeekList = [
 
 export const ProgramFactory = () => {
   const [pageNumber, setPageNumber] = useState<number>(0)
+  const [isPounds, setIsPounds] = useState<boolean>(true)
 
   const handlePageNumChange = (pageChange: number) => {
     if (pageChange < 0 && pageNumber > 0) {
@@ -49,7 +52,8 @@ export const ProgramFactory = () => {
       yearsOfExperience: '',
       numDaysInWeek: '',
       age: '',
-      weight: ''
+      weight: '',
+      gender: ''
     },
     onSubmit: async ({ value }) => {
       console.log(value)
@@ -68,7 +72,7 @@ export const ProgramFactory = () => {
             ) : pageNumber === 2 ? (
               <div>Workout Frequency</div>
             ) : pageNumber === 3 ? (
-              <div>Age and Weight</div>
+              <div>Age, Weight and Gender</div>
             ) : (
               <div>Summary</div>
             )}
@@ -83,7 +87,7 @@ export const ProgramFactory = () => {
             ) : pageNumber === 2 ? (
               <div>How many days in a week can you workout?</div>
             ) : pageNumber === 3 ? (
-              <div>What is your current Age and Weight?</div>
+              <div>What is your current age, weight and gender?</div>
             ) : (
               <div>Summary</div>
             )}
@@ -96,7 +100,7 @@ export const ProgramFactory = () => {
               form.handleSubmit()
             }}
           >
-            {pageNumber === 0 ? (
+            <Activity mode={pageNumber === 0 ? 'visible' : 'hidden'}>
               <form.Field name="fitnessGoal">
                 {(field) => (
                   <div>
@@ -118,7 +122,8 @@ export const ProgramFactory = () => {
                   </div>
                 )}
               </form.Field>
-            ) : pageNumber === 1 ? (
+            </Activity>
+            <Activity mode={pageNumber === 1 ? 'visible' : 'hidden'}>
               <form.Field name="yearsOfExperience">
                 {(field) => (
                   <div>
@@ -140,7 +145,8 @@ export const ProgramFactory = () => {
                   </div>
                 )}
               </form.Field>
-            ) : pageNumber === 2 ? (
+            </Activity>
+            <Activity mode={pageNumber === 2 ? 'visible' : 'hidden'}>
               <form.Field name="numDaysInWeek">
                 {(field) => (
                   <div>
@@ -162,16 +168,34 @@ export const ProgramFactory = () => {
                   </div>
                 )}
               </form.Field>
-            ) : pageNumber === 3 ? (
-              <div>Age Weight and Gender input fields</div>
-            ) : (
+            </Activity>
+            <Activity mode={pageNumber === 3 ? 'visible' : 'hidden'}>
+              <div className="flex flex-col">
+                <form.Field name="age">
+                  {(field) => (
+                    <div className="grid gap-3">
+                      <Label htmlFor={field.name}>Age</Label>
+                      <Input
+                        placeholder="25"
+                        id={field.name}
+                        value={field.state.value}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                      />
+                    </div>
+                  )}
+                </form.Field>
+                <form.Field name="weight"></form.Field>
+                <form.Field name="gender"></form.Field>
+              </div>
+            </Activity>
+            <Activity mode={pageNumber === MAX_PAGE_NUM ? 'visible' : 'hidden'}>
               <div>
                 Summary
                 <Button variant="default" type="submit">
                   Submit
                 </Button>
               </div>
-            )}
+            </Activity>
           </form>
         </CardContent>
         <CardFooter className="pt">
@@ -181,6 +205,7 @@ export const ProgramFactory = () => {
                 variant="secondary"
                 size="lg"
                 onClick={() => handlePageNumChange(-1)}
+                className="mr-auto"
               >
                 Back
               </Button>
@@ -190,6 +215,7 @@ export const ProgramFactory = () => {
                 variant="default"
                 size="lg"
                 onClick={() => handlePageNumChange(+1)}
+                className="ml-auto"
               >
                 Next
               </Button>
