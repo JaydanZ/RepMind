@@ -9,6 +9,8 @@ import {
   CardContent,
   CardDescription
 } from '../ui/card'
+import { InputGroup, InputGroupAddon, InputGroupInput } from '../ui/input-group'
+import { Separator } from '../ui/separator'
 import { Input } from '../ui/input'
 import { Label } from '../ui/label'
 import { Button } from '../ui/button'
@@ -33,6 +35,8 @@ const daysInWeekList = [
   '5 Days',
   '6-7 Days'
 ]
+
+const genderOptions = ['Male', 'Female']
 
 export const ProgramFactory = () => {
   const [pageNumber, setPageNumber] = useState<number>(0)
@@ -170,12 +174,16 @@ export const ProgramFactory = () => {
               </form.Field>
             </Activity>
             <Activity mode={pageNumber === 3 ? 'visible' : 'hidden'}>
-              <div className="flex flex-col">
+              <div className="flex flex-col gap-6">
                 <form.Field name="age">
                   {(field) => (
                     <div className="grid gap-3">
-                      <Label htmlFor={field.name}>Age</Label>
+                      <Label htmlFor={field.name} className="text-lg">
+                        Age
+                      </Label>
                       <Input
+                        type="number"
+                        inputMode="numeric"
                         placeholder="25"
                         id={field.name}
                         value={field.state.value}
@@ -184,8 +192,62 @@ export const ProgramFactory = () => {
                     </div>
                   )}
                 </form.Field>
-                <form.Field name="weight"></form.Field>
-                <form.Field name="gender"></form.Field>
+                <form.Field name="weight">
+                  {(field) => (
+                    <div className="grid gap-3">
+                      <Label htmlFor={field.name} className="text-lg">
+                        Weight
+                      </Label>
+                      <InputGroup>
+                        <InputGroupInput
+                          placeholder="180"
+                          type="number"
+                          inputMode="numeric"
+                          id={field.name}
+                          value={field.state.value}
+                          onChange={(e) => field.handleChange(e.target.value)}
+                        />
+                        <InputGroupAddon align="inline-end">
+                          Lbs
+                        </InputGroupAddon>
+                      </InputGroup>
+                    </div>
+                  )}
+                </form.Field>
+                <form.Field name="gender">
+                  {(field) => (
+                    <div>
+                      <Label htmlFor="gender" className="text-lg">
+                        Gender
+                      </Label>
+                      <div
+                        className="flex flex-row w-full justify-between space-x-4"
+                        id="gender"
+                      >
+                        {genderOptions.map((gender, index) => (
+                          <div
+                            className="flex items-center m w-full"
+                            key={index}
+                          >
+                            <label className="flex flex-row hover:cursor-pointer justify-between items-center w-full p-5 my-2 bg-neutral-900 border-2 rounded-lg font-medium has-[:checked]:border-app-colors-300 has-[:checked]:text-app-colors-300 has-[:checked]:bg-app-colors-300/5 hover:bg-neutral-800">
+                              {gender}
+                              <input
+                                type="radio"
+                                id={gender}
+                                value={gender}
+                                checked={field.state.value === gender}
+                                onChange={(e) =>
+                                  field.handleChange(e.target.value)
+                                }
+                                className="w-4 h-4 appearance-none rounded-full border-2 border-solid border-neutral-600 bg-neutral-600 checked:border-app-colors-300 checked:bg-app-colors-300"
+                              />
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </form.Field>
               </div>
             </Activity>
             <Activity mode={pageNumber === MAX_PAGE_NUM ? 'visible' : 'hidden'}>
@@ -198,7 +260,8 @@ export const ProgramFactory = () => {
             </Activity>
           </form>
         </CardContent>
-        <CardFooter className="pt">
+        <Separator className="mt-auto mb-6" orientation="horizontal" />
+        <CardFooter className="flex flex-col">
           <div className="flex flex-row w-full justify-between">
             {pageNumber > 0 && (
               <Button
