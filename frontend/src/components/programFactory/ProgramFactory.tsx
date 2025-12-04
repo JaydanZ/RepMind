@@ -1,6 +1,7 @@
 import { useState, Activity } from 'react'
 import { useForm } from '@tanstack/react-form'
 
+import { ChevronDownIcon } from 'lucide-react'
 import {
   Card,
   CardHeader,
@@ -9,16 +10,30 @@ import {
   CardContent,
   CardDescription
 } from '../ui/card'
-import { InputGroup, InputGroupAddon, InputGroupInput } from '../ui/input-group'
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput
+} from '../ui/input-group'
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem
+} from '../ui/dropdown-menu'
 import { Separator } from '../ui/separator'
 import { Input } from '../ui/input'
 import { Label } from '../ui/label'
 import { Button } from '../ui/button'
 
+enum WeightUnits {
+  Pounds = 'Lbs',
+  Kilograms = 'KGs'
+}
+
 const MAX_PAGE_NUM = 4
-
 const fitnessGoalList = ['Gain muscle and lose fat', 'Lose fat', 'Gain muscle']
-
 const yearsOfExperienceList = [
   'No Experience',
   '0 - 1 Years',
@@ -26,7 +41,6 @@ const yearsOfExperienceList = [
   '3 - 5 Years',
   'Over 5 Years'
 ]
-
 const daysInWeekList = [
   '1 Day',
   '2 Days',
@@ -35,12 +49,11 @@ const daysInWeekList = [
   '5 Days',
   '6-7 Days'
 ]
-
 const genderOptions = ['Male', 'Female']
 
 export const ProgramFactory = () => {
   const [pageNumber, setPageNumber] = useState<number>(0)
-  const [isPounds, setIsPounds] = useState<boolean>(true)
+  const [weightUnit, setWeightUnit] = useState<WeightUnits>(WeightUnits.Pounds)
 
   const handlePageNumChange = (pageChange: number) => {
     if (pageChange < 0 && pageNumber > 0) {
@@ -208,7 +221,33 @@ export const ProgramFactory = () => {
                           onChange={(e) => field.handleChange(e.target.value)}
                         />
                         <InputGroupAddon align="inline-end">
-                          Lbs
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <InputGroupButton
+                                variant="ghost"
+                                className="!pr-1.5 text-s"
+                              >
+                                {weightUnit}{' '}
+                                <ChevronDownIcon className="size-1" />
+                              </InputGroupButton>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  setWeightUnit(WeightUnits.Pounds)
+                                }
+                              >
+                                {WeightUnits.Pounds}
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  setWeightUnit(WeightUnits.Kilograms)
+                                }
+                              >
+                                {WeightUnits.Kilograms}
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </InputGroupAddon>
                       </InputGroup>
                     </div>
