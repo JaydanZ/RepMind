@@ -34,6 +34,28 @@ enum WeightUnits {
 }
 
 const MAX_SECTION_NUM = 4
+const sections = [
+  {
+    sectionName: 'Fitness Goal',
+    sectionNum: 0
+  },
+  {
+    sectionName: 'Years of Experience',
+    sectionNum: 1
+  },
+  {
+    sectionName: 'Workout Frequency',
+    sectionNum: 2
+  },
+  {
+    sectionName: 'Age, Weight and Gender',
+    sectionNum: 3
+  },
+  {
+    sectionName: 'Summary',
+    sectionNum: 4
+  }
+]
 const fitnessGoalList = ['Gain muscle and lose fat', 'Lose fat', 'Gain muscle']
 const yearsOfExperienceList = [
   'No Experience',
@@ -152,9 +174,35 @@ export const ProgramFactory = () => {
 
   return (
     <div className="flex flex-col justify-center items-center">
+      <Label className="text-[3rem] mb-8 font-thin">Program Generator</Label>
+      <div className="flex flex-row w-full mb-4">
+        {sections.map((section, index) => (
+          <Button
+            onClick={() => setSectionNumber(section.sectionNum)}
+            variant="ghost"
+            key={index}
+            className={clsx(
+              'flex flex-col text-[0.8rem]',
+              sectionNumber >= section.sectionNum
+                ? 'text-app-colors-300'
+                : 'text-neutral-500 hover:text-neutral-500'
+            )}
+          >
+            {section.sectionName}
+            <div
+              className={clsx(
+                'inline-block w-[130px] min-h-[3px] rounded-xl',
+                sectionNumber >= section.sectionNum
+                  ? 'bg-app-colors-300'
+                  : 'bg-neutral-500 hover:text-neutral-500'
+              )}
+            ></div>
+          </Button>
+        ))}
+      </div>
       <Card
         className={clsx(
-          'flex flex-col min-w-[450px] min-h-[550px] justify-between',
+          'flex flex-col w-full min-h-[550px] justify-between',
           sectionError.length > 0 && 'border-red-500'
         )}
       >
