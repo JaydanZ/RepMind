@@ -1,5 +1,5 @@
 import { useState, Activity } from 'react'
-import { useForm } from '@tanstack/react-form'
+import { useForm, useStore } from '@tanstack/react-form'
 import clsx from 'clsx'
 
 import { ChevronDownIcon } from 'lucide-react'
@@ -51,6 +51,14 @@ const daysInWeekList = [
   '6-7 Days'
 ]
 const genderOptions = ['Male', 'Female']
+const summaryFieldNames = [
+  'Fitness goal',
+  'Years of experience',
+  'Days per week',
+  'Age',
+  'Weight',
+  'Gender'
+]
 
 export const ProgramFactory = () => {
   const [sectionNumber, setSectionNumber] = useState<number>(0)
@@ -70,6 +78,12 @@ export const ProgramFactory = () => {
       console.log(value)
     }
   })
+
+  const formValues = useStore(form.store, (state) => state.values)
+  const formValuesArray = Array.from(
+    Object.entries(formValues),
+    ([option, value]) => ({ option, value })
+  )
 
   const handleSectionNumChange = (sectionChange: number) => {
     // Before advancing to the next section, we need to manually check if all necessary fields have been filled out in a section
@@ -151,7 +165,7 @@ export const ProgramFactory = () => {
             ) : sectionNumber === 3 ? (
               <div>What is your current age, weight and gender?</div>
             ) : (
-              <div>Summary</div>
+              <div>Here are all of the options you selected:</div>
             )}
           </CardDescription>
           {sectionError.length > 0 && (
@@ -351,10 +365,27 @@ export const ProgramFactory = () => {
             <Activity
               mode={sectionNumber === MAX_SECTION_NUM ? 'visible' : 'hidden'}
             >
-              <div>
-                Summary
-                <Button variant="default" type="submit">
-                  Submit
+              <div className="flex flex-col items-center w-full h-full">
+                <div className="flex flex-col w-full">
+                  {formValuesArray.map((formField, index) => (
+                    <div
+                      className="flex flex-row my-1 justify-between"
+                      key={index}
+                    >
+                      <Label className="text-[1rem] text-neutral-400">
+                        {summaryFieldNames[index]}
+                      </Label>
+                      <Label className="text-[0.9rem]">{formField.value}</Label>
+                    </div>
+                  ))}
+                </div>
+                <Button
+                  variant="default"
+                  type="submit"
+                  size="lg"
+                  className="mt-6 w-full"
+                >
+                  Generate Program
                 </Button>
               </div>
             </Activity>
