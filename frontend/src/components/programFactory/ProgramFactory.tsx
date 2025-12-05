@@ -51,37 +51,38 @@ const daysInWeekList = [
   '6-7 Days'
 ]
 const genderOptions = ['Male', 'Female']
-const summaryFieldNames = [
-  {
-    section: 'Fitness goal',
-    sectionNum: 0
-  },
-  {
-    section: 'Years of experience',
-    sectionNum: 1
-  },
-  {
-    section: 'Days per week',
-    sectionNum: 2
-  },
-  {
-    section: 'Age',
-    sectionNum: 3
-  },
-  {
-    section: 'Weight',
-    sectionNum: 3
-  },
-  {
-    section: 'Gender',
-    sectionNum: 3
-  }
-]
 
 export const ProgramFactory = () => {
   const [sectionNumber, setSectionNumber] = useState<number>(0)
   const [weightUnit, setWeightUnit] = useState<WeightUnits>(WeightUnits.Pounds)
   const [sectionError, setSectionError] = useState<string>('')
+
+  const summaryFieldNames = [
+    {
+      section: 'Fitness goal',
+      sectionNum: 0
+    },
+    {
+      section: 'Years of experience',
+      sectionNum: 1
+    },
+    {
+      section: 'Days per week',
+      sectionNum: 2
+    },
+    {
+      section: 'Age',
+      sectionNum: 3
+    },
+    {
+      section: `Weight (${weightUnit})`,
+      sectionNum: 3
+    },
+    {
+      section: 'Gender',
+      sectionNum: 3
+    }
+  ]
 
   const form = useForm({
     defaultValues: {
