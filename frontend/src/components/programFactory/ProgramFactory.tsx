@@ -1,5 +1,6 @@
 import { useState, Activity } from 'react'
 import { useForm } from '@tanstack/react-form'
+import clsx from 'clsx'
 
 import { ChevronDownIcon } from 'lucide-react'
 import {
@@ -32,7 +33,7 @@ enum WeightUnits {
   Kilograms = 'KGs'
 }
 
-const MAX_PAGE_NUM = 4
+const MAX_SECTION_NUM = 4
 const fitnessGoalList = ['Gain muscle and lose fat', 'Lose fat', 'Gain muscle']
 const yearsOfExperienceList = [
   'No Experience',
@@ -52,16 +53,9 @@ const daysInWeekList = [
 const genderOptions = ['Male', 'Female']
 
 export const ProgramFactory = () => {
-  const [pageNumber, setPageNumber] = useState<number>(0)
+  const [sectionNumber, setSectionNumber] = useState<number>(0)
   const [weightUnit, setWeightUnit] = useState<WeightUnits>(WeightUnits.Pounds)
-
-  const handlePageNumChange = (pageChange: number) => {
-    if (pageChange < 0 && pageNumber > 0) {
-      setPageNumber((prevPage) => prevPage - 1)
-    } else if (pageChange > 0 && pageNumber < MAX_PAGE_NUM) {
-      setPageNumber((prevPage) => prevPage + 1)
-    }
-  }
+  const [sectionError, setSectionError] = useState<string>('')
 
   const form = useForm({
     defaultValues: {
@@ -77,38 +71,92 @@ export const ProgramFactory = () => {
     }
   })
 
+  const handleSectionNumChange = (sectionChange: number) => {
+    // Before advancing to the next section, we need to manually check if all necessary fields have been filled out in a section
+    // Only when user clicks next, ignore if back is clicked
+
+    setSectionError('')
+
+    if (sectionChange > 0) {
+      switch (sectionNumber) {
+        case 0:
+          if (form.getFieldValue('fitnessGoal').length === 0) {
+            setSectionError('Error: you must select an option')
+            return
+          }
+          break
+        case 1:
+          if (form.getFieldValue('yearsOfExperience').length === 0) {
+            setSectionError('Error: you must select an option')
+            return
+          }
+          break
+        case 2:
+          if (form.getFieldValue('numDaysInWeek').length === 0) {
+            setSectionError('Error: you must select an option')
+            return
+          }
+          break
+        case 3:
+          if (
+            form.getFieldValue('age').length === 0 ||
+            form.getFieldValue('weight').length === 0 ||
+            form.getFieldValue('gender').length === 0
+          ) {
+            setSectionError('Error: all fields must be filled in / selected')
+            return
+          }
+          break
+      }
+    }
+
+    if (sectionChange < 0 && sectionNumber > 0) {
+      setSectionNumber((prevSection) => prevSection - 1)
+    } else if (sectionChange > 0 && sectionNumber < MAX_SECTION_NUM) {
+      setSectionNumber((prevSection) => prevSection + 1)
+    }
+  }
+
   return (
     <div className="flex flex-col justify-center items-center">
-      <Card className="flex flex-col min-w-[450px] min-h-[550px] justify-between">
+      <Card
+        className={clsx(
+          'flex flex-col min-w-[450px] min-h-[550px] justify-between',
+          sectionError.length > 0 && 'border-red-500'
+        )}
+      >
         <CardHeader>
           <CardTitle className="text-[2rem]">
-            {pageNumber === 0 ? (
+            {sectionNumber === 0 ? (
               <div>Fitness Goals</div>
-            ) : pageNumber === 1 ? (
+            ) : sectionNumber === 1 ? (
               <div>Years of Experience</div>
-            ) : pageNumber === 2 ? (
+            ) : sectionNumber === 2 ? (
               <div>Workout Frequency</div>
-            ) : pageNumber === 3 ? (
+            ) : sectionNumber === 3 ? (
               <div>Age, Weight and Gender</div>
             ) : (
               <div>Summary</div>
             )}
           </CardTitle>
           <CardDescription>
-            {pageNumber === 0 ? (
+            {sectionNumber === 0 ? (
               <div>
                 What fitness goals are you trying to achieve with the program?
               </div>
-            ) : pageNumber === 1 ? (
+            ) : sectionNumber === 1 ? (
               <div>How many years of experience do you have working out?</div>
-            ) : pageNumber === 2 ? (
+            ) : sectionNumber === 2 ? (
               <div>How many days in a week can you workout?</div>
-            ) : pageNumber === 3 ? (
+            ) : sectionNumber === 3 ? (
               <div>What is your current age, weight and gender?</div>
             ) : (
               <div>Summary</div>
             )}
           </CardDescription>
+          {sectionError.length > 0 && (
+            <Label className="pt-4 pb-1 text-red-500">{sectionError}</Label>
+          )}
         </CardHeader>
         <CardContent>
           <form
@@ -117,7 +165,7 @@ export const ProgramFactory = () => {
               form.handleSubmit()
             }}
           >
-            <Activity mode={pageNumber === 0 ? 'visible' : 'hidden'}>
+            <Activity mode={sectionNumber === 0 ? 'visible' : 'hidden'}>
               <form.Field name="fitnessGoal">
                 {(field) => (
                   <div>
@@ -140,7 +188,7 @@ export const ProgramFactory = () => {
                 )}
               </form.Field>
             </Activity>
-            <Activity mode={pageNumber === 1 ? 'visible' : 'hidden'}>
+            <Activity mode={sectionNumber === 1 ? 'visible' : 'hidden'}>
               <form.Field name="yearsOfExperience">
                 {(field) => (
                   <div>
@@ -163,7 +211,7 @@ export const ProgramFactory = () => {
                 )}
               </form.Field>
             </Activity>
-            <Activity mode={pageNumber === 2 ? 'visible' : 'hidden'}>
+            <Activity mode={sectionNumber === 2 ? 'visible' : 'hidden'}>
               <form.Field name="numDaysInWeek">
                 {(field) => (
                   <div>
@@ -186,7 +234,7 @@ export const ProgramFactory = () => {
                 )}
               </form.Field>
             </Activity>
-            <Activity mode={pageNumber === 3 ? 'visible' : 'hidden'}>
+            <Activity mode={sectionNumber === 3 ? 'visible' : 'hidden'}>
               <div className="flex flex-col gap-6">
                 <form.Field name="age">
                   {(field) => (
@@ -201,6 +249,11 @@ export const ProgramFactory = () => {
                         id={field.name}
                         value={field.state.value}
                         onChange={(e) => field.handleChange(e.target.value)}
+                        className={clsx(
+                          sectionError.length > 0 &&
+                            field.state.value.length === 0 &&
+                            'border-red-500 focus-visible:ring-0'
+                        )}
                       />
                     </div>
                   )}
@@ -211,7 +264,13 @@ export const ProgramFactory = () => {
                       <Label htmlFor={field.name} className="text-lg">
                         Weight
                       </Label>
-                      <InputGroup>
+                      <InputGroup
+                        className={clsx(
+                          sectionError.length > 0 &&
+                            field.state.value.length === 0 &&
+                            'border-red-500 has-[[data-slot=input-group-control]:focus-visible]:ring-0'
+                        )}
+                      >
                         <InputGroupInput
                           placeholder="180"
                           type="number"
@@ -289,7 +348,9 @@ export const ProgramFactory = () => {
                 </form.Field>
               </div>
             </Activity>
-            <Activity mode={pageNumber === MAX_PAGE_NUM ? 'visible' : 'hidden'}>
+            <Activity
+              mode={sectionNumber === MAX_SECTION_NUM ? 'visible' : 'hidden'}
+            >
               <div>
                 Summary
                 <Button variant="default" type="submit">
@@ -302,21 +363,21 @@ export const ProgramFactory = () => {
         <Separator className="mt-auto mb-6" orientation="horizontal" />
         <CardFooter className="flex flex-col">
           <div className="flex flex-row w-full justify-between">
-            {pageNumber > 0 && (
+            {sectionNumber > 0 && (
               <Button
                 variant="secondary"
                 size="lg"
-                onClick={() => handlePageNumChange(-1)}
+                onClick={() => handleSectionNumChange(-1)}
                 className="mr-auto"
               >
                 Back
               </Button>
             )}
-            {pageNumber !== MAX_PAGE_NUM && (
+            {sectionNumber !== MAX_SECTION_NUM && (
               <Button
                 variant="default"
                 size="lg"
-                onClick={() => handlePageNumChange(+1)}
+                onClick={() => handleSectionNumChange(+1)}
                 className="ml-auto"
               >
                 Next
