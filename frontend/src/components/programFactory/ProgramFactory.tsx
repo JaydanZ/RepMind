@@ -175,29 +175,28 @@ export const ProgramFactory = () => {
   return (
     <div className="flex flex-col justify-center items-center">
       <Label className="text-[3rem] mb-8 font-thin">Program Generator</Label>
-      <div className="flex flex-row w-full mb-4">
+      <div className="flex flex-row w-full mb-6 gap-x-4">
         {sections.map((section, index) => (
-          <Button
-            onClick={() => setSectionNumber(section.sectionNum)}
-            variant="ghost"
-            key={index}
-            className={clsx(
-              'flex flex-col text-[0.8rem]',
-              sectionNumber >= section.sectionNum
-                ? 'text-app-colors-300'
-                : 'text-neutral-500 hover:text-neutral-500'
-            )}
-          >
-            {section.sectionName}
+          <div className="flex flex-col items-center" key={index}>
+            <Label
+              className={clsx(
+                'text-[0.8rem] mb-2',
+                sectionNumber >= section.sectionNum
+                  ? 'text-app-colors-300'
+                  : 'text-neutral-500'
+              )}
+            >
+              {section.sectionName}
+            </Label>
             <div
               className={clsx(
-                'inline-block w-[130px] min-h-[3px] rounded-xl',
+                'inline-block w-[140px] min-h-[4px] rounded-xl',
                 sectionNumber >= section.sectionNum
                   ? 'bg-app-colors-300'
-                  : 'bg-neutral-500 hover:text-neutral-500'
+                  : 'bg-neutral-500'
               )}
             ></div>
-          </Button>
+          </div>
         ))}
       </div>
       <Card
