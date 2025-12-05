@@ -2,7 +2,7 @@ import { useState, Activity } from 'react'
 import { useForm, useStore } from '@tanstack/react-form'
 import clsx from 'clsx'
 
-import { ChevronDownIcon } from 'lucide-react'
+import { ChevronDownIcon, Cog } from 'lucide-react'
 import {
   Card,
   CardHeader,
@@ -52,12 +52,30 @@ const daysInWeekList = [
 ]
 const genderOptions = ['Male', 'Female']
 const summaryFieldNames = [
-  'Fitness goal',
-  'Years of experience',
-  'Days per week',
-  'Age',
-  'Weight',
-  'Gender'
+  {
+    section: 'Fitness goal',
+    sectionNum: 0
+  },
+  {
+    section: 'Years of experience',
+    sectionNum: 1
+  },
+  {
+    section: 'Days per week',
+    sectionNum: 2
+  },
+  {
+    section: 'Age',
+    sectionNum: 3
+  },
+  {
+    section: 'Weight',
+    sectionNum: 3
+  },
+  {
+    section: 'Gender',
+    sectionNum: 3
+  }
 ]
 
 export const ProgramFactory = () => {
@@ -372,10 +390,25 @@ export const ProgramFactory = () => {
                       className="flex flex-row my-1 justify-between"
                       key={index}
                     >
-                      <Label className="text-[1rem] text-neutral-400">
-                        {summaryFieldNames[index]}
+                      <Label className="text-[1.1rem] text-neutral-400">
+                        {summaryFieldNames[index].section}
                       </Label>
-                      <Label className="text-[0.9rem]">{formField.value}</Label>
+                      <div className="flex flex-row justify-center items-center">
+                        <Label className="text-[1.1rem]">
+                          {formField.value}
+                        </Label>
+                        <Button
+                          variant="ghost"
+                          onClick={() =>
+                            setSectionNumber(
+                              summaryFieldNames[index].sectionNum
+                            )
+                          }
+                          className="p-0 pl-2 w-fit h-fit text-neutral-400 text-xs"
+                        >
+                          <Cog className="!size-4" />
+                        </Button>
+                      </div>
                     </div>
                   ))}
                 </div>
