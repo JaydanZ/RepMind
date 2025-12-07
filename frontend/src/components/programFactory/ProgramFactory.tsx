@@ -34,6 +34,8 @@ enum WeightUnits {
 }
 
 const MAX_SECTION_NUM = 4
+const MAX_AGE = 120
+const MAX_WEIGHT = 900
 const sections = [
   {
     sectionName: 'Fitness Goal',
@@ -316,7 +318,19 @@ export const ProgramFactory = () => {
             </Activity>
             <Activity mode={sectionNumber === 3 ? 'visible' : 'hidden'}>
               <div className="flex flex-col gap-6">
-                <form.Field name="age">
+                <form.Field
+                  name="age"
+                  validators={{
+                    onChange: ({ value }) => {
+                      const formattedAge = parseInt(value)
+                      if (formattedAge < 0)
+                        return 'Age cannot be a negative number'
+                      if (formattedAge > MAX_AGE)
+                        return `Age cannot be greater than ${MAX_AGE}`
+                      return undefined
+                    }
+                  }}
+                >
                   {(field) => (
                     <div className="grid gap-3">
                       <Label htmlFor={field.name} className="text-lg">
@@ -330,15 +344,33 @@ export const ProgramFactory = () => {
                         value={field.state.value}
                         onChange={(e) => field.handleChange(e.target.value)}
                         className={clsx(
-                          sectionError.length > 0 &&
-                            field.state.value.length === 0 &&
-                            'border-red-500 focus-visible:ring-0'
+                          (sectionError.length > 0 &&
+                            field.state.value.length === 0) ||
+                            (field.state.meta.errors.length > 0 &&
+                              'border-red-500 focus-visible:ring-0')
                         )}
                       />
+                      {field.state.meta.errors.length > 0 && (
+                        <p className="text-red-500 text-sm">
+                          {field.state.meta.errors.join(', ')}
+                        </p>
+                      )}
                     </div>
                   )}
                 </form.Field>
-                <form.Field name="weight">
+                <form.Field
+                  name="weight"
+                  validators={{
+                    onChange: ({ value }) => {
+                      const formattedWeight = parseInt(value)
+                      if (formattedWeight < 0)
+                        return 'Weight cannot be a negative number'
+                      if (formattedWeight > MAX_WEIGHT)
+                        return `Weight cannot be greater than ${MAX_WEIGHT} ${weightUnit}`
+                      return undefined
+                    }
+                  }}
+                >
                   {(field) => (
                     <div className="grid gap-3">
                       <Label htmlFor={field.name} className="text-lg">
@@ -346,9 +378,10 @@ export const ProgramFactory = () => {
                       </Label>
                       <InputGroup
                         className={clsx(
-                          sectionError.length > 0 &&
-                            field.state.value.length === 0 &&
-                            'border-red-500 has-[[data-slot=input-group-control]:focus-visible]:ring-0'
+                          (sectionError.length > 0 &&
+                            field.state.value.length === 0) ||
+                            (field.state.meta.errors.length > 0 &&
+                              'border-red-500 has-[[data-slot=input-group-control]:focus-visible]:ring-0')
                         )}
                       >
                         <InputGroupInput
@@ -389,6 +422,11 @@ export const ProgramFactory = () => {
                           </DropdownMenu>
                         </InputGroupAddon>
                       </InputGroup>
+                      {field.state.meta.errors.length > 0 && (
+                        <p className="text-red-500 text-sm">
+                          {field.state.meta.errors.join(', ')}
+                        </p>
+                      )}
                     </div>
                   )}
                 </form.Field>
