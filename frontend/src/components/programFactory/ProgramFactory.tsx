@@ -2,6 +2,9 @@ import { useState, Activity } from 'react'
 import { useForm, useStore } from '@tanstack/react-form'
 import clsx from 'clsx'
 
+import { generateProgram } from '@/services/programGenAPI'
+import { programOptions } from '@/types/programCreation'
+
 import { ChevronDownIcon, Cog } from 'lucide-react'
 import {
   Card,
@@ -118,7 +121,25 @@ export const ProgramFactory = () => {
       gender: ''
     },
     onSubmit: async ({ value }) => {
-      console.log(value)
+      const formattedAge = parseInt(value.age)
+      const formattedWeight = parseInt(value.weight)
+
+      const programInput: programOptions = {
+        fitness_goal: value.fitnessGoal,
+        years_of_experience: value.yearsOfExperience,
+        days_per_week: value.numDaysInWeek,
+        age: formattedAge,
+        weight: formattedWeight,
+        weight_unit: weightUnit,
+        gender: value.gender
+      }
+
+      try {
+        const response = await generateProgram(programInput)
+        console.log(response)
+      } catch (error) {
+        console.error(error)
+      }
     }
   })
 
