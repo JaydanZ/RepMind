@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from ..models.programGeneration import ProgramOptions
+from ..utils.programGenerator import generate_program
 
 
 ## Endpoint to handle ai program generation without authentication / is user logged in status
@@ -9,6 +10,6 @@ program_generation_router = APIRouter(
 )
 
 @program_generation_router.post('/', status_code=201)
-def generateProgram(programInput: ProgramOptions):
-    print(programInput)
+def handleProgramGeneration(programInput: ProgramOptions):
+    generate_program(programInput)
     return { "Message": "Program generation endpoint hit" }
