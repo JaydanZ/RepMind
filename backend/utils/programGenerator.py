@@ -1,8 +1,10 @@
+import json
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts.chat import (
     HumanMessagePromptTemplate,
-    ChatPromptTemplate
+    ChatPromptTemplate,
 )
+from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import PydanticOutputParser
 
 from ..config import get_settings
@@ -15,7 +17,7 @@ openai_api_key = envVars.OPENAI_API_KEY
 ## Chat model definition
 OPENAI_MODEL = "gpt-5-nano"
 
-open_ai_client = ChatOpenAI(api_key=openai_api_key, model=OPENAI_MODEL)
+llm = ChatOpenAI(api_key=openai_api_key, model=OPENAI_MODEL)
 parser = PydanticOutputParser(pydantic_object=ProgramResult)
 
 ## Prompt Template
@@ -33,17 +35,16 @@ PROGRAM_GENERATION_PROMPT_TEMPLATE = """
 """
 
 def generate_program(program: ProgramOptions):
+    prompt = PromptTemplate(
+        template=PROGRAM_GENERATION_PROMPT_TEMPLATE,
+        input_variables=["fitness_goal","years_of_experience","days_per_week","age","weight","weight_unit","gender"],
+        partial_variables={"format_instructions": parser.get_format_instructions()}
+    )
 
-    message = HumanMessagePromptTemplate.from_template(template=PROGRAM_GENERATION_PROMPT_TEMPLATE)
-    chat_prompt = ChatPromptTemplate.from_messages(messages=[message])
+    chain = prompt | llm | parser
 
-    ## Insert data from user
-    chat_prompt_with_user_data = chat_prompt.format_prompt(fitness_goal=program.fitness_goal, years_of_experience=program.years_of_experience, 
-                                                           days_per_week=program.days_per_week, age=program.age, weight=program.weight, 
-                                                           weight_unit=program.weight_unit, gender=program.gender, format_instructions=parser.get_format_instructions())
-    
-    response = open_ai_client.invoke(chat_prompt_with_user_data.to_messages())
-    ##data = parser.parse(response)
-    print(response.content)
+    output = chain.invoke({"fitness_goal":program.fitness_goal, "years_of_experience": program.years_of_experience, 
+                           "days_per_week": program.days_per_week, "age":program.age, "weight":program.weight, 
+                           "weight_unit":program.weight_unit, "gender": program.gender})
 
-    return
+    return output

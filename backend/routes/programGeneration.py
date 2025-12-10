@@ -11,5 +11,5 @@ program_generation_router = APIRouter(
 
 @program_generation_router.post('/', status_code=201)
 def handleProgramGeneration(programInput: ProgramOptions):
-    generate_program(programInput)
-    return { "Message": "Program generation endpoint hit" }
+    content = generate_program(programInput)
+    return content
