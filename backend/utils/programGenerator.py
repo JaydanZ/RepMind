@@ -3,9 +3,10 @@ from langchain_core.prompts.chat import (
     HumanMessagePromptTemplate,
     ChatPromptTemplate
 )
+from langchain_core.output_parsers import PydanticOutputParser
 
 from ..config import get_settings
-from ..models.programGeneration import ProgramOptions
+from ..models.programGeneration import ProgramOptions, ProgramResult
 
 ## Get OPEN API key
 envVars = get_settings()
@@ -15,17 +16,20 @@ openai_api_key = envVars.OPENAI_API_KEY
 OPENAI_MODEL = "gpt-5-nano"
 
 open_ai_client = ChatOpenAI(api_key=openai_api_key, model=OPENAI_MODEL)
+parser = PydanticOutputParser(pydantic_object=ProgramResult)
 
 ## Prompt Template
 PROGRAM_GENERATION_PROMPT_TEMPLATE = """
     Assume you're a fitness trainer with over 10 years of experience with weightlifting, bodybuilding, strength training and
     assiting other people to achieve their fitness goals. Please generate a workout program following these arguments:
+    Only schedule workouts on weekdays,
     User's fitness goal: {fitness_goal}
     User's years of experience working out: {years_of_experience}
     User's availability to workout during the week: {days_per_week}
     User's current age: {age}
     User's current weight: {weight} {weight_unit}
     User's gender: {gender}
+    {format_instructions}
 """
 
 def generate_program(program: ProgramOptions):
@@ -36,9 +40,10 @@ def generate_program(program: ProgramOptions):
     ## Insert data from user
     chat_prompt_with_user_data = chat_prompt.format_prompt(fitness_goal=program.fitness_goal, years_of_experience=program.years_of_experience, 
                                                            days_per_week=program.days_per_week, age=program.age, weight=program.weight, 
-                                                           weight_unit=program.weight_unit, gender=program.gender)
+                                                           weight_unit=program.weight_unit, gender=program.gender, format_instructions=parser.get_format_instructions())
     
     response = open_ai_client.invoke(chat_prompt_with_user_data.to_messages())
-    print(response)
+    ##data = parser.parse(response)
+    print(response.content)
 
     return
