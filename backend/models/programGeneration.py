@@ -9,7 +9,6 @@ class ProgramOptions(BaseModel):
     weight_unit:str
     gender:str
 
-
 ## List of days working out during the week
     ## What exercises is the user doing each day (i.e. the body section focus of the day)
         ## This would also include the ammount of reps and sets per exercise
@@ -25,6 +24,5 @@ class Workout(BaseModel):
     focus: str = Field(description="Focus of the workout (i.e. Push day, Upper Day, etc.)")
     exercises: list[Exercise] = Field(description="A collection of exercises the user will perform for the day")
 class ProgramResult(BaseModel):
-    program_frequency: int = Field(description="The number of days the user will workout during the week")
     program_structure: list[Workout] = Field(description="A collection of workouts the user will perform for the week")
-    program_tips: list[str] = Field(description="A collection of workout tips to help the user along their journey")
+    program_tips_and_goals: list[str] = Field(description="A collection of workout tips / goals to help the user along their journey (Max 8 entries)")
