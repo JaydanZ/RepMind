@@ -1,4 +1,5 @@
 from functools import lru_cache
+from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
@@ -8,10 +9,11 @@ class Settings(BaseSettings):
     JWT_REFRESH_SECRET: str
     SUPABASE_URL: str
     SUPABASE_KEY: str
+    OPENAI_API_KEY: SecretStr
     model_config = SettingsConfigDict(env_file=".env")
 
 ## NON AUTHENTICATED ROUTES GO HERE
-non_auth_routes = ["/docs","/auth", "/auth/login", "/auth/logout", "/auth/createuser", "/auth/token"]
+non_auth_routes = ["/docs","/auth", "/auth/login", "/auth/logout", "/auth/createuser", "/auth/token","/programs", "/programs/"]
 
 @lru_cache
 def get_settings():

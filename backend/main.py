@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .config import get_settings
-from .routes import auth_router, profile_router
+from .routes import auth_router, profile_router, program_generation_router
 from .middleware import TokenAuthMiddleware
 
 ## ENV VARS
@@ -26,6 +26,7 @@ app.add_middleware(TokenAuthMiddleware)
 
 ## Routes
 app.include_router(auth_router)
+app.include_router(program_generation_router)
 app.include_router(profile_router)
 
 @app.get("/")
