@@ -17,9 +17,11 @@ parser = PydanticOutputParser(pydantic_object=ProgramResult)
 
 ## Prompt Template
 PROGRAM_GENERATION_PROMPT_TEMPLATE = """
-    Assume you're a fitness trainer with over 10 years of experience with weightlifting, bodybuilding, strength training and
-    assiting other people to achieve their fitness goals. Please generate a workout program following these arguments:
-    Only schedule workouts on weekdays,
+    You're a fitness trainer with over 10 years of experience with weightlifting, bodybuilding, strength training and
+    assiting other people to achieve their fitness goals. Your objective is to generate a workout program for the user 
+    following these arguments provided by the user:
+    Only schedule workouts on weekdays (If days_per_week is less than 6),
+    Ensure the user has enough recovery time during the week
     User's fitness goal: {fitness_goal}
     User's years of experience working out: {years_of_experience}
     User's availability to workout during the week: {days_per_week}
