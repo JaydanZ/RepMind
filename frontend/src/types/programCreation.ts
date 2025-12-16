@@ -1,4 +1,4 @@
-export interface programOptions {
+export interface ProgramOptions {
   fitness_goal: string
   years_of_experience: string
   days_per_week: string

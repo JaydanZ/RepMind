@@ -3,7 +3,9 @@ import { useForm, useStore } from '@tanstack/react-form'
 import clsx from 'clsx'
 
 import { generateProgram } from '@/services/programGenAPI'
-import { programOptions } from '@/types/programCreation'
+import { useAsyncDispatch } from '@/store/store'
+import { getAIProgram } from '@/features/programGeneration/programGenerationSlice'
+import { ProgramOptions } from '@/types/programCreation'
 
 import { ChevronDownIcon, Cog } from 'lucide-react'
 import {
@@ -84,6 +86,8 @@ export const ProgramFactory = () => {
   const [weightUnit, setWeightUnit] = useState<WeightUnits>(WeightUnits.Pounds)
   const [sectionError, setSectionError] = useState<string>('')
 
+  const dispatch = useAsyncDispatch()
+
   const summaryFieldNames = [
     {
       section: 'Fitness goal',
@@ -124,7 +128,7 @@ export const ProgramFactory = () => {
       const formattedAge = parseInt(value.age)
       const formattedWeight = parseInt(value.weight)
 
-      const programInput: programOptions = {
+      const programInput: ProgramOptions = {
         fitness_goal: value.fitnessGoal,
         years_of_experience: value.yearsOfExperience,
         days_per_week: value.numDaysInWeek,
@@ -135,8 +139,7 @@ export const ProgramFactory = () => {
       }
 
       try {
-        const response = await generateProgram(programInput)
-        console.log(response)
+        await dispatch(getAIProgram(programInput))
       } catch (error) {
         console.error(error)
       }
