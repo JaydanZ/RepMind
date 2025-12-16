@@ -30,9 +30,13 @@ const programGenerationSlice = createSlice({
         state.error = null
       }
     ),
+      builder.addCase(getAIProgram.pending, (state) => {
+        state.loading = true
+      }),
       builder.addCase(
         getAIProgram.rejected,
         (state: ProgramGenerationState, action) => {
+          state.loading = false
           if (action.payload) {
             state.error = action.payload
           } else {
