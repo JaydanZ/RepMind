@@ -1,18 +1,49 @@
 import { isAxiosError } from 'axios'
-import { createSlice, createAsyncThunk, createReducer } from '@reduxjs/toolkit'
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 
 import { generateProgram } from '@/services/programGenAPI'
 import { ProgranGenResult, ProgramOptions } from '@/types/programCreation'
 
-const initialState: ProgranGenResult = {
-  program_structure: null,
-  program_tips_and_goals: null
+interface ProgramGenerationState {
+  loading: boolean
+  aiProgram: ProgranGenResult | undefined
+  error: object | null
+}
+
+const initialState: ProgramGenerationState = {
+  loading: false,
+  aiProgram: undefined,
+  error: null
 }
 
 const programGenerationSlice = createSlice({
   name: 'programGeneration',
   initialState,
-  reducers: {}
+  reducers: {},
+  extraReducers: (builder) => {
+    // Handle storing result
+    builder.addCase(
+      getAIProgram.fulfilled,
+      (state: ProgramGenerationState, action) => {
+        state.aiProgram = action.payload
+        state.loading = false
+        state.error = null
+      }
+    ),
+      builder.addCase(
+        getAIProgram.rejected,
+        (state: ProgramGenerationState, action) => {
+          if (action.payload) {
+            state.error = action.payload
+          } else {
+            state.error = {
+              errorMessage: 'An error has occured generating your program',
+              errorCode: 400
+            }
+          }
+        }
+      )
+  }
 })
 
 export const getAIProgram = createAsyncThunk(
@@ -20,7 +51,7 @@ export const getAIProgram = createAsyncThunk(
   async (programOptions: ProgramOptions, { rejectWithValue }) => {
     try {
       const response = await generateProgram(programOptions)
-      console.log(response)
+      return response as ProgranGenResult
     } catch (error) {
       // If there was an error, cancel logout action
       if (isAxiosError(error)) {

@@ -2,7 +2,6 @@ import { useState, Activity } from 'react'
 import { useForm, useStore } from '@tanstack/react-form'
 import clsx from 'clsx'
 
-import { generateProgram } from '@/services/programGenAPI'
 import { useAsyncDispatch } from '@/store/store'
 import { getAIProgram } from '@/features/programGeneration/programGenerationSlice'
 import { ProgramOptions } from '@/types/programCreation'
