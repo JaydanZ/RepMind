@@ -22,6 +22,6 @@ export interface Workout {
 }
 
 export interface ProgranGenResult {
-  program_structure: Workout[]
-  program_tips_and_goals: string[]
+  program_structure: Workout[] | null
+  program_tips_and_goals: string[] | null
 }

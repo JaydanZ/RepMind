@@ -2,11 +2,13 @@ import { useDispatch } from 'react-redux'
 import { configureStore } from '@reduxjs/toolkit'
 import { protectedApiSlice } from '@/services/protectedRoutesAPI'
 import authReducer from '@/features/auth/authSlice'
+import programGenerationReducer from '@/features/programGeneration/programGenerationSlice'
 
 export const store = configureStore({
   reducer: {
     [protectedApiSlice.reducerPath]: protectedApiSlice.reducer,
-    auth: authReducer
+    auth: authReducer,
+    programGeneration: programGenerationReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(protectedApiSlice.middleware)
