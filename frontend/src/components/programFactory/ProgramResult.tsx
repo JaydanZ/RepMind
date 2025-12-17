@@ -26,7 +26,7 @@ export const ProgramResult = () => {
             <Button
               variant="outline"
               className={clsx(
-                'mx-1',
+                'mx-1 border-b-0 rounded-b-none',
                 index === selectedDay &&
                   'border-app-colors-300 text-app-colors-300 hover:text-app-colors-300 hover:bg-background'
               )}
@@ -37,9 +37,11 @@ export const ProgramResult = () => {
           </div>
         ))}
       </div>
-      <div className="flex flex-col mt-5">
+      <div className="flex flex-col min-w-[500px] border rounded-md border-app-colors-300 p-5">
         {programData?.program_structure && (
-          <Label>{programData.program_structure[selectedDay].focus}</Label>
+          <Label className="text-3xl mb-6">
+            {programData.program_structure[selectedDay].focus}
+          </Label>
         )}
         <Accordion type="single" collapsible defaultValue="exercise-0">
           {programData?.program_structure &&
