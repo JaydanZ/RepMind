@@ -38,7 +38,7 @@ export const ProgramResult = () => {
           </div>
         ))}
       </div>
-      <div className="flex flex-col w-[600px] border rounded-md border-app-colors-300 p-5">
+      <div className="flex flex-col w-[600px] border rounded-md border-app-colors-300 bg-background p-5">
         {programData?.program_structure && (
           <Label className="text-3xl mb-6">
             {programData.program_structure[selectedDay].focus}
@@ -65,9 +65,12 @@ export const ProgramResult = () => {
         <Label className="text-[2rem] mb-10">Program Tips and Goals</Label>
         {programData?.program_tips_and_goals &&
           programData.program_tips_and_goals.map((tip, index) => (
-            <Label className="font-normal mb-5" key={index}>{`${
-              index + 1
-            }. ${tip}`}</Label>
+            <Label className="font-normal text-[1rem] mb-5" key={index}>
+              <span className="font-bold text-app-colors-300">{`${
+                index + 1
+              }.`}</span>
+              {` ${tip}`}
+            </Label>
           ))}
       </div>
     </div>
