@@ -1,8 +1,19 @@
+import { useState } from 'react'
+import clsx from 'clsx'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/store/store'
+
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger
+} from '../ui/accordion'
 import { Label } from '../ui/label'
+import { Button } from '../ui/button'
 
 export const ProgramResult = () => {
+  const [selectedDay, setSelectedDay] = useState<number>(0)
   const programData = useSelector(
     (state: RootState) => state.programGeneration.aiProgram
   )
@@ -12,9 +23,37 @@ export const ProgramResult = () => {
       <div className="flex flex-row">
         {programData?.program_structure?.map((workout, index) => (
           <div key={index}>
-            <div>{workout.day}</div>
+            <Button
+              variant="outline"
+              className={clsx(
+                'mx-1',
+                index === selectedDay &&
+                  'border-app-colors-300 text-app-colors-300 hover:text-app-colors-300 hover:bg-background'
+              )}
+              onClick={() => setSelectedDay(index)}
+            >
+              {workout.day.substring(0, 3)}
+            </Button>
           </div>
         ))}
+      </div>
+      <div className="flex flex-col mt-5">
+        {programData?.program_structure && (
+          <Label>{programData.program_structure[selectedDay].focus}</Label>
+        )}
+        <Accordion type="single" collapsible defaultValue="exercise-0">
+          {programData?.program_structure &&
+            programData?.program_structure[selectedDay]?.exercises.map(
+              (exercise, index) => (
+                <AccordionItem key={index} value={`exercise-${index}`}>
+                  <AccordionTrigger>{`${exercise.name} | ${exercise.sets}x${exercise.reps}`}</AccordionTrigger>
+                  <AccordionContent>
+                    {`Exercise tip: ${exercise.exercise_tip}`}
+                  </AccordionContent>
+                </AccordionItem>
+              )
+            )}
+        </Accordion>
       </div>
     </div>
   )
