@@ -139,7 +139,8 @@ export const ProgramFactory = () => {
         age: formattedAge,
         weight: formattedWeight,
         weight_unit: weightUnit,
-        gender: value.gender
+        gender: value.gender,
+        isLoggedIn: isUserLoggedIn
       }
 
       try {

@@ -6,6 +6,7 @@ export interface ProgramOptions {
   weight: number
   weight_unit: string
   gender: string
+  isLoggedIn: boolean
 }
 
 export interface Exercise {
