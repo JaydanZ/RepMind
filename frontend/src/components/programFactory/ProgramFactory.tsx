@@ -3,6 +3,8 @@ import { useForm, useStore } from '@tanstack/react-form'
 import clsx from 'clsx'
 
 import { useAsyncDispatch } from '@/store/store'
+import { useSelector } from 'react-redux'
+import { RootState } from '@/store/store'
 import { getAIProgram } from '@/features/programGeneration/programGenerationSlice'
 import { ProgramOptions } from '@/types/programCreation'
 
@@ -85,6 +87,9 @@ export const ProgramFactory = () => {
   const [weightUnit, setWeightUnit] = useState<WeightUnits>(WeightUnits.Pounds)
   const [sectionError, setSectionError] = useState<string>('')
 
+  const isUserLoggedIn = useSelector(
+    (state: RootState) => state.auth.isLoggedIn
+  )
   const dispatch = useAsyncDispatch()
 
   const summaryFieldNames = [

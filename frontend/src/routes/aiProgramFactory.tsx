@@ -13,7 +13,6 @@ function RouteComponent() {
     (state: RootState) => state.programGeneration.aiProgram
   )
 
-  console.log(programResult)
   return (
     <div className="flex h-dvh justify-center items-center">
       {!programResult && <ProgramFactory />}

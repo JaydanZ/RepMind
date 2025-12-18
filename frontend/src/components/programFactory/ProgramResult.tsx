@@ -65,12 +65,14 @@ export const ProgramResult = () => {
         <Label className="text-[2rem] mb-10">Program Tips and Goals</Label>
         {programData?.program_tips_and_goals &&
           programData.program_tips_and_goals.map((tip, index) => (
-            <Label className="font-normal text-[1rem] mb-5" key={index}>
-              <span className="font-bold text-app-colors-300">{`${
+            <div className="flex flex-row" key={index}>
+              <span className="font-bold text-app-colors-300 text-[1.1rem] mr-2">{`${
                 index + 1
               }.`}</span>
-              {` ${tip}`}
-            </Label>
+              <Label className="font-thin text-[1.1rem] mb-5">
+                {` ${tip}`}
+              </Label>
+            </div>
           ))}
       </div>
     </div>

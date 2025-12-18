@@ -9,6 +9,7 @@ export interface SignupUser extends UserCredentials {
 
 export interface AuthState {
   loading: boolean
+  isLoggedIn: boolean
   userInfo: object
   userToken: string | null | undefined
   error: object | null
