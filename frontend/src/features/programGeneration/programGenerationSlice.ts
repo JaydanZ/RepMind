@@ -41,8 +41,7 @@ const programGenerationSlice = createSlice({
             state.error = action.payload
           } else {
             state.error = {
-              errorMessage: 'An error has occured generating your program',
-              errorCode: 400
+              error: action.payload
             }
           }
         }
@@ -60,10 +59,11 @@ export const getAIProgram = createAsyncThunk(
       // If there was an error, cancel logout action
       if (isAxiosError(error)) {
         return rejectWithValue({
-          errorMessage: error.message,
+          errorMessage: error.response?.data,
           errorCode: error.code
         })
       }
+      return rejectWithValue(error)
     }
   }
 )

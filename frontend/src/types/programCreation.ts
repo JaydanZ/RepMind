@@ -9,6 +9,10 @@ export interface ProgramOptions {
   isLoggedIn: boolean
 }
 
+export interface ProgramSubmission extends ProgramOptions {
+  freeLimitEnabled: boolean
+}
+
 export interface Exercise {
   name: string
   sets: number
