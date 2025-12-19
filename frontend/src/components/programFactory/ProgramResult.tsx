@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import clsx from 'clsx'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
+import { clearProgram } from '@/features/programGeneration/programGenerationSlice'
 import { RootState } from '@/store/store'
 
 import {
@@ -12,14 +13,24 @@ import {
 import { Separator } from '../ui/separator'
 import { Label } from '../ui/label'
 import { Button } from '../ui/button'
+import { ArrowLeft } from 'lucide-react'
 
 export const ProgramResult = () => {
   const [selectedDay, setSelectedDay] = useState<number>(0)
+  const dispatch = useDispatch()
   const programData = useSelector(
     (state: RootState) => state.programGeneration.aiProgram
   )
   return (
     <div className="flex flex-col justify-center items-center">
+      <Button
+        variant="ghost"
+        className="text-app-colors-300 mr-auto"
+        onClick={() => dispatch(clearProgram())}
+      >
+        <ArrowLeft />
+        Back
+      </Button>
       <Label className="text-[3rem] mb-10 font-thin">Your Program</Label>
       <div className="flex flex-row -mb-px">
         {programData?.program_structure?.map((workout, index) => (

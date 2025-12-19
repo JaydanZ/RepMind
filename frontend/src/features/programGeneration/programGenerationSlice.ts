@@ -19,7 +19,11 @@ const initialState: ProgramGenerationState = {
 const programGenerationSlice = createSlice({
   name: 'programGeneration',
   initialState,
-  reducers: {},
+  reducers: {
+    clearProgram(state) {
+      state.aiProgram = undefined
+    }
+  },
   extraReducers: (builder) => {
     // Handle storing result
     builder.addCase(
@@ -68,4 +72,5 @@ export const getAIProgram = createAsyncThunk(
   }
 )
 
+export const { clearProgram } = programGenerationSlice.actions
 export default programGenerationSlice.reducer
