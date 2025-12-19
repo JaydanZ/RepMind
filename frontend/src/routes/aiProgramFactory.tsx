@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { ProgramFactory } from '@/components/programFactory/ProgramFactory'
 import { ProgramResult } from '@/components/programFactory/ProgramResult'
+import { ProgramLoadingScreen } from '@/components/programFactory/ProgramLoadingScreen'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/store/store'
 
@@ -12,11 +13,16 @@ function RouteComponent() {
   const programResult = useSelector(
     (state: RootState) => state.programGeneration.aiProgram
   )
+  const isLoading = useSelector(
+    (state: RootState) => state.programGeneration.loading
+  )
+  // const isLoading = true
 
   return (
     <div className="flex h-dvh justify-center items-center">
-      {!programResult && <ProgramFactory />}
-      {programResult && <ProgramResult />}
+      {!programResult && !isLoading && <ProgramFactory />}
+      {isLoading && <ProgramLoadingScreen />}
+      {programResult && !isLoading && <ProgramResult />}
     </div>
   )
 }
