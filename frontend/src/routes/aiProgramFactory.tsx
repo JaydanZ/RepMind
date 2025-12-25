@@ -16,10 +16,9 @@ function RouteComponent() {
   const isLoading = useSelector(
     (state: RootState) => state.programGeneration.loading
   )
-  // const isLoading = true
 
   return (
-    <div className="flex h-dvh justify-center items-center pt-[100px]">
+    <div className="flex h-dvh justify-center items-center pt-[90px]">
       {!programResult && !isLoading && <ProgramFactory />}
       {isLoading && <ProgramLoadingScreen />}
       {programResult && !isLoading && <ProgramResult />}
