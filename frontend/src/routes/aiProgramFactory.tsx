@@ -19,7 +19,7 @@ function RouteComponent() {
   // const isLoading = true
 
   return (
-    <div className="flex h-dvh justify-center items-center">
+    <div className="flex h-dvh justify-center items-center pt-[100px]">
       {!programResult && !isLoading && <ProgramFactory />}
       {isLoading && <ProgramLoadingScreen />}
       {programResult && !isLoading && <ProgramResult />}
