@@ -8,6 +8,8 @@ class ProgramOptions(BaseModel):
     weight:int
     weight_unit:str
     gender:str
+    isLoggedIn:bool
+    freeLimitEnabled:bool
 
 class Exercise(BaseModel):
     name: str = Field(description="Name of the exercise")

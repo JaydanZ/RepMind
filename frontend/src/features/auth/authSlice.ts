@@ -18,9 +18,11 @@ interface LoginResponse {
 // Initialize userToken from cookie store on page load
 const tokenInStore = await cookieStore.get('auth_token')
 const userToken = tokenInStore ? tokenInStore?.value : null
+const isLoggedIn = userToken ? true : false
 
 const initialState: AuthState = {
   loading: false,
+  isLoggedIn,
   userInfo: {},
   userToken,
   error: null,
@@ -38,6 +40,7 @@ const authSlice = createSlice({
         username: action.payload.username,
         email: action.payload.email
       }
+      state.isLoggedIn = true
       state.userToken = action.payload.token_data.access_token
     })
     builder.addCase(userLogin.pending, (state) => {
@@ -56,6 +59,7 @@ const authSlice = createSlice({
       state.userInfo = {}
       state.userToken = null
       state.error = null
+      state.isLoggedIn = false
     })
     builder.addCase(userLogout.rejected, (state, action) => {
       if (action.payload) {

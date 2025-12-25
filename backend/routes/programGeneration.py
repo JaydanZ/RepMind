@@ -11,5 +11,8 @@ program_generation_router = APIRouter(
 
 @program_generation_router.post('/', status_code=201)
 def handleProgramGeneration(programInput: ProgramOptions):
+    ## Check if free limit is enabled -> means user is not logged in
+    if(programInput.freeLimitEnabled == True):
+        raise HTTPException(status_code=401, detail="User must login to continue using API")
     content = generate_program(programInput)
     return content
