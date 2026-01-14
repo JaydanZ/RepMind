@@ -50,6 +50,7 @@ function RootComponent() {
             authStatus ? 'justify-evenly' : 'justify-center'
           )}
         >
+          {/* MOBILE VIEW */}
           {authStatus
             ? LOGGED_IN_ROUTES.map((route, key) => (
                 <>
@@ -95,6 +96,7 @@ function RootComponent() {
         </nav>
       ) : (
         <nav className="flex flex-nowrap fixed top-0 z-100 w-full items-center justify-between bg-app-colors-500 py-6">
+          {/* DESKTOP VIEW */}
           {/* Left elements */}
           <ul className="flex flex-row list-style-none me-auto pl-12">
             <li className="text-app-colors-300 font-main-font font-medium text-[1.5rem]">
@@ -107,19 +109,12 @@ function RootComponent() {
               ? LOGGED_IN_ROUTES.map((route, key) => (
                   <>
                     {route.href ? (
-                      <Button
-                        variant="ghost"
-                        size="lg"
-                        key={key}
-                        className="ml-8"
-                      >
-                        {route.icon}
-                        {route.href && (
-                          <Link to={route.href} params={route.params}>
-                            {route.id}
-                          </Link>
-                        )}
-                      </Button>
+                      <Link to={route.href} key={key} params={route.params}>
+                        <Button variant="ghost" size="lg" className="ml-8">
+                          {route.icon}
+                          {route.id}
+                        </Button>
+                      </Link>
                     ) : (
                       <Button
                         variant="ghost"
@@ -135,12 +130,12 @@ function RootComponent() {
                   </>
                 ))
               : LOGGED_OUT_ROUTES.map((route, key) => (
-                  <Button variant="ghost" size="lg" key={key} className="ml-8">
-                    {route.icon}
-                    <Link to={route.href} params={route.params}>
+                  <Link to={route.href} key={key} params={route.params}>
+                    <Button variant="ghost" size="lg" className="ml-8">
+                      {route.icon}
                       {route.id}
-                    </Link>
-                  </Button>
+                    </Button>
+                  </Link>
                 ))}
           </div>
         </nav>
