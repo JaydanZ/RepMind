@@ -55,17 +55,17 @@ function RootComponent() {
             ? LOGGED_IN_ROUTES.map((route, key) => (
                 <>
                   {route.href ? (
-                    <Button
-                      variant="ghost"
-                      size="lg"
-                      key={key}
-                      className="flex flex-col"
-                    >
-                      {route.icon}
-                      <Link to={route.href} params={route.params}>
+                    <Link to={route.href} key={key} params={route.params}>
+                      <Button
+                        variant="ghost"
+                        size="lg"
+                        className="flex flex-col"
+                      >
+                        {route.icon}
+
                         {route.id}
-                      </Link>
-                    </Button>
+                      </Button>
+                    </Link>
                   ) : (
                     <Button
                       variant="ghost"
@@ -81,17 +81,13 @@ function RootComponent() {
                 </>
               ))
             : LOGGED_OUT_ROUTES.map((route, key) => (
-                <Button
-                  variant="ghost"
-                  size="lg"
-                  key={key}
-                  className="flex flex-col"
-                >
-                  {route.icon}
-                  <Link to={route.href} params={route.params}>
+                <Link to={route.href} key={key} params={route.params}>
+                  <Button variant="ghost" size="lg" className="flex flex-col">
+                    {route.icon}
+
                     {route.id}
-                  </Link>
-                </Button>
+                  </Button>
+                </Link>
               ))}
         </nav>
       ) : (
