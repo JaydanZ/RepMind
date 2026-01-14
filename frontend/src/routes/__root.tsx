@@ -62,7 +62,6 @@ function RootComponent() {
                         className="flex flex-col"
                       >
                         {route.icon}
-
                         {route.id}
                       </Button>
                     </Link>
@@ -84,7 +83,6 @@ function RootComponent() {
                 <Link to={route.href} key={key} params={route.params}>
                   <Button variant="ghost" size="lg" className="flex flex-col">
                     {route.icon}
-
                     {route.id}
                   </Button>
                 </Link>
