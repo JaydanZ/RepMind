@@ -98,13 +98,13 @@ function RootComponent() {
             </li>
           </ul>
           {/* Right elements */}
-          <div className="flex flex-row items-center pr-12">
+          <div className="flex flex-row items-center pr-12 gap-12">
             {authStatus
               ? LOGGED_IN_ROUTES.map((route, key) => (
                   <>
                     {route.href ? (
                       <Link to={route.href} key={key} params={route.params}>
-                        <Button variant="ghost" size="lg" className="ml-8">
+                        <Button variant="ghost" size="lg" className="p-0">
                           {route.icon}
                           {route.id}
                         </Button>
@@ -114,7 +114,7 @@ function RootComponent() {
                         variant="ghost"
                         size="lg"
                         key={key}
-                        className="flex flex-row"
+                        className="flex flex-row p-0"
                         onClick={handleLogout}
                       >
                         {route.icon}
@@ -125,7 +125,7 @@ function RootComponent() {
                 ))
               : LOGGED_OUT_ROUTES.map((route, key) => (
                   <Link to={route.href} key={key} params={route.params}>
-                    <Button variant="ghost" size="lg" className="ml-8">
+                    <Button variant="ghost" size="lg" className="p-0">
                       {route.icon}
                       {route.id}
                     </Button>
