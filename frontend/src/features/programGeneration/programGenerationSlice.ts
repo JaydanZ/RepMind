@@ -38,6 +38,9 @@ const programGenerationSlice = createSlice({
     ),
       builder.addCase(getAIProgram.pending, (state) => {
         state.loading = true
+        state.hasUsedProgramGen = localStorage.getItem('hasUsedProgramGen')
+          ? true
+          : false
       }),
       builder.addCase(
         getAIProgram.rejected,

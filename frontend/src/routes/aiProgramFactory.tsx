@@ -17,9 +17,21 @@ function RouteComponent() {
     (state: RootState) => state.programGeneration.loading
   )
 
+  // Handle program generation limit
+  const isLoggedIn = useSelector((state: RootState) => state.auth.isLoggedIn)
+  const hasUsedProgramGen = useSelector(
+    (state: RootState) => state.programGeneration.hasUsedProgramGen
+  )
+  const limitProgramGen = !isLoggedIn && hasUsedProgramGen ? true : false
+
   return (
     <div className="flex h-dvh justify-center items-center pt-[90px]">
-      {!programResult && !isLoading && <ProgramFactory />}
+      {!programResult && !isLoading && !limitProgramGen && <ProgramFactory />}
+      {!programResult && !isLoading && limitProgramGen && (
+        <div>
+          This feature can no longer be used. You must login to continue.
+        </div>
+      )}
       {isLoading && <ProgramLoadingScreen />}
       {programResult && !isLoading && <ProgramResult />}
     </div>
