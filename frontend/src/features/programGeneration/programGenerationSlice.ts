@@ -8,14 +8,12 @@ interface ProgramGenerationState {
   loading: boolean
   aiProgram: ProgranGenResult | undefined
   error: object | null
-  hasUsedProgramGen: boolean
 }
 
 const initialState: ProgramGenerationState = {
   loading: false,
   aiProgram: undefined,
-  error: null,
-  hasUsedProgramGen: localStorage.getItem('hasUsedProgramGen') ? true : false
+  error: null
 }
 
 const programGenerationSlice = createSlice({
@@ -38,9 +36,6 @@ const programGenerationSlice = createSlice({
     ),
       builder.addCase(getAIProgram.pending, (state) => {
         state.loading = true
-        state.hasUsedProgramGen = localStorage.getItem('hasUsedProgramGen')
-          ? true
-          : false
       }),
       builder.addCase(
         getAIProgram.rejected,

@@ -19,10 +19,12 @@ function RouteComponent() {
 
   // Handle program generation limit
   const isLoggedIn = useSelector((state: RootState) => state.auth.isLoggedIn)
-  const hasUsedProgramGen = useSelector(
-    (state: RootState) => state.programGeneration.hasUsedProgramGen
-  )
-  const limitProgramGen = !isLoggedIn && hasUsedProgramGen ? true : false
+
+  const checkProgramGenUsage = () => {
+    return localStorage.getItem('hasUsedProgramGen') ? true : false
+  }
+
+  const limitProgramGen = !isLoggedIn && checkProgramGenUsage() ? true : false
 
   return (
     <div className="flex h-dvh justify-center items-center pt-[90px]">
