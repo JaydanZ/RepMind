@@ -8,12 +8,14 @@ interface ProgramGenerationState {
   loading: boolean
   aiProgram: ProgranGenResult | undefined
   error: object | null
+  hasUsedProgramGen: boolean
 }
 
 const initialState: ProgramGenerationState = {
   loading: false,
   aiProgram: undefined,
-  error: null
+  error: null,
+  hasUsedProgramGen: localStorage.getItem('hasUsedProgramGen') ? true : false
 }
 
 const programGenerationSlice = createSlice({
