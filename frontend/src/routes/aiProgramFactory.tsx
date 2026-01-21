@@ -4,6 +4,7 @@ import { ProgramResult } from '@/components/programFactory/ProgramResult'
 import { ProgramLoadingScreen } from '@/components/programFactory/ProgramLoadingScreen'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/store/store'
+import { LimitReachedDisplay } from '@/components/programFactory/LimitReachedDisplay'
 
 export const Route = createFileRoute('/aiProgramFactory')({
   component: RouteComponent
@@ -30,9 +31,7 @@ function RouteComponent() {
     <div className="flex h-dvh justify-center items-center pt-[90px]">
       {!programResult && !isLoading && !limitProgramGen && <ProgramFactory />}
       {!programResult && !isLoading && limitProgramGen && (
-        <div>
-          This feature can no longer be used. You must login to continue.
-        </div>
+        <LimitReachedDisplay />
       )}
       {isLoading && <ProgramLoadingScreen />}
       {programResult && !isLoading && <ProgramResult />}
