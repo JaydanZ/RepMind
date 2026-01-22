@@ -19,7 +19,7 @@ export const LimitReachedDisplay = () => {
       </CardHeader>
       <CardContent className="mt-6 max-w-[600px]">
         <label className="text-red-500 text-base font-medium">
-          You have reached the program generation limit for non-logged in users.
+          You have reached the program generation limit for non logged-in users.
           Please login to continue using this feature!
         </label>
       </CardContent>

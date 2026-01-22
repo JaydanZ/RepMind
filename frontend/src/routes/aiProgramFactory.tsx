@@ -5,6 +5,7 @@ import { ProgramLoadingScreen } from '@/components/programFactory/ProgramLoading
 import { useSelector } from 'react-redux'
 import { RootState } from '@/store/store'
 import { LimitReachedDisplay } from '@/components/programFactory/LimitReachedDisplay'
+import { getExpireTime } from '@/services/programGenAPI'
 
 export const Route = createFileRoute('/aiProgramFactory')({
   component: RouteComponent
@@ -21,11 +22,7 @@ function RouteComponent() {
   // Handle program generation limit
   const isLoggedIn = useSelector((state: RootState) => state.auth.isLoggedIn)
 
-  const checkProgramGenUsage = () => {
-    return localStorage.getItem('hasUsedProgramGen') ? true : false
-  }
-
-  const limitProgramGen = !isLoggedIn && checkProgramGenUsage() ? true : false
+  const limitProgramGen = !isLoggedIn && getExpireTime() ? true : false
 
   return (
     <div className="flex h-dvh justify-center items-center pt-[90px]">
