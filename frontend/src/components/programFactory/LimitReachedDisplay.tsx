@@ -7,6 +7,9 @@ import { Button } from '../ui/button'
 import { Separator } from '../ui/separator'
 
 export const LimitReachedDisplay = () => {
+  const warningMessage =
+    'You have reached the program generation limit for non logged-in users. Please login to continue using this feature!'
+
   return (
     <Card>
       <CardHeader className="!p-0 ">
@@ -19,8 +22,7 @@ export const LimitReachedDisplay = () => {
       </CardHeader>
       <CardContent className="mt-6 max-w-[600px]">
         <label className="text-red-500 text-base font-medium">
-          You have reached the program generation limit for non logged-in users.
-          Please login to continue using this feature!
+          {warningMessage}
         </label>
       </CardContent>
       <Separator className="mt-auto mb-6" orientation="horizontal" />
