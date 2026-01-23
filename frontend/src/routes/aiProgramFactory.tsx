@@ -6,6 +6,7 @@ import { useSelector } from 'react-redux'
 import { RootState } from '@/store/store'
 import { LimitReachedDisplay } from '@/components/programFactory/LimitReachedDisplay'
 import { getExpireTime } from '@/services/programGenAPI'
+import clsx from 'clsx'
 
 export const Route = createFileRoute('/aiProgramFactory')({
   component: RouteComponent
@@ -25,7 +26,12 @@ function RouteComponent() {
   const limitProgramGen = !isLoggedIn && getExpireTime() ? true : false
 
   return (
-    <div className="flex h-dvh justify-center items-center pt-[90px]">
+    <div
+      className={clsx(
+        'flex h-dvh justify-center pt-[90px]',
+        programResult && !isLoading ? 'items-start' : 'items-center'
+      )}
+    >
       {!programResult && !isLoading && !limitProgramGen && <ProgramFactory />}
       {!programResult && !isLoading && limitProgramGen && (
         <LimitReachedDisplay />
