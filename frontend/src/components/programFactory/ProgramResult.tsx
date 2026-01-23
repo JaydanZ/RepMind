@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from '@tanstack/react-router'
 import clsx from 'clsx'
 import { useSelector, useDispatch } from 'react-redux'
 import { clearProgram } from '@/features/programGeneration/programGenerationSlice'
@@ -21,6 +22,8 @@ export const ProgramResult = () => {
   const programData = useSelector(
     (state: RootState) => state.programGeneration.aiProgram
   )
+  const isLoggedIn = useSelector((state: RootState) => state.auth.isLoggedIn)
+
   return (
     <div className="flex flex-col justify-center items-center">
       <Button
@@ -85,6 +88,49 @@ export const ProgramResult = () => {
               </Label>
             </div>
           ))}
+      </div>
+      <Separator className="w-full my-8" />
+      <div className="flex flex-col items-center pb-20">
+        {isLoggedIn ? (
+          <div className="flex flex-col items-center">
+            <Button
+              size="lg"
+              variant="outline"
+              className="border-app-colors-300 text-lg py-5 hover:bg-app-colors-300 hover:text-black"
+            >
+              Import program into profile
+            </Button>
+            <label className="italic text-xl text-neutral-400 font-thin py-4">
+              Or
+            </label>
+            <Button
+              size="lg"
+              variant="outline"
+              onClick={() => dispatch(clearProgram())}
+              className="border-app-colors-300 text-lg py-5 hover:bg-app-colors-300 hover:text-black"
+            >
+              Generate new program
+            </Button>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center">
+            <label className="text-4xl font-semibold">
+              Want to generate a new program?
+            </label>
+            <label className="text-lg py-8 font-semibold text-app-colors-300">
+              Login to continue using this feature!
+            </label>
+            <Link to="/login">
+              <Button
+                size="lg"
+                variant="outline"
+                className="border-app-colors-300 text-lg py-5 hover:bg-app-colors-300 hover:text-black"
+              >
+                Login
+              </Button>
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   )

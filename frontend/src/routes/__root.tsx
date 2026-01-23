@@ -42,7 +42,7 @@ function RootComponent() {
   }
 
   return (
-    <div className="relative min-h-dvh bg-app-colors-500">
+    <div className="relative min-h-dvh h-max bg-app-colors-500 z-50">
       {isMobile ? (
         <nav
           className={clsx(
@@ -89,7 +89,7 @@ function RootComponent() {
               ))}
         </nav>
       ) : (
-        <nav className="flex flex-nowrap fixed top-0 z-100 w-full items-center justify-between bg-app-colors-500 py-6">
+        <nav className="flex flex-nowrap fixed top-0 z-50 w-full items-center justify-between bg-app-colors-500 py-6">
           {/* DESKTOP VIEW */}
           {/* Left elements */}
           <ul className="flex flex-row list-style-none me-auto pl-12">

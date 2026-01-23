@@ -28,7 +28,7 @@ function RouteComponent() {
   return (
     <div
       className={clsx(
-        'flex h-dvh justify-center pt-[90px]',
+        'flex h-max justify-center pt-[90px]',
         programResult && !isLoading ? 'items-start' : 'items-center'
       )}
     >
