@@ -28,8 +28,8 @@ function RouteComponent() {
   return (
     <div
       className={clsx(
-        'flex h-max justify-center pt-[90px]',
-        programResult && !isLoading ? 'items-start' : 'items-center'
+        'flex justify-center pt-[90px]',
+        programResult && !isLoading ? 'items-start h-max' : 'items-center h-dvh'
       )}
     >
       {!programResult && !isLoading && !limitProgramGen && <ProgramFactory />}
