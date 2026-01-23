@@ -49,7 +49,7 @@ export const ProgramResult = () => {
           </div>
         ))}
       </div>
-      <div className="flex flex-col w-[600px] border rounded-md border-app-colors-300 bg-background p-5">
+      <div className="flex flex-col w-[650px] border rounded-md border-app-colors-300 bg-background p-5">
         {programData?.program_structure && (
           <Label className="text-3xl mb-6">
             {programData.program_structure[selectedDay].focus}
@@ -71,9 +71,9 @@ export const ProgramResult = () => {
             )}
         </Accordion>
       </div>
-      <Separator className="w-full my-10" />
-      <div className="flex flex-col max-w-[600px]">
-        <Label className="text-[2rem] mb-10">Program Tips and Goals</Label>
+      <Separator className="w-full mt-10 mb-6" />
+      <div className="flex flex-col max-w-[650px]">
+        <Label className="text-[2rem] mb-6">Program Tips and Goals</Label>
         {programData?.program_tips_and_goals &&
           programData.program_tips_and_goals.map((tip, index) => (
             <div className="flex flex-row" key={index}>
