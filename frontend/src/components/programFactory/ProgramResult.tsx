@@ -120,7 +120,7 @@ export const ProgramResult = () => {
             </Button>
           </div>
         ) : (
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center pt-4">
             <Card className="w-max">
               <CardHeader className="pb-10">
                 <CardTitle className="text-app-colors-300 text-2xl">
