@@ -11,6 +11,13 @@ import {
   AccordionItem,
   AccordionTrigger
 } from '../ui/accordion'
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent
+} from '../ui/card'
 import { Separator } from '../ui/separator'
 import { Label } from '../ui/label'
 import { Button } from '../ui/button'
@@ -114,21 +121,37 @@ export const ProgramResult = () => {
           </div>
         ) : (
           <div className="flex flex-col items-center">
-            <label className="text-4xl font-semibold">
-              Want to generate a new program?
-            </label>
-            <label className="text-lg py-8 font-semibold text-app-colors-300">
-              Login to continue using this feature!
-            </label>
-            <Link to="/login">
-              <Button
-                size="lg"
-                variant="outline"
-                className="border-app-colors-300 text-lg py-5 hover:bg-app-colors-300 hover:text-black"
-              >
-                Login
-              </Button>
-            </Link>
+            <Card className="w-max">
+              <CardHeader className="pb-10">
+                <CardTitle className="text-app-colors-300 text-2xl">
+                  Want to generate a new program?
+                </CardTitle>
+                <CardDescription>
+                  Login or register an account to continue using this feature!
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="flex flex-row gap-10 justify-between items-center">
+                <Link to="/login">
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="border-app-colors-300 text-lg py-5 hover:bg-app-colors-300 hover:text-black"
+                  >
+                    Login
+                  </Button>
+                </Link>
+                <Label className="italic text-neutral-500">Or</Label>
+                <Link to="/registerUser">
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="border-app-colors-300 text-lg py-5 hover:bg-app-colors-300 hover:text-black"
+                  >
+                    Register
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
           </div>
         )}
       </div>
