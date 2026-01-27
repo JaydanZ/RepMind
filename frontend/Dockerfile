@@ -1,23 +1,31 @@
 # Base Image
-FROM node:20-slim AS base
+FROM node:20-alpine
 
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable
-COPY . /app
 WORKDIR /app
 
-## Install dependencies
-FROM base AS prod-deps
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile
+#ENV Vars
+ARG VITE_BACKEND_API_URL
+ENV VITE_BACKEND_API_URL=$VITE_BACKEND_API_URL
 
-FROM base AS build
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+# Install pnpm
+RUN npm install -g pnpm
+
+# Copy package files
+COPY package.json pnpm-lock.yaml* ./
+
+# Install dependencies
+RUN pnpm install
+RUN pnpm add typescript
+
+# Copy source code
+COPY . .
+
+# Build the app
 RUN pnpm run build
 
-FROM base
-COPY --from=prod-deps /app/node_modules /app/node_modules
-COPY --from=build /app/dist /app/dist
+# Install serve to run the built app
+RUN npm install -g serve
 
 EXPOSE 5173
-CMD ["pnpm","start"]
+
+CMD ["serve", "-s", "dist", "-l", "5173"]
