@@ -1,0 +1,14 @@
+version: "3"
+services:
+  repmind-frontend:
+    build: ./frontend
+    env_file:
+      - ./frontend/.env
+    ports:
+      - "5173:5173"
+  repmind-backend:
+    build: ./backend
+    env_file:
+      - ./backend/.env
+    ports:
+      - "8000:8000"
