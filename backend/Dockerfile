@@ -1,28 +1,11 @@
-FROM python:3.9
+FROM python:3.10-slim
 
 WORKDIR /app
 
-#ENV VARS
-ARG CLIENT_URL
-ARG REDIS_HOST
-ARG JWT_SECRET_KEY
-ARG JWT_REFRESH_SECRET
-ARG SUPABASE_URL
-ARG SUPABASE_KEY
-ARG OPENAI_API_KEY
-
-ENV CLIENT_URL=$CLIENT_URL
-ENV REDIS_HOST=$REDIS_HOST
-ENV JWT_SECRET_KEY=$JWT_SECRET_KEY
-ENV JWT_REFRESH_SECRET=$JWT_REFRESH_SECRET
-ENV SUPABASE_URL=$SUPABASE_URL
-ENV SUPABASE_KEY=$SUPABASE_KEY
-ENV OPENAI_API_KEY=$OPENAI_API_KEY
-
 # Install packages
-COPY ./requirements.txt ./requirements.txt
-RUN pip install --no-cache-dir --upgrade -r ./requirements.txt
+COPY requirements.txt .
+RUN pip install --no-cache-dir --upgrade -r requirements.txt
 
 COPY . .
 
-CMD ["fastapi","run","app/main.py","--port","80"]
+CMD ["fastapi","run","main.py","--port","8000"]
