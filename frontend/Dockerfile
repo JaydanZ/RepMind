@@ -1,11 +1,11 @@
 # Base Image
 FROM node:20-alpine
 
-WORKDIR /app
-
-#ENV Vars
+#ENV Vars - MUST BE LOADED THIS WAY DUE TO VITES HANDLING OF ENV VARS
 ARG VITE_BACKEND_API_URL
 ENV VITE_BACKEND_API_URL=$VITE_BACKEND_API_URL
+
+WORKDIR /app
 
 # Install pnpm
 RUN npm install -g pnpm
