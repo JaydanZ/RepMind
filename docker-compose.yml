@@ -1,0 +1,29 @@
+services:
+  repmind-frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - VITE_BACKEND_API_URL=${VITE_BACKEND_API_URL}
+    networks:
+      - repmind
+    ports:
+      - "5173:5173"
+  repmind-backend:
+    build: ./backend
+    environment:
+      - CLIENT_URL=${CLIENT_URL}
+      - REDIS_HOST=${REDIS_HOST}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_KEY=${SUPABASE_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    networks:
+      - repmind
+    ports:
+      - "8000:8000"
+
+networks:
+  repmind:
+    driver: bridge
