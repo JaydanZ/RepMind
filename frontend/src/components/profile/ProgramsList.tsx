@@ -1,3 +1,3 @@
-export default function ProgramsList() {
+export const ProgramsList = () => {
   return <div>ProgramsList</div>
 }

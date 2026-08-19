@@ -1,3 +1,3 @@
-export default function WorkoutStreakTracker() {
+export const WorkoutStreakTracker = () => {
   return <div>WorkoutStreakTracker</div>
 }

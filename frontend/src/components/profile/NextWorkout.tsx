@@ -1,3 +1,3 @@
-export default function NextWorkout() {
+export const NextWorkout = () => {
   return <div>NextWorkout</div>
 }
