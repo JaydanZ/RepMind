@@ -144,7 +144,7 @@ export const WorkoutStreakTracker = ({ data }: WorkoutStreakTrackerProps) => {
   }, [data])
 
   return (
-    <Card className="w-full max-w-4xl bg-app-colors-500 border-app-colors-400">
+    <Card className="w-full max-w-fit bg-app-colors-500 border-app-colors-400">
       <CardHeader>
         <div className="flex flex-row justify-between items-center">
           <div>
@@ -191,7 +191,8 @@ export const WorkoutStreakTracker = ({ data }: WorkoutStreakTrackerProps) => {
                   const currentMonth = firstDay.getMonth()
                   const prevWeek = yearData.weeks[weekIndex - 1]
                   const prevMonth = prevWeek?.[0]?.getMonth()
-                  const isNewMonth = weekIndex === 0 || currentMonth !== prevMonth
+                  const isNewMonth =
+                    weekIndex === 0 || currentMonth !== prevMonth
 
                   return (
                     <div
