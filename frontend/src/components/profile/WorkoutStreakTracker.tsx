@@ -146,7 +146,7 @@ export const WorkoutStreakTracker = ({ data }: WorkoutStreakTrackerProps) => {
   return (
     <Card className="w-full max-w-fit bg-app-colors-500 border-app-colors-400">
       <CardHeader>
-        <div className="flex flex-row justify-between items-center">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-0">
           <div>
             <CardTitle className="text-app-colors-100">
               Workout Activity
@@ -168,8 +168,8 @@ export const WorkoutStreakTracker = ({ data }: WorkoutStreakTrackerProps) => {
       <CardContent>
         <div className="overflow-x-auto">
           <div className="flex">
-            {/* Day labels */}
-            <div className="flex flex-col gap-[2px] mr-2 pt-4">
+            {/* Day labels - hidden on mobile */}
+            <div className="hidden sm:flex flex-col gap-[2px] mr-2 pt-4">
               {DAY_LABELS.map((day, index) => (
                 <div
                   key={index}
@@ -183,7 +183,7 @@ export const WorkoutStreakTracker = ({ data }: WorkoutStreakTrackerProps) => {
             {/* Grid container */}
             <div className="flex flex-col">
               {/* Month labels row */}
-              <div className="flex gap-[2px] mb-1">
+              <div className="flex gap-[1px] sm:gap-[2px] mb-1">
                 {yearData.weeks.map((week, weekIndex) => {
                   const firstDay = week[0]
                   if (!firstDay) return null
@@ -197,7 +197,7 @@ export const WorkoutStreakTracker = ({ data }: WorkoutStreakTrackerProps) => {
                   return (
                     <div
                       key={weekIndex}
-                      className="w-3 text-[10px] text-app-colors-200 text-center leading-4"
+                      className="w-2 sm:w-3 text-[8px] sm:text-[10px] text-app-colors-200 text-center leading-4"
                     >
                       {isNewMonth ? MONTH_LABELS[currentMonth] : ''}
                     </div>
@@ -206,14 +206,14 @@ export const WorkoutStreakTracker = ({ data }: WorkoutStreakTrackerProps) => {
               </div>
 
               {/* Contribution grid */}
-              <div className="flex gap-[2px]">
+              <div className="flex gap-[1px] sm:gap-[2px]">
                 {yearData.weeks.map((week, weekIndex) => (
-                  <div key={weekIndex} className="flex flex-col gap-[2px]">
+                  <div key={weekIndex} className="flex flex-col gap-[1px] sm:gap-[2px]">
                     {Array.from({ length: 7 }).map((_, dayIndex) => {
                       const date = week[dayIndex]
 
                       if (!date) {
-                        return <div key={dayIndex} className="h-3 w-3" />
+                        return <div key={dayIndex} className="h-2 w-2 sm:h-3 sm:w-3" />
                       }
 
                       const dateKey = formatDateKey(date)
@@ -224,7 +224,7 @@ export const WorkoutStreakTracker = ({ data }: WorkoutStreakTrackerProps) => {
                       return (
                         <div
                           key={dayIndex}
-                          className={`h-3 w-3 rounded-sm transition-colors cursor-pointer ${getColorClass(
+                          className={`h-2 w-2 sm:h-3 sm:w-3 rounded-sm transition-colors cursor-pointer ${getColorClass(
                             hasWorkedOut,
                             isToday
                           )}`}
@@ -244,13 +244,13 @@ export const WorkoutStreakTracker = ({ data }: WorkoutStreakTrackerProps) => {
           </div>
 
           {/* Legend */}
-          <div className="flex items-center justify-end gap-2 mt-4 text-xs text-app-colors-200">
+          <div className="flex items-center justify-end gap-1 sm:gap-2 mt-4 text-[10px] sm:text-xs text-app-colors-200">
             <span>Less</span>
-            <div className="flex gap-[2px]">
-              <div className="h-3 w-3 rounded-sm bg-app-colors-400" />
-              <div className="h-3 w-3 rounded-sm bg-app-colors-300 opacity-30" />
-              <div className="h-3 w-3 rounded-sm bg-app-colors-300 opacity-60" />
-              <div className="h-3 w-3 rounded-sm bg-app-colors-300" />
+            <div className="flex gap-[1px] sm:gap-[2px]">
+              <div className="h-2 w-2 sm:h-3 sm:w-3 rounded-sm bg-app-colors-400" />
+              <div className="h-2 w-2 sm:h-3 sm:w-3 rounded-sm bg-app-colors-300 opacity-30" />
+              <div className="h-2 w-2 sm:h-3 sm:w-3 rounded-sm bg-app-colors-300 opacity-60" />
+              <div className="h-2 w-2 sm:h-3 sm:w-3 rounded-sm bg-app-colors-300" />
             </div>
             <span>More</span>
           </div>
