@@ -148,19 +148,17 @@ export const WorkoutStreakTracker = ({ data }: WorkoutStreakTrackerProps) => {
       <CardHeader>
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-0">
           <div>
-            <CardTitle className="text-app-colors-100">
-              Workout Activity
-            </CardTitle>
-            <CardDescription className="text-app-colors-200">
+            <CardTitle className="text-neutral-50">Workout Activity</CardTitle>
+            <CardDescription className="text-neutral-400">
               {totalWorkouts} workouts in the last year
             </CardDescription>
           </div>
-          <div className="flex gap-6 text-app-colors-100">
+          <div className="flex gap-6 text-neutral-50">
             <div className="text-center">
               <div className="text-2xl font-bold text-app-colors-300">
                 {currentStreak}
               </div>
-              <div className="text-xs text-app-colors-200">Current Streak</div>
+              <div className="text-xs text-neutral-400">Current Streak</div>
             </div>
           </div>
         </div>
@@ -173,7 +171,7 @@ export const WorkoutStreakTracker = ({ data }: WorkoutStreakTrackerProps) => {
               {DAY_LABELS.map((day, index) => (
                 <div
                   key={index}
-                  className="h-3 text-xs text-app-colors-200 flex items-center"
+                  className="h-3 text-xs text-neutral-400 flex items-center"
                 >
                   {day}
                 </div>
@@ -197,7 +195,7 @@ export const WorkoutStreakTracker = ({ data }: WorkoutStreakTrackerProps) => {
                   return (
                     <div
                       key={weekIndex}
-                      className="w-2 sm:w-3 text-[8px] sm:text-[10px] text-app-colors-200 text-center leading-4"
+                      className="w-2 sm:w-3 text-[8px] sm:text-[10px] text-neutral-400 text-center leading-4"
                     >
                       {isNewMonth ? MONTH_LABELS[currentMonth] : ''}
                     </div>
@@ -208,12 +206,20 @@ export const WorkoutStreakTracker = ({ data }: WorkoutStreakTrackerProps) => {
               {/* Contribution grid */}
               <div className="flex gap-[1px] sm:gap-[2px]">
                 {yearData.weeks.map((week, weekIndex) => (
-                  <div key={weekIndex} className="flex flex-col gap-[1px] sm:gap-[2px]">
+                  <div
+                    key={weekIndex}
+                    className="flex flex-col gap-[1px] sm:gap-[2px]"
+                  >
                     {Array.from({ length: 7 }).map((_, dayIndex) => {
                       const date = week[dayIndex]
 
                       if (!date) {
-                        return <div key={dayIndex} className="h-2 w-2 sm:h-3 sm:w-3" />
+                        return (
+                          <div
+                            key={dayIndex}
+                            className="h-2 w-2 sm:h-3 sm:w-3"
+                          />
+                        )
                       }
 
                       const dateKey = formatDateKey(date)
@@ -244,7 +250,7 @@ export const WorkoutStreakTracker = ({ data }: WorkoutStreakTrackerProps) => {
           </div>
 
           {/* Legend */}
-          <div className="flex items-center justify-end gap-1 sm:gap-2 mt-4 text-[10px] sm:text-xs text-app-colors-200">
+          <div className="flex items-center justify-end gap-1 sm:gap-2 mt-4 text-[10px] sm:text-xs text-neutral-400">
             <span>Less</span>
             <div className="flex gap-[1px] sm:gap-[2px]">
               <div className="h-2 w-2 sm:h-3 sm:w-3 rounded-sm bg-app-colors-400" />
