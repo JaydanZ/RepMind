@@ -15,6 +15,7 @@ export interface WorkoutTracker {
 }
 
 export interface Program {
+  name: string
   is_active_program: boolean
   program_structure: Workout[]
   last_updated: string
