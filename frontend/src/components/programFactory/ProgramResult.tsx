@@ -41,7 +41,9 @@ export const ProgramResult = () => {
         <ArrowLeft />
         Back
       </Button>
-      <Label className="text-[3rem] mb-10 font-thin">Your Program</Label>
+      <Label className="text-[3rem] mb-10 font-thin">
+        {programData?.name ? programData.name : 'Your Program'}
+      </Label>
       <div className="flex flex-row -mb-px">
         {programData?.program_structure?.map((workout, index) => (
           <div key={index} className={clsx(index === selectedDay && 'z-10')}>
