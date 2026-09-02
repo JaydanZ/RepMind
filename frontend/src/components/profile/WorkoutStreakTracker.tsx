@@ -144,7 +144,7 @@ export const WorkoutStreakTracker = ({ data }: WorkoutStreakTrackerProps) => {
   }, [data])
 
   return (
-    <Card className="w-full max-w-fit bg-app-colors-500 border-app-colors-400">
+    <Card className="w-full max-w-[1000px] bg-app-colors-500 border-app-colors-400">
       <CardHeader>
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-0">
           <div>
