@@ -5,9 +5,12 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle
 } from '@/components/ui/card'
+import { Button } from '../ui/button'
+import { useNavigate } from '@tanstack/react-router'
 
 interface NextWorkoutProps {
   data?: Program | null
@@ -72,10 +75,15 @@ const formatDate = (dateStr: string): string => {
 }
 
 export const NextWorkout = ({ data }: NextWorkoutProps) => {
+  const navigate = useNavigate()
   const workout = useMemo(
     () => resolveWorkout(data?.program_structure ?? []),
     [data]
   )
+
+  const handleNavToProgramGenClick = () => {
+    navigate({ to: '/aiProgramFactory' })
+  }
 
   const hasWorkout = workout !== null
   const isRestDay =
@@ -103,9 +111,19 @@ export const NextWorkout = ({ data }: NextWorkoutProps) => {
         </CardHeader>
         <CardContent>
           <p className="text-neutral-400 text-sm">
-            Generate a workout program to see your next day here.
+            Generate or set a workout program as your active program to see your
+            next workout day here.
           </p>
         </CardContent>
+        <CardFooter>
+          <Button
+            variant="default"
+            size="lg"
+            onClick={handleNavToProgramGenClick}
+          >
+            Generate a Program
+          </Button>
+        </CardFooter>
       </Card>
     )
   }
