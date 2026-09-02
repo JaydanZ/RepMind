@@ -98,8 +98,6 @@ export const WorkoutStreakTracker = ({ data }: WorkoutStreakTrackerProps) => {
     return { weeks, workoutMap }
   }, [data])
 
-  const today = formatDateKey(new Date())
-
   // Calculate stats
   const totalWorkouts = data?.filter((w) => w.has_worked_out).length || 0
   const currentStreak = useMemo(() => {
