@@ -181,7 +181,7 @@ export const WorkoutStreakTracker = ({ data }: WorkoutStreakTrackerProps) => {
             {/* Grid container */}
             <div className="flex flex-col">
               {/* Month labels row */}
-              <div className="flex gap-[1px] sm:gap-[2px] mb-1">
+              <div className="flex gap-px sm:gap-[2px] mb-1">
                 {yearData.weeks.map((week, weekIndex) => {
                   const firstDay = week[0]
                   if (!firstDay) return null
@@ -204,11 +204,11 @@ export const WorkoutStreakTracker = ({ data }: WorkoutStreakTrackerProps) => {
               </div>
 
               {/* Contribution grid */}
-              <div className="flex gap-[1px] sm:gap-[2px]">
+              <div className="flex gap-px sm:gap-[2px]">
                 {yearData.weeks.map((week, weekIndex) => (
                   <div
                     key={weekIndex}
-                    className="flex flex-col gap-[1px] sm:gap-[2px]"
+                    className="flex flex-col gap-px sm:gap-[2px]"
                   >
                     {Array.from({ length: 7 }).map((_, dayIndex) => {
                       const date = week[dayIndex]
@@ -252,7 +252,7 @@ export const WorkoutStreakTracker = ({ data }: WorkoutStreakTrackerProps) => {
           {/* Legend */}
           <div className="flex items-center justify-end gap-1 sm:gap-2 mt-4 text-[10px] sm:text-xs text-neutral-400">
             <span>Less</span>
-            <div className="flex gap-[1px] sm:gap-[2px]">
+            <div className="flex gap-px sm:gap-[2px]">
               <div className="h-2 w-2 sm:h-3 sm:w-3 rounded-sm bg-app-colors-400" />
               <div className="h-2 w-2 sm:h-3 sm:w-3 rounded-sm bg-app-colors-300 opacity-30" />
               <div className="h-2 w-2 sm:h-3 sm:w-3 rounded-sm bg-app-colors-300 opacity-60" />
