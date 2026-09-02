@@ -37,12 +37,9 @@ const getDayOfWeek = (date: Date): number => {
 }
 
 // Get color intensity based on workout status
-const getColorClass = (hasWorkedOut: boolean, isToday: boolean): string => {
+const getColorClass = (hasWorkedOut: boolean): string => {
   if (hasWorkedOut) {
     return 'bg-app-colors-300 hover:bg-app-colors-200'
-  }
-  if (isToday) {
-    return 'bg-app-colors-400 border border-app-colors-300 hover:bg-app-colors-200'
   }
   return 'bg-app-colors-400 hover:bg-app-colors-200'
 }
@@ -225,14 +222,12 @@ export const WorkoutStreakTracker = ({ data }: WorkoutStreakTrackerProps) => {
                       const dateKey = formatDateKey(date)
                       const workout = yearData.workoutMap.get(dateKey)
                       const hasWorkedOut = workout?.has_worked_out ?? false
-                      const isToday = dateKey === today
 
                       return (
                         <div
                           key={dayIndex}
                           className={`h-2 w-2 sm:h-3 sm:w-3 rounded-sm transition-colors cursor-pointer ${getColorClass(
-                            hasWorkedOut,
-                            isToday
+                            hasWorkedOut
                           )}`}
                           title={`${date.toLocaleDateString('en-US', {
                             weekday: 'short',
@@ -251,14 +246,12 @@ export const WorkoutStreakTracker = ({ data }: WorkoutStreakTrackerProps) => {
 
           {/* Legend */}
           <div className="flex items-center justify-end gap-1 sm:gap-2 mt-4 text-[10px] sm:text-xs text-neutral-400">
-            <span>Less</span>
+            <span>No Workout</span>
             <div className="flex gap-px sm:gap-[2px]">
               <div className="h-2 w-2 sm:h-3 sm:w-3 rounded-sm bg-app-colors-400" />
-              <div className="h-2 w-2 sm:h-3 sm:w-3 rounded-sm bg-app-colors-300 opacity-30" />
-              <div className="h-2 w-2 sm:h-3 sm:w-3 rounded-sm bg-app-colors-300 opacity-60" />
               <div className="h-2 w-2 sm:h-3 sm:w-3 rounded-sm bg-app-colors-300" />
             </div>
-            <span>More</span>
+            <span>Workout Completed</span>
           </div>
         </div>
       </CardContent>
