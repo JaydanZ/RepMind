@@ -7,6 +7,7 @@ import {
 import { RootState } from '@/store/store'
 import { refreshAccessToken } from '@/features/auth/authSlice'
 import { genNewAccessToken } from './authAPI'
+import { Profile } from '@/types/profile'
 
 const BACKEND_API = import.meta.env.VITE_BACKEND_API_URL
 
@@ -44,7 +45,7 @@ const protectedRoutesApi = async (
 export const protectedApiSlice = createApi({
   baseQuery: protectedRoutesApi,
   endpoints: (builder) => ({
-    getProfileData: builder.query<object, void>({
+    getProfileData: builder.query<Profile, void>({
       query: () => '/profile',
       keepUnusedDataFor: 5
     })

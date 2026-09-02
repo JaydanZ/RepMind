@@ -21,5 +21,6 @@ class Workout(BaseModel):
     focus: str = Field(description="Focus of the workout (i.e. Push day, Upper Day, etc.)")
     exercises: list[Exercise] = Field(description="A collection of exercises the user will perform for the day")
 class ProgramResult(BaseModel):
+    name: str = Field(description="A short descriptive name for the program (i.e. '5-Day Upper/Lower Split')")
     program_structure: list[Workout] = Field(description="A collection of workouts the user will perform for the week")
     program_tips_and_goals: list[str] = Field(description="A collection of workout tips / goals to help the user along their journey (Max 4 entries)")
