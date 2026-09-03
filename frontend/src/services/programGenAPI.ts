@@ -24,7 +24,10 @@ export const generateProgram = async (programInput: ProgramOptions) => {
     freeLimitEnabled
   }
 
-  const response = await axios.post(`${BACKEND_API}/programs`, submission)
+  const response = await axios.post(
+    `${BACKEND_API}/programs/generation`,
+    submission
+  )
   return response.data
 }
 

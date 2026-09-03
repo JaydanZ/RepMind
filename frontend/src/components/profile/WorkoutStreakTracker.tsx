@@ -75,14 +75,20 @@ export const WorkoutStreakTracker = ({ data }: WorkoutStreakTrackerProps) => {
     }
 
     // Group dates by week (for grid layout)
-    const weeks: Date[][] = []
-    let currentWeek: Date[] = []
+    const weeks: (Date | null)[][] = []
+    let currentWeek: (Date | null)[] = []
 
     dates.forEach((date) => {
       const dayOfWeek = getDayOfWeek(date)
 
       // Start new week on Sunday
       if (dayOfWeek === 0 && currentWeek.length > 0) {
+        if (currentWeek.length < 7) {
+          const currentWeekLength = currentWeek.length
+          for (let i = 0; i < 7 - currentWeekLength; i++) {
+            currentWeek.unshift(null)
+          }
+        }
         weeks.push(currentWeek)
         currentWeek = []
       }
@@ -207,7 +213,6 @@ export const WorkoutStreakTracker = ({ data }: WorkoutStreakTrackerProps) => {
                   >
                     {Array.from({ length: 7 }).map((_, dayIndex) => {
                       const date = week[dayIndex]
-
                       if (!date) {
                         return (
                           <div
