@@ -20,5 +20,5 @@ def handleProgramGeneration(programInput: ProgramOptions):
 
 @programs_router.post('/import', status_code=201)
 def handleProgramImport(programImport: ProgramImport):
-    
+    print(programImport)
     return

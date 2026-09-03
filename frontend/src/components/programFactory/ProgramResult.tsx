@@ -4,6 +4,8 @@ import clsx from 'clsx'
 import { useSelector, useDispatch } from 'react-redux'
 import { clearProgram } from '@/features/programGeneration/programGenerationSlice'
 import { RootState } from '@/store/store'
+import { ProgramStruct } from '@/types/programCreation'
+import { programImport } from '@/services/programsAPI'
 
 import {
   Accordion,
@@ -30,6 +32,21 @@ export const ProgramResult = () => {
     (state: RootState) => state.programGeneration.aiProgram
   )
   const isLoggedIn = useSelector((state: RootState) => state.auth.isLoggedIn)
+
+  const handleProgramImport = async () => {
+    if (programData) {
+      const program: ProgramStruct = {
+        program_name: programData?.name,
+        program_structure: programData?.program_structure
+      }
+
+      try {
+        const response = programImport(program)
+      } catch (error) {
+        console.error(error)
+      }
+    }
+  }
 
   return (
     <div className="flex flex-col justify-center items-center">
@@ -106,6 +123,7 @@ export const ProgramResult = () => {
               size="lg"
               variant="outline"
               className="border-app-colors-300 text-lg py-5 hover:bg-app-colors-300 hover:text-black"
+              onClick={handleProgramImport}
             >
               Import program into profile
             </Button>

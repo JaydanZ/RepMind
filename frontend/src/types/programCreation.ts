@@ -17,13 +17,18 @@ export interface Exercise {
   name: string
   sets: number
   reps: number
-  exercise_tip: string
+  exercise_tip?: string
 }
 
 export interface Workout {
   day: string
   focus: string
   exercises: Exercise[]
+}
+
+export interface ProgramStruct {
+  program_name: string
+  program_structure: Workout[] | null
 }
 
 export interface ProgranGenResult {

@@ -32,6 +32,7 @@ class TokenAuthMiddleware(BaseHTTPMiddleware):
 
         ## Check if user has token or is valid
         access_token = request.headers.get("authorization")
+        print(access_token)
 
         if not access_token or not access_token.startswith("Bearer "):
             return handleTokenError("Authentication Required")

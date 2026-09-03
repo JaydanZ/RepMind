@@ -1,8 +1,10 @@
 from pydantic import BaseModel
 
 class Exercise(BaseModel):
+    exercise_tip:str
     name:str
-    sets:str
+    sets:int
+    reps:int
 
 class Workout(BaseModel):
     day:str
