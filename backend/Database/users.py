@@ -35,10 +35,10 @@ def find_user_by_username(username: str):
             raise error
 
     
-def find_user_by_email(email: str) -> dict | None:
+def find_user_by_email(email: str):
     try: 
         response = supabase.table('users').select("*").eq('email',email).single().execute()
-        return response.data.copy()
+        return response.data
     except APIError as error:
         if error.code == "PGRST116":
             return None
