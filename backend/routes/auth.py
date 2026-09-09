@@ -61,11 +61,12 @@ def login_user(user: LoginUser):
         raise HTTPException(status_code=401, detail="Invalid Credentials")
     
     ## Generate token for user
-    token = create_access_token(data={"sub": user.email})
-    refresh_token = create_refresh_token(data={"sub": user.email})
+    user_id = existing_user["id"]
+    token = create_access_token(data={"sub": user_id})
+    refresh_token = create_refresh_token(data={"sub": user_id})
 
     ## Store refresh token in redis
-    redis_client.set(user.email, refresh_token)
+    redis_client.set(str(user_id), refresh_token)
 
     token_data = Token(access_token=token, generated_by_refresh_token=False)
     
@@ -79,14 +80,14 @@ def logout_user(refresh_token: RefreshToken):
     
     ## Need to validate refresh token 
     payload = validateRefreshToken(refresh_token.refresh_token)
-    userEmail = payload["sub"]
-    storedRefreshToken = redis_client.get(userEmail)
+    user_id = payload["sub"]
+    storedRefreshToken = redis_client.get(user_id)
 
     if refresh_token.refresh_token != storedRefreshToken:
         raise HTTPException(status_code=401, detail="Refresh token does not exist")
     
     ## Now we can delete the refresh token from our redis cache
-    redis_client.delete(userEmail)
+    redis_client.delete(user_id)
 
     return { "Message": "User logged out successfully" }
 
@@ -98,13 +99,13 @@ def generate_new_access_token(refresh_token: RefreshToken):
 
     ## Need to validate refresh token 
     payload = validateRefreshToken(refresh_token.refresh_token)
-    userEmail = payload["sub"]
-    storedRefreshToken = redis_client.get(userEmail)
+    user_id = payload["sub"]
+    storedRefreshToken = redis_client.get(user_id)
 
     if refresh_token.refresh_token != storedRefreshToken:
         raise HTTPException(status_code=401, detail="Refresh token does not exist")
     
     ## Token has been validated, generate new access token
-    token = create_access_token(data={"sub": userEmail})
+    token = create_access_token(data={"sub": user_id})
 
     return Token(access_token=token, generated_by_refresh_token=True)
