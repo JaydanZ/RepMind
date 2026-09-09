@@ -41,7 +41,8 @@ export const ProgramResult = () => {
       }
 
       try {
-        const response = programImport(program)
+        const response = await programImport(program)
+        console.log(response)
       } catch (error) {
         console.error(error)
       }
