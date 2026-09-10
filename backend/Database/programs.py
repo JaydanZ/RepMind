@@ -41,3 +41,52 @@ def insert_program_from_import(program_import: ProgramImport, current_user_id) -
             "error": str(e),
             "message": f"Failed to import program: {str(e)}"
         }
+    
+def get_program_by_id(program_id: str) -> Dict[str, Any]:
+    try:
+        response = supabase.table("workout_programs").select("*").eq("id", program_id).execute()
+        if response.data and len(response.data) > 0:
+            return {
+                "success": True,
+                "data": response.data[0]
+            }
+        return {"success": False, "error": "Program not found"}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+def get_user_programs(user_id: str):
+    try:
+        response = supabase.table("workout_programs").select("*").eq("user_id", user_id).execute()
+        return {
+            "success": True,
+            "data": response.data if response.data else []
+        }
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+def update_program(program_id: str, updates: Dict[str, Any]) -> Dict[str, Any]:
+    try:
+        response = supabase.table("workout_programs").update(updates).eq("id", program_id).execute()
+        return {
+            "success": True,
+            "message": "Program updated successfully"
+        }
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+def delete_program(program_id: str) -> Dict[str, Any]:
+    try:
+        # Delete related records first (cascading deletes will handle this)
+        supabase.table("program_exercises").delete().eq("program_day_id", program_id).execute()
+        supabase.table("program_days").delete().eq("program_id", program_id).execute()
+        
+        response = supabase.table("workout_programs").delete().eq("id", program_id).execute()
+        return {
+            "success": True,
+            "message": "Program deleted successfully"
+        }
+    except Exception as e:
+        return {"success": False, "error": str(e)}
