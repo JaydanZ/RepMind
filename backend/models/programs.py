@@ -15,3 +15,11 @@ class ProgramImport(BaseModel):
     program_name:str
     program_structure:list[Workout]
 
+class WorkoutProgram(BaseModel):
+    created_at:str
+    description:str | None
+    id:str
+    program_name:str
+    program_structure:list[Workout]
+    updated_at:str
+    user_id:str

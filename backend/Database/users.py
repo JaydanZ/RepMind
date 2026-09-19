@@ -44,3 +44,10 @@ def find_user_by_email(email: str):
             return None
         else:
             raise error
+
+def set_users_active_program(program_id: str, user_id: str):
+    try:
+        response = supabase.table('users').update({"active_program":program_id}).eq('id',user_id).execute()
+        return response.data
+    except Exception as e:
+        return {"success": False, "error": str(e)}
