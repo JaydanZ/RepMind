@@ -16,8 +16,20 @@ interface ProgramRowProps {
   isActive: boolean
 }
 
+interface ProgramsListProps {
+  programs: WorkoutProgram[]
+  activeProgram: WorkoutProgram[]
+}
+
 export const ProgramRow = (props: ProgramRowProps): ReactElement => {
-  const handleSetActive = () => {}
+  const handleSetActive = async () => {
+    try {
+      const response = await setProgramActive(props.program)
+      console.log(response)
+    } catch (error) {
+      console.error(error)
+    }
+  }
 
   return (
     <Card className="w-full max-w-[1000px] bg-app-colors-500 border-app-colors-400 mt-1 mb-1">
@@ -36,7 +48,9 @@ export const ProgramRow = (props: ProgramRowProps): ReactElement => {
               {props.isActive ? (
                 <div>Active</div>
               ) : (
-                <Button variant="default">Set as Active</Button>
+                <Button variant="default" onClick={handleSetActive}>
+                  Set as Active
+                </Button>
               )}
             </div>
             <div className="flex justify-center items-center">
@@ -54,18 +68,17 @@ export const ProgramRow = (props: ProgramRowProps): ReactElement => {
   )
 }
 
-export const ProgramsList = ({ programs, activeProgram }) => {
-  console.log(programs)
+export const ProgramsList = (props: ProgramsListProps): ReactElement => {
   return (
     <div className="w-full max-w-[1000px] flex flex-col">
-      {programs &&
-        programs.map((program: WorkoutProgram, index: number) => (
+      {props.programs &&
+        props.programs.map((program: WorkoutProgram, index: number) => (
           <ProgramRow
             program={program}
             key={index}
             isActive={
-              activeProgram.length > 0
-                ? activeProgram[0].id === program.id
+              props.activeProgram.length > 0
+                ? props.activeProgram[0].id === program.id
                   ? true
                   : false
                 : false

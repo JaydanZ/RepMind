@@ -62,7 +62,7 @@ export const programImport = async (program: ProgramStruct) => {
 
 export const setProgramActive = async (program: WorkoutProgram) => {
   const response = await protectedApi.post(
-    `${BACKEND_API}/programs/active`,
+    `${BACKEND_API}/profile/active`,
     program
   )
   return response.data
