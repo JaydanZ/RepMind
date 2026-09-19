@@ -10,6 +10,7 @@ export const Route = createFileRoute('/profile')({
 
 function RouteComponent() {
   const { data } = useGetProfileDataQuery()
+  console.log(data?.active_program)
 
   const test_data = null
 
@@ -22,7 +23,10 @@ function RouteComponent() {
       <div className="flex flex-col justify-center items-center max-w-[1000px] w-full pt-32 gap-6 pb-24 pl-12 pr-12">
         <NextWorkout data={test_data} />
         <WorkoutStreakTracker data={test_data} />
-        <ProgramsList programs={data ? data.programs : null} />
+        <ProgramsList
+          programs={data ? data.programs : null}
+          activeProgram={data ? data.active_program : null}
+        />
       </div>
     </div>
   )

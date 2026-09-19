@@ -5,8 +5,10 @@ import {
   CardDescription,
   CardHeader
 } from '../ui/card'
+import { Button } from '../ui/button'
+import { Trash } from 'lucide-react'
 
-export const ProgramRow = ({ program }) => {
+export const ProgramRow = ({ program, isActive }) => {
   return (
     <Card className="w-full max-w-[1000px] bg-app-colors-500 border-app-colors-400 mt-1 mb-1">
       <CardHeader>
@@ -20,7 +22,14 @@ export const ProgramRow = ({ program }) => {
             </CardDescription>
           </div>
           <div className="flex gap-6 text-neutral-50">
-            <div className="text-center"></div>
+            <div className="text-center">
+              <Button variant="default">Set as Active</Button>
+            </div>
+            <div className="flex justify-center items-center text-red-500">
+              <Button variant="ghost" className="px-1">
+                <Trash />
+              </Button>
+            </div>
           </div>
         </div>
       </CardHeader>
@@ -28,12 +37,22 @@ export const ProgramRow = ({ program }) => {
   )
 }
 
-export const ProgramsList = ({ programs }) => {
+export const ProgramsList = ({ programs, activeProgram }) => {
   return (
     <div className="w-full max-w-[1000px] flex flex-col">
       {programs &&
         programs.map((program, index) => (
-          <ProgramRow program={program} key={index} />
+          <ProgramRow
+            program={program}
+            key={index}
+            isActive={
+              activeProgram.length > 0
+                ? activeProgram[0].id === program.id
+                  ? true
+                  : false
+                : false
+            }
+          />
         ))}
     </div>
   )
