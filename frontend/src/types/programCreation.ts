@@ -36,3 +36,13 @@ export interface ProgranGenResult {
   program_structure: Workout[] | null
   program_tips_and_goals: string[] | null
 }
+
+export interface WorkoutProgram {
+  created_at: string
+  description: string | null
+  id: string
+  program_name: string
+  program_structure: Workout[]
+  updated_at: string
+  user_id: string
+}
