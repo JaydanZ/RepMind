@@ -27,7 +27,7 @@ async def get_profile_data(current_user_id: str = Depends(get_current_user)):
     active_program_data = get_program_by_id(user_data["active_program"])
     active_program = []
     if(active_program_data["success"] == True):
-        active_program = active_program_data["data"]
+        active_program = [active_program_data["data"]]
 
     profile_data = {
         "user_id": user_data["id"],

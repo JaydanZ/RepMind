@@ -1,10 +1,5 @@
-import {
-  Card,
-  CardContent,
-  CardTitle,
-  CardDescription,
-  CardHeader
-} from '../ui/card'
+import { useState, memo } from 'react'
+import { Card, CardTitle, CardDescription, CardHeader } from '../ui/card'
 import { Button } from '../ui/button'
 import { Trash } from 'lucide-react'
 import { setProgramActive } from '@/services/programsAPI'
@@ -14,22 +9,22 @@ import { ReactElement } from 'react'
 interface ProgramRowProps {
   program: WorkoutProgram
   isActive: boolean
+  setActive: (program: WorkoutProgram) => void
 }
 
 interface ProgramsListProps {
-  programs: WorkoutProgram[]
-  activeProgram: WorkoutProgram[]
+  programs: WorkoutProgram[] | null
+  activeProgram: WorkoutProgram[] | null
 }
 
-export const ProgramRow = (props: ProgramRowProps): ReactElement => {
-  const handleSetActive = async () => {
-    try {
-      const response = await setProgramActive(props.program)
-      console.log(response)
-    } catch (error) {
-      console.error(error)
-    }
-  }
+interface ProgramActiveResponse {
+  message: string
+  program_id: string
+  status: number
+}
+
+export const ProgramRow = memo((props: ProgramRowProps): ReactElement => {
+  const handleDeleteProgram = async () => {}
 
   return (
     <Card className="w-full max-w-[1000px] bg-app-colors-500 border-app-colors-400 mt-1 mb-1">
@@ -48,7 +43,10 @@ export const ProgramRow = (props: ProgramRowProps): ReactElement => {
               {props.isActive ? (
                 <div>Active</div>
               ) : (
-                <Button variant="default" onClick={handleSetActive}>
+                <Button
+                  variant="default"
+                  onClick={() => props.setActive(props.program)}
+                >
                   Set as Active
                 </Button>
               )}
@@ -57,6 +55,7 @@ export const ProgramRow = (props: ProgramRowProps): ReactElement => {
               <Button
                 variant="ghost"
                 className="px-1 text-red-800 hover:text-red-500"
+                onClick={handleDeleteProgram}
               >
                 <Trash />
               </Button>
@@ -66,23 +65,33 @@ export const ProgramRow = (props: ProgramRowProps): ReactElement => {
       </CardHeader>
     </Card>
   )
-}
+})
+
+ProgramRow.displayName = 'ProgramRow'
 
 export const ProgramsList = (props: ProgramsListProps): ReactElement => {
+  const [activeProgramId, setActiveProgramId] = useState<string | null>(
+    props.activeProgram ? props.activeProgram[0].id : null
+  )
+  const handleSetActive = async (program: WorkoutProgram) => {
+    try {
+      const response = await setProgramActive(program)
+      if (response && (response as ProgramActiveResponse).status === 201)
+        setActiveProgramId(response.program_id)
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
   return (
     <div className="w-full max-w-[1000px] flex flex-col">
       {props.programs &&
-        props.programs.map((program: WorkoutProgram, index: number) => (
+        props.programs.map((program: WorkoutProgram) => (
           <ProgramRow
             program={program}
-            key={index}
-            isActive={
-              props.activeProgram.length > 0
-                ? props.activeProgram[0].id === program.id
-                  ? true
-                  : false
-                : false
-            }
+            key={program.id}
+            isActive={program.id === activeProgramId}
+            setActive={handleSetActive}
           />
         ))}
     </div>

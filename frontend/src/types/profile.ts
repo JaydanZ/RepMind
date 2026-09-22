@@ -1,11 +1,13 @@
 import { Workout } from './programCreation'
+import { WorkoutProgram } from './programCreation'
 
 export interface Profile {
+  user_id: string
   username: string
   email: string
-  programs: Program[] | null
-  active_program: Program | null
-  workout_streak_tracker: WorkoutTracker[] | null
+  programs: WorkoutProgram[] | null
+  active_program: WorkoutProgram[] | null
+  workout_streak: number
 }
 
 export interface WorkoutTracker {
