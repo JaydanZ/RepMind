@@ -1,18 +1,20 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Request
 from ..models.programGeneration import ProgramOptions
 from ..utils.programGenerator import generate_program
 from ..models.programs import ProgramImport
 from ..Database.programs import insert_program_from_import
 from ..middleware.authenticateToken import get_current_user
+from ..utils.limiter import limiter
 
-## Endpoint to handle ai program generation without authentication / is user logged in status
+## Endpoint to handle ai program generation with / without authentication 
 programs_router = APIRouter(
     prefix="/programs",
     tags=["programs"]
 )
 
 @programs_router.post('/generation', status_code=201)
-def handleProgramGeneration(programInput: ProgramOptions):
+@limiter.limit("5/minute")
+def handleProgramGeneration(request: Request, programInput: ProgramOptions):
     ## Check if free limit is enabled -> means user is not logged in
     if(programInput.freeLimitEnabled == True):
         raise HTTPException(status_code=401, detail="User must login to continue using API")

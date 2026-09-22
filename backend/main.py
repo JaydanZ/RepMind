@@ -3,6 +3,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from .config import get_settings
 from .routes import auth_router, profile_router, programs_router
 from .middleware import TokenAuthMiddleware
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from typing import Any, cast
+from .utils.limiter import limiter
 
 ## ENV VARS
 client_url = get_settings()
@@ -11,6 +15,9 @@ origins = [client_url.CLIENT_URL]
 
 ## Setup API
 app = FastAPI()
+
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, cast(Any,_rate_limit_exceeded_handler))
 
 ## Middleware
 app.add_middleware(
