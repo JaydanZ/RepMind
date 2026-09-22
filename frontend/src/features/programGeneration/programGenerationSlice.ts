@@ -4,10 +4,15 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { generateProgram } from '@/services/programGenAPI'
 import { ProgranGenResult, ProgramOptions } from '@/types/programCreation'
 
+export interface ProgramGenerationError {
+  errorCode: number
+  errorMessage: object
+}
+
 interface ProgramGenerationState {
   loading: boolean
   aiProgram: ProgranGenResult | undefined
-  error: object | null
+  error: ProgramGenerationError | object | null
 }
 
 const initialState: ProgramGenerationState = {
@@ -36,13 +41,14 @@ const programGenerationSlice = createSlice({
     ),
       builder.addCase(getAIProgram.pending, (state) => {
         state.loading = true
+        state.error = null
       }),
       builder.addCase(
         getAIProgram.rejected,
         (state: ProgramGenerationState, action) => {
           state.loading = false
           if (action.payload) {
-            state.error = action.payload
+            state.error = action.payload as ProgramGenerationError
           } else {
             state.error = {
               error: action.payload
@@ -64,7 +70,7 @@ export const getAIProgram = createAsyncThunk(
       if (isAxiosError(error)) {
         return rejectWithValue({
           errorMessage: error.response?.data,
-          errorCode: error.code
+          errorCode: error.status
         })
       }
       return rejectWithValue(error)

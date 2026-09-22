@@ -5,10 +5,16 @@ import { CircleAlert } from 'lucide-react'
 import { Card, CardHeader, CardFooter, CardContent } from '../ui/card'
 import { Button } from '../ui/button'
 import { Separator } from '../ui/separator'
+import { ReactElement } from 'react'
 
-export const LimitReachedDisplay = () => {
-  const warningMessage =
-    'You have reached the program generation limit for non logged-in users. Please login to continue using this feature!'
+interface LimitReachedProp {
+  authLimitReached: boolean
+}
+
+export const LimitReachedDisplay = (props: LimitReachedProp): ReactElement => {
+  const warningMessage = props.authLimitReached
+    ? 'You have reached the program generation limit. Please wait a moment before generating another program!'
+    : 'You have reached the program generation limit for non logged-in users. Please login to continue using this feature!'
 
   return (
     <Card>
@@ -25,18 +31,21 @@ export const LimitReachedDisplay = () => {
           {warningMessage}
         </label>
       </CardContent>
+
       <Separator className="mt-auto mb-6" orientation="horizontal" />
-      <CardFooter className="flex flex-row justify-center">
-        <Link to="/login">
-          <Button
-            variant="secondary"
-            size="lg"
-            className="text-lg px-12 bg-red-500 text-neutral-900 hover:bg-red-700"
-          >
-            Login
-          </Button>
-        </Link>
-      </CardFooter>
+      {!props.authLimitReached && (
+        <CardFooter className="flex flex-row justify-center">
+          <Link to="/login">
+            <Button
+              variant="secondary"
+              size="lg"
+              className="text-lg px-12 bg-red-500 text-neutral-900 hover:bg-red-700"
+            >
+              Login
+            </Button>
+          </Link>
+        </CardFooter>
+      )}
     </Card>
   )
 }
