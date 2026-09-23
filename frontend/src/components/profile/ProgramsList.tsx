@@ -70,14 +70,18 @@ export const ProgramRow = memo((props: ProgramRowProps): ReactElement => {
 ProgramRow.displayName = 'ProgramRow'
 
 export const ProgramsList = (props: ProgramsListProps): ReactElement => {
-  const [activeProgramId, setActiveProgramId] = useState<string | null>(
-    props.activeProgram ? props.activeProgram[0].id : null
+  const [optimisticActiveId, setOptimisticActiveId] = useState<string | null>(
+    null
   )
+
+  const activeProgramId =
+    optimisticActiveId ?? props.activeProgram?.[0]?.id ?? null
+
   const handleSetActive = async (program: WorkoutProgram) => {
     try {
       const response = await setProgramActive(program)
       if (response && (response as ProgramActiveResponse).status === 201)
-        setActiveProgramId(response.program_id)
+        setOptimisticActiveId(response.program_id)
     } catch (error) {
       console.error(error)
     }
