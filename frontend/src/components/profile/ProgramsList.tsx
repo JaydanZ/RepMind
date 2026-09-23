@@ -5,6 +5,16 @@ import { Trash } from 'lucide-react'
 import { setProgramActive } from '@/services/programsAPI'
 import { WorkoutProgram } from '@/types/programCreation'
 import { ReactElement } from 'react'
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+  DialogTrigger
+} from '@/components/ui/dialog'
 
 interface ProgramRowProps {
   program: WorkoutProgram
@@ -52,13 +62,30 @@ export const ProgramRow = memo((props: ProgramRowProps): ReactElement => {
               )}
             </div>
             <div className="flex justify-center items-center">
-              <Button
-                variant="ghost"
-                className="px-1 text-red-800 hover:text-red-500"
-                onClick={handleDeleteProgram}
-              >
-                <Trash />
-              </Button>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="px-1 text-red-800 hover:text-red-500"
+                  >
+                    <Trash />
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Delete Program</DialogTitle>
+                    <DialogDescription>
+                      Are you sure you want to delete this program?
+                    </DialogDescription>
+                  </DialogHeader>
+                  <DialogFooter>
+                    <Button onClick={handleDeleteProgram}>Delete</Button>
+                    <DialogClose asChild>
+                      <Button variant="outline">Cancel</Button>
+                    </DialogClose>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </div>
           </div>
         </div>
