@@ -1,7 +1,8 @@
 import { useState, memo } from 'react'
+import clsx from 'clsx'
 import { Card, CardTitle, CardDescription, CardHeader } from '../ui/card'
 import { Button } from '../ui/button'
-import { Trash } from 'lucide-react'
+import { Trash, Power } from 'lucide-react'
 import { setProgramActive, deleteProgram } from '@/services/programsAPI'
 import { WorkoutProgram } from '@/types/programCreation'
 import { ReactElement } from 'react'
@@ -50,13 +51,16 @@ export const ProgramRow = memo((props: ProgramRowProps): ReactElement => {
           <div className="flex gap-6 text-neutral-50">
             <div className="text-center">
               {props.isActive ? (
-                <div>Active</div>
+                <div className="flex justify-center items-center text-app-colors-300 py-2 px-4 gap-2">
+                  <Power className="[filter:drop-shadow(0_0_15px_rgba(134,234,67,1))_drop-shadow(0_0_5px_rgba(134,234,67,1))]" />
+                </div>
               ) : (
                 <Button
-                  variant="default"
+                  variant="ghost"
                   onClick={() => props.setActive(props.program)}
+                  className="text-neutral-600"
                 >
-                  Set as Active
+                  <Power />
                 </Button>
               )}
             </div>
