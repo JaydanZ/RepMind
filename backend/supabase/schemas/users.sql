@@ -4,7 +4,8 @@ CREATE TABLE IF NOT EXISTS "public"."users" (
     "email" "text" NOT NULL,
     "password" "text" NOT NULL,
     "created_at" timestamp with time zone DEFAULT "now"(),
-    "active_program" "uuid"
+    "active_program" "uuid",
+    "current_streak" INT NOT NULL DEFAULT 0
 );
 
 ALTER TABLE "public"."users" ENABLE ROW LEVEL SECURITY;
