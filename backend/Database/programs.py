@@ -57,7 +57,7 @@ def get_program_by_id(program_id: str) -> Dict[str, Any]:
 
 def get_user_programs(user_id: str):
     try:
-        response = supabase.table("workout_programs").select("*").eq("user_id", user_id).execute()
+        response = supabase.table("active_workout_programs").select("*").eq("user_id", user_id).execute()
         return {
             "success": True,
             "data": response.data if response.data else []
