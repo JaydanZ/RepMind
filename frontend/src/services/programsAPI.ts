@@ -67,3 +67,12 @@ export const setProgramActive = async (program: WorkoutProgram) => {
   )
   return response.data
 }
+
+export const deleteProgram = async (programId: string) => {
+  const response = await protectedApi.delete(`${BACKEND_API}/profile/delete`, {
+    data: {
+      program_id: programId
+    }
+  })
+  return response.data
+}

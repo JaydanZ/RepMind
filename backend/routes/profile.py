@@ -1,5 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException
-from typing import Annotated
+from pydantic import BaseModel
+from fastapi import APIRouter, Depends, HTTPException, Request, Body
+from typing import Annotated, Any
 from fastapi.security import OAuth2PasswordBearer
 from ..Database.programs import get_user_programs, get_program_by_id
 from ..Database.users import find_user_by_id
@@ -7,6 +8,9 @@ from ..middleware.authenticateToken import get_current_user
 from ..models.programs import WorkoutProgram
 from ..Database.users import set_users_active_program
 import ast
+
+class DeleteProgramRequest(BaseModel):
+    data: dict[str,str]
 
 profile_router = APIRouter(
     prefix="/profile",
@@ -48,5 +52,15 @@ async def set_active_program(program: WorkoutProgram, user_id: str = Depends(get
     return {
         "message": "active program set",
         "program_id": formatted_response[0]["active_program"],
+        "status": 201
+    }
+
+@profile_router.delete("/delete", status_code=201)
+async def delete_program(request: Request, user_id: str = Depends(get_current_user)):
+
+    print("test")
+    return {
+        "message": "program deleted",
+        "program_id": "test",
         "status": 201
     }

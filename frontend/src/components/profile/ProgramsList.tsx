@@ -2,7 +2,7 @@ import { useState, memo } from 'react'
 import { Card, CardTitle, CardDescription, CardHeader } from '../ui/card'
 import { Button } from '../ui/button'
 import { Trash } from 'lucide-react'
-import { setProgramActive } from '@/services/programsAPI'
+import { setProgramActive, deleteProgram } from '@/services/programsAPI'
 import { WorkoutProgram } from '@/types/programCreation'
 import { ReactElement } from 'react'
 import {
@@ -20,6 +20,7 @@ interface ProgramRowProps {
   program: WorkoutProgram
   isActive: boolean
   setActive: (program: WorkoutProgram) => void
+  deleteProgram: (programId: string) => void
 }
 
 interface ProgramsListProps {
@@ -34,8 +35,6 @@ interface ProgramActiveResponse {
 }
 
 export const ProgramRow = memo((props: ProgramRowProps): ReactElement => {
-  const handleDeleteProgram = async () => {}
-
   return (
     <Card className="w-full max-w-[1000px] bg-app-colors-500 border-app-colors-400 mt-1 mb-1">
       <CardHeader>
@@ -79,7 +78,11 @@ export const ProgramRow = memo((props: ProgramRowProps): ReactElement => {
                     </DialogDescription>
                   </DialogHeader>
                   <DialogFooter>
-                    <Button onClick={handleDeleteProgram}>Delete</Button>
+                    <Button
+                      onClick={() => props.deleteProgram(props.program.id)}
+                    >
+                      Delete
+                    </Button>
                     <DialogClose asChild>
                       <Button variant="outline">Cancel</Button>
                     </DialogClose>
@@ -114,6 +117,15 @@ export const ProgramsList = (props: ProgramsListProps): ReactElement => {
     }
   }
 
+  const handleDeleteProgram = async (programId: string) => {
+    try {
+      const response = await deleteProgram(programId)
+      console.log(response)
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
   return (
     <div className="w-full max-w-[1000px] flex flex-col">
       {props.programs &&
@@ -123,6 +135,7 @@ export const ProgramsList = (props: ProgramsListProps): ReactElement => {
             key={program.id}
             isActive={program.id === activeProgramId}
             setActive={handleSetActive}
+            deleteProgram={handleDeleteProgram}
           />
         ))}
     </div>
