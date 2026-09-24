@@ -1,5 +1,4 @@
 import { useState, memo } from 'react'
-import clsx from 'clsx'
 import { Card, CardTitle, CardDescription, CardHeader } from '../ui/card'
 import { Button } from '../ui/button'
 import { Trash, Power } from 'lucide-react'
