@@ -46,7 +46,7 @@ function RootComponent() {
       {isMobile ? (
         <nav
           className={clsx(
-            'flex flex-row fixed bottom-0 w-full z-100 bg-app-colors-500 pb-8',
+            'flex flex-row fixed bottom-0 w-full z-[100] bg-app-colors-500 pb-8 pt-4',
             authStatus ? 'justify-evenly' : 'justify-center'
           )}
         >
