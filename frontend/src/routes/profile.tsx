@@ -9,14 +9,17 @@ export const Route = createFileRoute('/profile')({
 })
 
 function RouteComponent() {
-  const { data } = useGetProfileDataQuery()
-  console.log(data?.active_program)
+  const { data, refetch } = useGetProfileDataQuery()
+
+  const refreshAfterProgramDelete = async () => {
+    try {
+      await refetch()
+    } catch (error) {
+      console.error(error)
+    }
+  }
 
   const test_data = null
-
-  //const data = {
-  //  workout_streak_tracker: null
-  //}
 
   return (
     <div className="flex flex-col justify-center items-center">
@@ -26,6 +29,7 @@ function RouteComponent() {
         <ProgramsList
           programs={data ? data.programs : null}
           activeProgram={data ? data.active_program : null}
+          refreshProgramsList={refreshAfterProgramDelete}
         />
       </div>
     </div>

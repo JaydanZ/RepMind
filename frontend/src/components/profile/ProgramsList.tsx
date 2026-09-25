@@ -26,6 +26,7 @@ interface ProgramRowProps {
 interface ProgramsListProps {
   programs: WorkoutProgram[] | null
   activeProgram: WorkoutProgram[] | null
+  refreshProgramsList: () => void
 }
 
 interface ProgramActiveResponse {
@@ -122,8 +123,8 @@ export const ProgramsList = (props: ProgramsListProps): ReactElement => {
 
   const handleDeleteProgram = async (programId: string) => {
     try {
-      const response = await deleteProgram(programId)
-      console.log(response)
+      await deleteProgram(programId)
+      props.refreshProgramsList()
     } catch (error) {
       console.error(error)
     }
