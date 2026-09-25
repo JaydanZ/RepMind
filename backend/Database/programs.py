@@ -1,5 +1,6 @@
 from typing import List, Dict, Any
 from supabase import Client
+from datetime import datetime, timezone
 from ..models.programs import ProgramImport, Exercise, Workout
 from .supabase import supabase
 from .users import find_user_by_email
@@ -77,15 +78,12 @@ def update_program(program_id: str, updates: Dict[str, Any]) -> Dict[str, Any]:
         return {"success": False, "error": str(e)}
 
 
-def delete_program(program_id: str) -> Dict[str, Any]:
+def delete_program(program_id: str, user_id: str) -> Dict[str, Any]:
     try:
-        # Delete related records first (cascading deletes will handle this)
-        supabase.table("program_exercises").delete().eq("program_day_id", program_id).execute()
-        supabase.table("program_days").delete().eq("program_id", program_id).execute()
-        
-        response = supabase.table("workout_programs").delete().eq("id", program_id).execute()
+        response = supabase.table("active_workout_programs").update({"deleted_at": datetime.now(timezone.utc).isoformat()}).eq("id", program_id).eq("user_id", user_id).execute()
         return {
             "success": True,
+            "data": response.data,
             "message": "Program deleted successfully"
         }
     except Exception as e:
