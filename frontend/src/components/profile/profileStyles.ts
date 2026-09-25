@@ -1,4 +1,3 @@
-// Shared surface + control styles for the profile page, matching the landing page board
 export const panelClass = 'rounded-lg border border-neutral-800 bg-[#141414]'
 
 export const panelHeaderClass =

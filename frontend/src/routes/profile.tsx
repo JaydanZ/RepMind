@@ -21,7 +21,6 @@ function RouteComponent() {
   const { data, isLoading, isError, isFetching, refetch } =
     useGetProfileDataQuery()
 
-  // Re-run the profile query so the programs list re-renders with fresh data
   const refreshAfterProgramDelete = async () => {
     try {
       await refetch()

@@ -9,10 +9,8 @@ import clsx from 'clsx'
 import { Plus } from 'lucide-react'
 import { SAMPLE_WEEK } from '@/data/landingData'
 
-// Row index drives the cascade delay so the week "writes itself" column by column on load
 const cascade = (index: number) => ({ '--i': index }) as CSSProperties
 
-// Tabs only exist below lg; at lg and up all four days render as columns
 const useIsTabbed = () => {
   const [isTabbed, setIsTabbed] = useState(true)
   useEffect(() => {
@@ -79,7 +77,6 @@ export const SampleWeek = () => {
         </p>
       </header>
 
-      {/* Mobile: day tabs, mirroring the real program view */}
       <div
         role="tablist"
         aria-label="Training days"

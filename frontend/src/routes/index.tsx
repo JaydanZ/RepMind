@@ -1,11 +1,3 @@
-/*
-  Landing page direction (impeccable)
-  THESIS: The week is the page. Show the output, a real-looking program board, instead of a slogan over an empty hero.
-  OWN-WORLD: Near-black #0f0f0f ground, one lime accent #94ea43, Roboto body with Roboto Condensed display, hairline neutral-800 rules, tabular sets x reps.
-  STORY: Visitor sees what they will get, learns it takes four answers, learns they can save and track it, then generates a program.
-  FIRST VIEWPORT: Left-aligned two-line condensed headline, one-line subline, lime "Generate a Program" CTA; the sample week board starts below and peeks into the fold.
-  FORM: Grounded structure "week board", dealt from the surface roll, seed e0812da1.
-*/
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { ArrowRight, Bookmark, Flame, Power } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -58,7 +50,6 @@ function RouteComponent() {
 
   return (
     <main className="landing mx-auto w-full max-w-7xl px-4 pb-36 pt-12 sm:px-8 min-[800px]:pb-0 min-[800px]:pt-32 lg:px-12">
-      {/* Hero */}
       <section className="pb-10 pt-4 md:pb-14">
         <h1 className="max-w-[24ch] font-display text-[2.5rem] font-bold leading-[0.98] tracking-[-0.02em] text-neutral-50 sm:text-6xl lg:text-7xl xl:text-[5.25rem]">
           <span className="block text-balance">Your next training week,</span>
@@ -83,7 +74,6 @@ function RouteComponent() {
 
       <SampleWeek />
 
-      {/* How it works: the answers behind the sample week */}
       <section
         id="how-it-works"
         aria-labelledby="how-title"
@@ -120,7 +110,6 @@ function RouteComponent() {
         </ol>
       </section>
 
-      {/* Save and track */}
       <section
         aria-labelledby="track-title"
         className="grid gap-12 pt-28 md:pt-36 lg:grid-cols-12 lg:gap-8"
@@ -163,7 +152,6 @@ function RouteComponent() {
         </ul>
       </section>
 
-      {/* Closing call to action */}
       <section
         aria-labelledby="close-title"
         className="mt-28 border-t border-neutral-800 pb-16 pt-20 md:mt-36 md:pb-24 md:pt-28"

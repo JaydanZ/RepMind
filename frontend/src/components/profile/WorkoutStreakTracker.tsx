@@ -15,7 +15,6 @@ interface WorkoutStreakTrackerProps {
   isLoading?: boolean
 }
 
-// Generate last 365 days of dates
 const generateYearDates = () => {
   const dates: Date[] = []
   const today = new Date()
@@ -29,7 +28,6 @@ const generateYearDates = () => {
   return dates
 }
 
-// Format date to YYYY-MM-DD string
 const formatDateKey = (date: Date): string => {
   return date.toISOString().split('T')[0]
 }
@@ -67,7 +65,6 @@ export const WorkoutStreakTracker = ({
     const dates = generateYearDates()
     const workoutMap = new Map<string, WorkoutTracker>()
 
-    // Build map from data
     if (data) {
       data.forEach((workout) => {
         if (workout.date) {
@@ -76,12 +73,10 @@ export const WorkoutStreakTracker = ({
       })
     }
 
-    // Group dates by week (for grid layout)
     const weeks: (Date | null)[][] = []
     let currentWeek: (Date | null)[] = []
 
     dates.forEach((date) => {
-      // Start new week on Sunday
       if (date.getDay() === 0 && currentWeek.length > 0) {
         while (currentWeek.length < 7) currentWeek.unshift(null)
         weeks.push(currentWeek)
@@ -90,7 +85,6 @@ export const WorkoutStreakTracker = ({
       currentWeek.push(date)
     })
 
-    // Push remaining week
     if (currentWeek.length > 0) {
       weeks.push(currentWeek)
     }
@@ -100,7 +94,6 @@ export const WorkoutStreakTracker = ({
 
   const totalWorkouts = data?.filter((w) => w.has_worked_out).length || 0
 
-  // Prefer the streak the backend tracks; fall back to computing it from history
   const currentStreak = useMemo(() => {
     if (typeof streak === 'number') return streak
     if (!data) return 0
@@ -131,13 +124,11 @@ export const WorkoutStreakTracker = ({
     return count
   }, [data, streak])
 
-  // On narrow screens the grid scrolls; start at the most recent weeks
   useEffect(() => {
     const el = scrollRef.current
     if (el) el.scrollLeft = el.scrollWidth
   }, [yearData, isLoading, data])
 
-  // Only offer drag-to-scroll when the grid is wider than its container
   useEffect(() => {
     const el = scrollRef.current
     if (!el) return
@@ -148,7 +139,6 @@ export const WorkoutStreakTracker = ({
     return () => observer.disconnect()
   }, [isLoading])
 
-  // Touch and trackpads scroll natively; mouse users drag the grid sideways
   const handlePointerDown = (event: PointerEvent<HTMLDivElement>) => {
     const el = scrollRef.current
     if (
@@ -178,7 +168,6 @@ export const WorkoutStreakTracker = ({
     setIsDragging(false)
   }
 
-  // The backend doesn't send per-day history yet; the grid renders empty until it does
   const hasHistory = Array.isArray(data)
 
   return (

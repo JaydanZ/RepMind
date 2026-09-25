@@ -1,6 +1,5 @@
 import { Workout } from '@/types/programCreation'
 
-// Example output shown on the landing page. Illustrative only, not a real user's program.
 export const SAMPLE_PROFILE = [
   { question: 'Fitness goal', answer: 'Gain muscle' },
   { question: 'Experience', answer: '2 - 3 years' },
@@ -125,7 +124,8 @@ export const SAMPLE_WEEK: Workout[] = [
         name: 'Dumbbell Curl',
         sets: 3,
         reps: 12,
-        exercise_tip: 'Supinate your wrist as you curl for a stronger contraction.'
+        exercise_tip:
+          'Supinate your wrist as you curl for a stronger contraction.'
       }
     ]
   },
@@ -165,7 +165,8 @@ export const SAMPLE_WEEK: Workout[] = [
         name: 'Hanging Knee Raise',
         sets: 3,
         reps: 12,
-        exercise_tip: 'Curl your pelvis up at the top instead of just lifting the knees.'
+        exercise_tip:
+          'Curl your pelvis up at the top instead of just lifting the knees.'
       }
     ]
   }
