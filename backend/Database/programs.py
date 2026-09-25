@@ -3,7 +3,7 @@ from supabase import Client
 from datetime import datetime, timezone
 from ..models.programs import ProgramImport, Exercise, Workout
 from .supabase import supabase
-from .users import find_user_by_email
+from .users import find_user_by_id
 from ..utils.programs import _convert_workouts_to_json
 import ast
 
@@ -11,7 +11,7 @@ import ast
 def insert_program_from_import(program_import: ProgramImport, current_user_id) -> Dict[str, Any]:
     try:
         # Convert Pydantic models to dictionaries for JSON serialization
-        response = find_user_by_email(current_user_id)
+        response = find_user_by_id(current_user_id)
         convertedResponse = ast.literal_eval(str(response))
         
         id_key, id_value = next(iter(convertedResponse.items()))
