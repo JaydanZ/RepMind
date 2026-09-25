@@ -132,6 +132,19 @@
 }
 
 @layer utilities {
+  /* Landing page: sample week rows cascade in, staggered by --i */
+  .animate-write-in {
+    animation-delay: calc(var(--i, 0) * 28ms);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .animate-write-in {
+      animation: none;
+    }
+  }
+  .landing ::selection {
+    background: #94ea43;
+    color: #0f0f0f;
+  }
   input[type='number']::-webkit-inner-spin-button,
   input[type='number']::-webkit-outer-spin-button {
     -webkit-appearance: none;

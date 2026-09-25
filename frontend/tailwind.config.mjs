@@ -61,6 +61,11 @@ export default {
   			}
   		},
   		fontFamily: {
+  			display: [
+  				'"Roboto Condensed"',
+  				'Roboto',
+  				'sans-serif'
+  			],
   			'main-font': [
   				'Roboto"',
   				'sans-serif'
@@ -71,7 +76,20 @@ export default {
   			md: 'calc(var(--radius) - 2px)',
   			sm: 'calc(var(--radius) - 4px)'
   		},
+  		transitionTimingFunction: {
+  			'out-strong': 'cubic-bezier(0.23, 1, 0.32, 1)'
+  		},
   		keyframes: {
+  			'write-in': {
+  				from: {
+  					opacity: '0',
+  					transform: 'translateY(6px)'
+  				},
+  				to: {
+  					opacity: '1',
+  					transform: 'translateY(0)'
+  				}
+  			},
   			'accordion-down': {
   				from: {
   					height: '0'
@@ -91,7 +109,8 @@ export default {
   		},
   		animation: {
   			'accordion-down': 'accordion-down 0.2s ease-out',
-  			'accordion-up': 'accordion-up 0.2s ease-out'
+  			'accordion-up': 'accordion-up 0.2s ease-out',
+  			'write-in': 'write-in 420ms cubic-bezier(0.23, 1, 0.32, 1) backwards'
   		}
   	}
   },
