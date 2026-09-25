@@ -52,6 +52,11 @@ protectedApi.interceptors.response.use(
   }
 )
 
+export const getUsersPrograms = async () => {
+  const response = await protectedApi.get(`${BACKEND_API}/profile`)
+  return response.data
+}
+
 export const programImport = async (program: ProgramStruct) => {
   const response = await protectedApi.post(
     `${BACKEND_API}/programs/import`,
