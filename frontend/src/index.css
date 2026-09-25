@@ -141,7 +141,7 @@
       animation: none;
     }
   }
-  .landing ::selection {
+  ::selection {
     background: #94ea43;
     color: #0f0f0f;
   }

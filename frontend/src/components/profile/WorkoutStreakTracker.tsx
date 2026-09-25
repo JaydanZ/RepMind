@@ -1,15 +1,18 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo, useRef, useState, PointerEvent } from 'react'
+import clsx from 'clsx'
+import { Flame } from 'lucide-react'
 import { WorkoutTracker } from '@/types/profile'
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle
-} from '@/components/ui/card'
+  panelClass,
+  panelHeaderClass,
+  panelTitleClass,
+  skeletonClass
+} from './profileStyles'
 
 interface WorkoutStreakTrackerProps {
   data?: WorkoutTracker[] | null
+  streak?: number | null
+  isLoading?: boolean
 }
 
 // Generate last 365 days of dates
@@ -31,19 +34,6 @@ const formatDateKey = (date: Date): string => {
   return date.toISOString().split('T')[0]
 }
 
-// Get day of week (0 = Sunday, 6 = Saturday)
-const getDayOfWeek = (date: Date): number => {
-  return date.getDay()
-}
-
-// Get color intensity based on workout status
-const getColorClass = (hasWorkedOut: boolean): string => {
-  if (hasWorkedOut) {
-    return 'bg-app-colors-300 hover:bg-app-colors-200'
-  }
-  return 'bg-app-colors-400 hover:bg-app-colors-200'
-}
-
 const MONTH_LABELS = [
   'Jan',
   'Feb',
@@ -60,7 +50,19 @@ const MONTH_LABELS = [
 ]
 const DAY_LABELS = ['', 'Mon', '', 'Wed', '', 'Fri', '']
 
-export const WorkoutStreakTracker = ({ data }: WorkoutStreakTrackerProps) => {
+const CELL = 'size-2.5 sm:size-3 lg:size-[15px] rounded-[3px]'
+
+export const WorkoutStreakTracker = ({
+  data,
+  streak,
+  isLoading
+}: WorkoutStreakTrackerProps) => {
+  const scrollRef = useRef<HTMLDivElement>(null)
+  // Drag state lives in a ref so pointer moves never re-render the grid
+  const dragRef = useRef<{ startX: number; startScroll: number } | null>(null)
+  const [isScrollable, setIsScrollable] = useState(false)
+  const [isDragging, setIsDragging] = useState(false)
+
   const yearData = useMemo(() => {
     const dates = generateYearDates()
     const workoutMap = new Map<string, WorkoutTracker>()
@@ -79,20 +81,12 @@ export const WorkoutStreakTracker = ({ data }: WorkoutStreakTrackerProps) => {
     let currentWeek: (Date | null)[] = []
 
     dates.forEach((date) => {
-      const dayOfWeek = getDayOfWeek(date)
-
       // Start new week on Sunday
-      if (dayOfWeek === 0 && currentWeek.length > 0) {
-        if (currentWeek.length < 7) {
-          const currentWeekLength = currentWeek.length
-          for (let i = 0; i < 7 - currentWeekLength; i++) {
-            currentWeek.unshift(null)
-          }
-        }
+      if (date.getDay() === 0 && currentWeek.length > 0) {
+        while (currentWeek.length < 7) currentWeek.unshift(null)
         weeks.push(currentWeek)
         currentWeek = []
       }
-
       currentWeek.push(date)
     })
 
@@ -104,19 +98,18 @@ export const WorkoutStreakTracker = ({ data }: WorkoutStreakTrackerProps) => {
     return { weeks, workoutMap }
   }, [data])
 
-  // Calculate stats
   const totalWorkouts = data?.filter((w) => w.has_worked_out).length || 0
+
+  // Prefer the streak the backend tracks; fall back to computing it from history
   const currentStreak = useMemo(() => {
+    if (typeof streak === 'number') return streak
     if (!data) return 0
 
     const workoutDates = new Set(
       data.filter((w) => w.has_worked_out && w.date).map((w) => w.date)
     )
 
-    let streak = 0
     const todayDate = new Date()
-
-    // Check if today or yesterday was a workout day
     const todayKey = formatDateKey(todayDate)
     const yesterdayDate = new Date(todayDate)
     yesterdayDate.setDate(yesterdayDate.getDate() - 1)
@@ -126,138 +119,242 @@ export const WorkoutStreakTracker = ({ data }: WorkoutStreakTrackerProps) => {
       return 0
     }
 
-    // Count consecutive days
     const startDate = workoutDates.has(todayKey) ? todayDate : yesterdayDate
-
+    let count = 0
     for (let i = 0; i < 365; i++) {
       const checkDate = new Date(startDate)
       checkDate.setDate(checkDate.getDate() - i)
-      const checkKey = formatDateKey(checkDate)
-
-      if (workoutDates.has(checkKey)) {
-        streak++
-      } else {
-        break
-      }
+      if (workoutDates.has(formatDateKey(checkDate))) count++
+      else break
     }
 
-    return streak
-  }, [data])
+    return count
+  }, [data, streak])
+
+  // On narrow screens the grid scrolls; start at the most recent weeks
+  useEffect(() => {
+    const el = scrollRef.current
+    if (el) el.scrollLeft = el.scrollWidth
+  }, [yearData, isLoading, data])
+
+  // Only offer drag-to-scroll when the grid is wider than its container
+  useEffect(() => {
+    const el = scrollRef.current
+    if (!el) return
+    const update = () => setIsScrollable(el.scrollWidth > el.clientWidth + 1)
+    update()
+    const observer = new ResizeObserver(update)
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [isLoading])
+
+  // Touch and trackpads scroll natively; mouse users drag the grid sideways
+  const handlePointerDown = (event: PointerEvent<HTMLDivElement>) => {
+    const el = scrollRef.current
+    if (
+      !el ||
+      !isScrollable ||
+      event.pointerType !== 'mouse' ||
+      event.button !== 0
+    )
+      return
+    dragRef.current = { startX: event.clientX, startScroll: el.scrollLeft }
+    el.setPointerCapture(event.pointerId)
+    setIsDragging(true)
+  }
+
+  const handlePointerMove = (event: PointerEvent<HTMLDivElement>) => {
+    const el = scrollRef.current
+    const drag = dragRef.current
+    if (!el || !drag) return
+    event.preventDefault()
+    el.scrollLeft = drag.startScroll - (event.clientX - drag.startX)
+  }
+
+  const endDrag = (event: PointerEvent<HTMLDivElement>) => {
+    if (!dragRef.current) return
+    dragRef.current = null
+    scrollRef.current?.releasePointerCapture(event.pointerId)
+    setIsDragging(false)
+  }
+
+  // The backend doesn't send per-day history yet; the grid renders empty until it does
+  const hasHistory = Array.isArray(data)
 
   return (
-    <Card className="w-full max-w-[1000px] bg-app-colors-500 border-app-colors-400">
-      <CardHeader>
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-0">
-          <div>
-            <CardTitle className="text-neutral-50">Workout Activity</CardTitle>
-            <CardDescription className="text-neutral-400">
-              {totalWorkouts} workouts in the last year
-            </CardDescription>
-          </div>
-          <div className="flex gap-6 text-neutral-50">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-app-colors-300">
-                {currentStreak}
-              </div>
-              <div className="text-xs text-neutral-400">Current Streak</div>
-            </div>
-          </div>
+    <section aria-labelledby="activity-title" className={panelClass}>
+      <div className={panelHeaderClass}>
+        <div>
+          <h2 id="activity-title" className={panelTitleClass}>
+            Activity
+          </h2>
+          <p className="mt-0.5 text-sm text-neutral-400">
+            {isLoading ? (
+              <span className={clsx(skeletonClass, 'inline-block h-3 w-40')} />
+            ) : hasHistory ? (
+              `${totalWorkouts} ${
+                totalWorkouts === 1 ? 'workout' : 'workouts'
+              } in the last year`
+            ) : (
+              'Your current training streak'
+            )}
+          </p>
         </div>
-      </CardHeader>
-      <CardContent>
-        <div className="overflow-x-auto">
-          <div className="flex">
-            {/* Day labels - hidden on mobile */}
-            <div className="hidden sm:flex flex-col gap-[2px] mr-2 pt-4">
-              {DAY_LABELS.map((day, index) => (
-                <div
-                  key={index}
-                  className="h-3 text-xs text-neutral-400 flex items-center"
-                >
-                  {day}
-                </div>
-              ))}
-            </div>
+        <div className="flex items-center gap-2">
+          <Flame
+            aria-hidden
+            className={clsx(
+              'size-5',
+              currentStreak > 0 ? 'text-app-colors-300' : 'text-neutral-500'
+            )}
+          />
+          <p className="text-sm text-neutral-400">
+            {isLoading ? (
+              <span
+                className={clsx(
+                  skeletonClass,
+                  'inline-block h-6 w-6 align-middle'
+                )}
+              />
+            ) : (
+              <span className="font-display text-2xl font-bold tabular-nums text-neutral-50">
+                {currentStreak}
+              </span>
+            )}{' '}
+            day streak
+          </p>
+        </div>
+      </div>
 
-            {/* Grid container */}
-            <div className="flex flex-col">
-              {/* Month labels row */}
-              <div className="flex gap-px sm:gap-[2px] mb-1">
-                {yearData.weeks.map((week, weekIndex) => {
-                  const firstDay = week[0]
-                  if (!firstDay) return null
-
-                  const currentMonth = firstDay.getMonth()
-                  const prevWeek = yearData.weeks[weekIndex - 1]
-                  const prevMonth = prevWeek?.[0]?.getMonth()
-                  const isNewMonth =
-                    weekIndex === 0 || currentMonth !== prevMonth
-
-                  return (
-                    <div
-                      key={weekIndex}
-                      className="w-2 sm:w-3 text-[8px] sm:text-[10px] text-neutral-400 text-center leading-4"
-                    >
-                      {isNewMonth ? MONTH_LABELS[currentMonth] : ''}
-                    </div>
-                  )
-                })}
-              </div>
-
-              {/* Contribution grid */}
-              <div className="flex gap-px sm:gap-[2px]">
-                {yearData.weeks.map((week, weekIndex) => (
+      {isLoading ? (
+        <div className="px-4 py-5 sm:px-6">
+          <div className={clsx(skeletonClass, 'h-28 w-full')} />
+        </div>
+      ) : (
+        <div className="px-4 py-5 sm:px-6">
+          <div
+            ref={scrollRef}
+            tabIndex={isScrollable ? 0 : undefined}
+            aria-label={
+              isScrollable
+                ? 'Workout activity grid, scroll horizontally'
+                : undefined
+            }
+            role={isScrollable ? 'region' : undefined}
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={endDrag}
+            onPointerCancel={endDrag}
+            className={clsx(
+              'overflow-x-auto overscroll-x-contain rounded-sm pb-2 [scrollbar-color:#404040_transparent] [scrollbar-width:thin] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-app-colors-300',
+              isScrollable && 'cursor-grab',
+              isDragging && 'cursor-grabbing select-none'
+            )}
+          >
+            <div
+              role="img"
+              aria-label={`Workout activity for the last year: ${totalWorkouts} workouts, current streak ${currentStreak} days`}
+              className="flex w-max"
+            >
+              <div className="sticky left-0 z-10 flex flex-col gap-[3px] bg-[#141414] pr-2 pt-5">
+                {DAY_LABELS.map((day, index) => (
                   <div
-                    key={weekIndex}
-                    className="flex flex-col gap-px sm:gap-[2px]"
+                    key={index}
+                    className="flex h-2.5 items-center text-[10px] text-neutral-400 sm:h-3 lg:h-[15px]"
                   >
-                    {Array.from({ length: 7 }).map((_, dayIndex) => {
-                      const date = week[dayIndex]
-                      if (!date) {
-                        return (
-                          <div
-                            key={dayIndex}
-                            className="h-2 w-2 sm:h-3 sm:w-3"
-                          />
-                        )
-                      }
-
-                      const dateKey = formatDateKey(date)
-                      const workout = yearData.workoutMap.get(dateKey)
-                      const hasWorkedOut = workout?.has_worked_out ?? false
-
-                      return (
-                        <div
-                          key={dayIndex}
-                          className={`h-2 w-2 sm:h-3 sm:w-3 rounded-sm transition-colors cursor-pointer ${getColorClass(
-                            hasWorkedOut
-                          )}`}
-                          title={`${date.toLocaleDateString('en-US', {
-                            weekday: 'short',
-                            year: 'numeric',
-                            month: 'short',
-                            day: 'numeric'
-                          })}${hasWorkedOut ? ' - Workout completed' : ''}`}
-                        />
-                      )
-                    })}
+                    {day}
                   </div>
                 ))}
               </div>
+
+              <div className="flex flex-col">
+                <div className="mb-1.5 flex gap-[3px]">
+                  {yearData.weeks.map((week, weekIndex) => {
+                    const firstDay = week.find((day) => day !== null)
+                    const prevFirstDay = yearData.weeks[weekIndex - 1]?.find(
+                      (day) => day !== null
+                    )
+                    const isNewMonth =
+                      firstDay &&
+                      (weekIndex === 0 ||
+                        firstDay.getMonth() !== prevFirstDay?.getMonth())
+
+                    return (
+                      <div
+                        key={weekIndex}
+                        className="relative h-3.5 w-2.5 text-[10px] leading-none text-neutral-400 sm:w-3 lg:w-[15px]"
+                      >
+                        {isNewMonth && (
+                          <span className="absolute left-0 top-0 whitespace-nowrap">
+                            {MONTH_LABELS[firstDay.getMonth()]}
+                          </span>
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+
+                <div
+                  className={clsx(
+                    'flex gap-[3px] transition-opacity duration-200',
+                    isLoading && 'animate-pulse opacity-60'
+                  )}
+                >
+                  {yearData.weeks.map((week, weekIndex) => (
+                    <div key={weekIndex} className="flex flex-col gap-[3px]">
+                      {Array.from({ length: 7 }).map((_, dayIndex) => {
+                        const date = week[dayIndex]
+                        if (!date) {
+                          return <div key={dayIndex} className={CELL} />
+                        }
+
+                        const workout = yearData.workoutMap.get(
+                          formatDateKey(date)
+                        )
+                        const hasWorkedOut = workout?.has_worked_out ?? false
+
+                        return (
+                          <div
+                            key={dayIndex}
+                            className={clsx(
+                              CELL,
+                              hasWorkedOut
+                                ? 'bg-app-colors-300'
+                                : 'bg-neutral-800/70'
+                            )}
+                            title={`${date.toLocaleDateString('en-US', {
+                              weekday: 'short',
+                              year: 'numeric',
+                              month: 'short',
+                              day: 'numeric'
+                            })}${hasWorkedOut ? ', workout completed' : ''}`}
+                          />
+                        )
+                      })}
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Legend */}
-          <div className="flex items-center justify-end gap-1 sm:gap-2 mt-4 text-[10px] sm:text-xs text-neutral-400">
-            <span>No Workout</span>
-            <div className="flex gap-px sm:gap-[2px]">
-              <div className="h-2 w-2 sm:h-3 sm:w-3 rounded-sm bg-app-colors-400" />
-              <div className="h-2 w-2 sm:h-3 sm:w-3 rounded-sm bg-app-colors-300" />
+          <div className="mt-3 flex flex-wrap items-center justify-between gap-3 text-xs text-neutral-400">
+            <p>
+              {!hasHistory
+                ? 'Day-by-day workout history isn’t recorded yet.'
+                : totalWorkouts === 0
+                  ? 'No workouts logged in the last year.'
+                  : ''}
+            </p>
+            <div className="flex items-center gap-2">
+              <span>Rest</span>
+              <div className={clsx(CELL, 'bg-neutral-800/70')} />
+              <div className={clsx(CELL, 'bg-app-colors-300')} />
+              <span>Workout</span>
             </div>
-            <span>Workout Completed</span>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      )}
+    </section>
   )
 }

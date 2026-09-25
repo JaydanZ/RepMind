@@ -1,30 +1,31 @@
-import { useMemo } from 'react'
-import { Program } from '@/types/profile'
-import { Workout } from '@/types/programCreation'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle
-} from '@/components/ui/card'
-import { Button } from '../ui/button'
+import { useMemo, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
+import clsx from 'clsx'
+import { ArrowRight, Plus } from 'lucide-react'
+import { Workout, WorkoutProgram } from '@/types/programCreation'
+import { Button } from '../ui/button'
+import {
+  panelClass,
+  panelHeaderClass,
+  panelTitleClass,
+  primaryButtonClass,
+  skeletonClass
+} from './profileStyles'
 
 interface NextWorkoutProps {
-  data?: Program | null
+  program: WorkoutProgram | null
+  isLoading?: boolean
 }
 
-const DAY_NAMES: Record<number, string> = {
-  0: 'Sunday',
-  1: 'Monday',
-  2: 'Tuesday',
-  3: 'Wednesday',
-  4: 'Thursday',
-  5: 'Friday',
-  6: 'Saturday'
-}
+const DAY_NAMES = [
+  'Sunday',
+  'Monday',
+  'Tuesday',
+  'Wednesday',
+  'Thursday',
+  'Friday',
+  'Saturday'
+]
 
 const normalize = (value: string): string => value.trim().toLowerCase()
 
@@ -39,6 +40,7 @@ const getDayIndex = (day: string): number | null => {
   return null
 }
 
+// Today's workout if scheduled, otherwise the next upcoming day in the week
 const resolveWorkout = (structure: Workout[]): Workout | null => {
   if (!structure?.length) return null
 
@@ -74,110 +76,153 @@ const formatDate = (dateStr: string): string => {
   })
 }
 
-export const NextWorkout = ({ data }: NextWorkoutProps) => {
+const NextWorkoutSkeleton = () => (
+  <section className={panelClass} aria-busy="true" aria-label="Next workout">
+    <div className={panelHeaderClass}>
+      <div className={clsx(skeletonClass, 'h-5 w-28')} />
+    </div>
+    <div className="px-4 py-5 sm:px-6">
+      <div className={clsx(skeletonClass, 'h-8 w-40')} />
+      <div className={clsx(skeletonClass, 'mt-2 h-4 w-24')} />
+      <div className="mt-6 flex flex-col gap-4">
+        {Array.from({ length: 4 }).map((_, index) => (
+          <div key={index} className="flex justify-between gap-4">
+            <div className={clsx(skeletonClass, 'h-4 w-1/2')} />
+            <div className={clsx(skeletonClass, 'h-4 w-12')} />
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+)
+
+export const NextWorkout = ({ program, isLoading }: NextWorkoutProps) => {
   const navigate = useNavigate()
+  const [openTip, setOpenTip] = useState<number | null>(null)
   const workout = useMemo(
-    () => resolveWorkout(data?.program_structure ?? []),
-    [data]
+    () => resolveWorkout(program?.program_structure ?? []),
+    [program]
   )
 
-  const handleNavToProgramGenClick = () => {
-    navigate({ to: '/aiProgramFactory' })
-  }
+  if (isLoading) return <NextWorkoutSkeleton />
 
-  const hasWorkout = workout !== null
-  const isRestDay =
-    hasWorkout && getDayIndex(workout.day) !== new Date().getDay()
-  const dayName = hasWorkout ? workout.day ?? '' : 'Rest Day'
-
-  if (!data || !workout) {
+  if (!program || !workout) {
     return (
-      <Card className="w-full max-w-[1000px] bg-app-colors-500 border-app-colors-400">
-        <CardHeader>
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-0">
-            <div>
-              <CardTitle className="text-neutral-50">Next Workout</CardTitle>
-              <CardDescription className="text-neutral-400">
-                No active program yet
-              </CardDescription>
-            </div>
-            <div className="flex gap-6 text-neutral-50">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-app-colors-300">—</div>
-                <div className="text-xs text-neutral-400">Workout Day</div>
-              </div>
-            </div>
+      <section aria-labelledby="next-workout-title" className={panelClass}>
+        <div className={panelHeaderClass}>
+          <h2 id="next-workout-title" className={panelTitleClass}>
+            Next workout
+          </h2>
+        </div>
+        <div className="flex flex-col items-start gap-5 px-4 py-8 sm:px-6">
+          <div>
+            <p className="text-lg font-semibold text-neutral-50">
+              No active program yet
+            </p>
+            <p className="mt-2 max-w-[48ch] text-sm leading-relaxed text-neutral-400">
+              Set one of your saved programs as active, or generate a new one,
+              and your next training day will show up here.
+            </p>
           </div>
-        </CardHeader>
-        <CardContent>
-          <p className="text-neutral-400 text-sm">
-            Generate or set a workout program as your active program to see your
-            next workout day here.
-          </p>
-        </CardContent>
-        <CardFooter>
           <Button
-            variant="default"
-            size="lg"
-            onClick={handleNavToProgramGenClick}
+            className={primaryButtonClass}
+            onClick={() => navigate({ to: '/aiProgramFactory' })}
           >
             Generate a Program
+            <ArrowRight aria-hidden />
           </Button>
-        </CardFooter>
-      </Card>
+        </div>
+      </section>
     )
   }
 
+  const isToday = getDayIndex(workout.day) === new Date().getDay()
+
   return (
-    <Card className="w-full max-w-[1000px] bg-app-colors-500 border-app-colors-400">
-      <CardHeader>
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-0">
-          <div>
-            <CardTitle className="text-neutral-50">Next Workout</CardTitle>
-            <CardDescription className="text-neutral-400">
-              {data.name}
-              {data.last_updated
-                ? ` · updated ${formatDate(data.last_updated)}`
-                : ''}
-            </CardDescription>
-          </div>
-          <div className="flex gap-6 text-neutral-50">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-app-colors-300">
-                {dayName}
-              </div>
-              <div className="text-xs text-neutral-400">
-                {workout.focus}
-                {isRestDay ? ' · Coming Up' : ''}
-              </div>
-            </div>
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="flex flex-col divide-y divide-app-colors-400">
-          {workout.exercises.map((exercise, index) => (
-            <div
-              key={index}
-              className="flex flex-row items-start justify-between gap-4 py-3"
+    <section aria-labelledby="next-workout-title" className={panelClass}>
+      <div className={panelHeaderClass}>
+        <h2 id="next-workout-title" className={panelTitleClass}>
+          Next workout
+        </h2>
+        <span
+          className={clsx(
+            'rounded-full px-2.5 py-1 text-xs font-medium',
+            isToday
+              ? 'bg-app-colors-300/15 text-app-colors-300'
+              : 'bg-neutral-800 text-neutral-300'
+          )}
+        >
+          {isToday ? 'Today' : 'Coming up'}
+        </span>
+      </div>
+
+      <div className="px-4 pb-2 pt-5 sm:px-6">
+        <p className="font-display text-3xl font-bold leading-none text-neutral-50">
+          {workout.day}
+        </p>
+        <p className="mt-2 text-sm text-app-colors-300">{workout.focus}</p>
+        <p className="mt-1 text-sm text-neutral-400">
+          {program.program_name}
+          {program.updated_at && (
+            <>, updated {formatDate(program.updated_at)}</>
+          )}
+        </p>
+      </div>
+
+      <ul className="px-4 pb-3 sm:px-6">
+        {workout.exercises.map((exercise, index) => {
+          const isOpen = openTip === index
+          const hasTip = Boolean(exercise.exercise_tip)
+          return (
+            <li
+              key={`${exercise.name}-${index}`}
+              className="border-t border-neutral-800/80 first:border-t-0"
             >
-              <div className="flex flex-col">
-                <span className="text-neutral-50 font-medium">
+              <button
+                type="button"
+                disabled={!hasTip}
+                aria-expanded={hasTip ? isOpen : undefined}
+                aria-controls={hasTip ? `next-tip-${index}` : undefined}
+                onClick={() => setOpenTip(isOpen ? null : index)}
+                className="group flex min-h-12 w-full items-center gap-3 rounded-sm py-3 text-left outline-none focus-visible:ring-1 focus-visible:ring-app-colors-300 disabled:cursor-default"
+              >
+                <span className="flex-1 text-[0.9375rem] leading-snug text-neutral-100">
                   {exercise.name}
                 </span>
-                {exercise.exercise_tip && (
-                  <span className="text-xs text-neutral-400 mt-0.5">
-                    {exercise.exercise_tip}
-                  </span>
+                <span className="whitespace-nowrap text-sm tabular-nums text-neutral-400">
+                  {exercise.sets} &times; {exercise.reps}
+                </span>
+                {hasTip && (
+                  <Plus
+                    aria-hidden
+                    className={clsx(
+                      'size-4 shrink-0 text-neutral-500 transition-transform duration-200 ease-out-strong group-hover:text-app-colors-300',
+                      isOpen && 'rotate-45 text-app-colors-300'
+                    )}
+                  />
                 )}
-              </div>
-              <span className="text-app-colors-300 font-semibold whitespace-nowrap">
-                {exercise.sets}×{exercise.reps}
-              </span>
-            </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+              </button>
+              {hasTip && (
+                <div
+                  id={`next-tip-${index}`}
+                  className={clsx(
+                    'grid transition-[grid-template-rows,opacity] duration-200 ease-out-strong',
+                    isOpen
+                      ? 'grid-rows-[1fr] opacity-100'
+                      : 'grid-rows-[0fr] opacity-0'
+                  )}
+                >
+                  <p className="overflow-hidden text-sm leading-relaxed text-neutral-400">
+                    <span className="block pb-3 pr-7">
+                      {exercise.exercise_tip}
+                    </span>
+                  </p>
+                </div>
+              )}
+            </li>
+          )
+        })}
+      </ul>
+    </section>
   )
 }
