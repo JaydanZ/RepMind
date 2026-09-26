@@ -5,7 +5,9 @@ CREATE TABLE IF NOT EXISTS "public"."completed_workouts" (
     "program_day_id" "uuid",
     "completed_at" "date" DEFAULT CURRENT_DATE NOT NULL,
     "is_completed" boolean DEFAULT false,
-    "notes" "text"
+    "notes" "text",
+    "day" "text",
+    "focus" "text"
 );
 
 CREATE TABLE IF NOT EXISTS "public"."exercise_set_logs" (
@@ -14,7 +16,11 @@ CREATE TABLE IF NOT EXISTS "public"."exercise_set_logs" (
     "name" "text" NOT NULL,
     "set_number" integer NOT NULL,
     "weight" numeric(10,2),
-    "reps" integer
+    "reps" integer,
+    "exercise_order" integer,
+    "notes" "text",
+    "weight_unit" "text" DEFAULT 'lb'::"text" NOT NULL,
+    CONSTRAINT "exercise_set_logs_weight_unit_check" CHECK (("weight_unit" = ANY (ARRAY['lb'::"text", 'kg'::"text"])))
 );
 
 CREATE TABLE IF NOT EXISTS "public"."personal_records" (
@@ -97,7 +103,8 @@ ALTER TABLE "public"."workout_streaks" OWNER TO "postgres";
 
 
 CREATE INDEX "idx_completed_workouts_user_date" ON "public"."completed_workouts" USING "btree" ("user_id", "completed_at");
-CREATE INDEX "idx_exercise_set_logs_workout" ON "public"."exercise_set_logs" USING "btree" ("completed_workout_id");
+CREATE INDEX "idx_exercise_set_logs_name" ON "public"."exercise_set_logs" USING "btree" ("name");
+CREATE INDEX "idx_exercise_set_logs_workout"ON "public"."exercise_set_logs" USING "btree" ("completed_workout_id");
 CREATE INDEX "idx_personal_records_user" ON "public"."personal_records" USING "btree" ("user_id");
 CREATE INDEX "idx_program_days_program" ON "public"."program_days" USING "btree" ("program_id");
 CREATE INDEX "idx_program_exercises_day" ON "public"."program_exercises" USING "btree" ("program_day_id");
