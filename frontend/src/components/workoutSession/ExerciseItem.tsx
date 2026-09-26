@@ -7,13 +7,22 @@ import {
   SetEntry,
   WeightUnit
 } from '@/types/workoutSession'
-import { isExerciseComplete, isSetComplete } from '@/hooks/useWorkoutSession'
+import {
+  isExerciseComplete,
+  isSetComplete,
+  localDateString
+} from '@/hooks/useWorkoutSession'
 import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger
 } from '@/components/ui/accordion'
 import { SetRow, setGridClass } from './SetRow'
+import {
+  bestPreviousSet,
+  previousSetFor,
+  toPreviousValues
+} from './previousSets'
 
 interface ExerciseItemProps {
   exercise: Exercise
@@ -32,6 +41,7 @@ interface ExerciseItemProps {
 }
 
 const formatSessionDate = (dateStr: string) => {
+  if (dateStr === localDateString()) return 'today'
   const date = new Date(`${dateStr}T00:00:00`)
   if (isNaN(date.getTime())) return dateStr
   return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
@@ -50,6 +60,7 @@ export const ExerciseItem = memo(
   }: ExerciseItemProps) => {
     const complete = isExerciseComplete(sets)
     const loggedCount = sets.filter(isSetComplete).length
+    const lastBest = toPreviousValues(bestPreviousSet(previous), unit)
 
     return (
       <AccordionItem
@@ -79,8 +90,18 @@ export const ExerciseItem = memo(
             <span className="block text-[0.9375rem] font-medium leading-snug text-neutral-50">
               {exercise.name}
             </span>
-            <span className="mt-0.5 block text-sm tabular-nums text-neutral-400">
+            <span className="mt-0.5 block truncate text-sm tabular-nums text-neutral-400">
               {exercise.sets} &times; {exercise.reps}
+              {lastBest && (
+                <>
+                  <span aria-hidden className="px-1.5 text-neutral-600">
+                    /
+                  </span>
+                  <span className="text-neutral-300">
+                    <span className="sr-only">, </span>Last {lastBest.text}
+                  </span>
+                </>
+              )}
               <span className="sr-only">
                 {complete
                   ? ', complete'
@@ -131,9 +152,7 @@ export const ExerciseItem = memo(
                 entry={entry}
                 targetReps={exercise.reps}
                 unit={unit}
-                previous={previous?.sets.find(
-                  (set) => set.set_number === setIndex + 1
-                )}
+                previous={previousSetFor(previous, setIndex + 1)}
                 previousLoading={previousLoading}
                 onChange={onChange}
                 onFill={onFill}

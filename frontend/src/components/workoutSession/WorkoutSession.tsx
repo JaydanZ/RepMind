@@ -148,12 +148,11 @@ export const WorkoutSession = ({
     [workout.exercises]
   )
   const previousQuery = useGetPreviousPerformanceQuery(
-    { names: exerciseNames, before: performedOn },
+    { names: exerciseNames, until: performedOn },
     { skip: exerciseNames.length === 0 }
   )
   const [submitWorkout, submitState] = useSubmitWorkoutMutation()
 
-  // Open the first exercise that still has sets to log
   const [openItem, setOpenItem] = useState(() => {
     const index = state.entries.findIndex((sets) => !isExerciseComplete(sets))
     return String(index === -1 ? 0 : index)

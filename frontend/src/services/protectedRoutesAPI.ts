@@ -49,7 +49,7 @@ const protectedRoutesApi = async (
 
 export const protectedApiSlice = createApi({
   baseQuery: protectedRoutesApi,
-  tagTypes: ['Profile'],
+  tagTypes: ['Profile', 'PreviousPerformance'],
   endpoints: (builder) => ({
     getProfileData: builder.query<Profile, void>({
       query: () => '/profile',
@@ -58,17 +58,18 @@ export const protectedApiSlice = createApi({
     }),
     getPreviousPerformance: builder.query<
       PreviousPerformance,
-      { names: string[]; before: string }
+      { names: string[]; until: string }
     >({
-      query: ({ names, before }) => {
-        const params = new URLSearchParams({ before })
+      query: ({ names, until }) => {
+        const params = new URLSearchParams({ until })
         names.forEach((name) => params.append('names', name))
         return `/workouts/previous?${params.toString()}`
-      }
+      },
+      providesTags: ['PreviousPerformance']
     }),
     submitWorkout: builder.mutation<SubmitWorkoutResponse, WorkoutSubmission>({
-      query: (body) => ({ url: '/workouts', method: 'POST', body }),
-      invalidatesTags: ['Profile']
+      query: (body) => ({ url: '/workouts/', method: 'POST', body }),
+      invalidatesTags: ['Profile', 'PreviousPerformance']
     })
   })
 })

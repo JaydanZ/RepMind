@@ -66,12 +66,12 @@ async def submit_workout(submission: WorkoutSubmission, user_id: str = Depends(g
 @workouts_router.get("/previous", status_code=200)
 async def previous_performance(
     names: Annotated[list[str], Query(min_length=1, max_length=50)],
-    before: date,
+    until: date,
     user_id: str = Depends(get_current_user)
 ):
-    _check_client_date(before)
+    _check_client_date(until)
 
-    result = get_previous_performance(user_id, names, before)
+    result = get_previous_performance(user_id, names, until)
     if not result["success"]:
         raise HTTPException(status_code=500, detail="Failed to load previous performance")
     return result["data"]
