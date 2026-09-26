@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import clsx from 'clsx'
-import { ArrowRight, Plus } from 'lucide-react'
+import { ArrowRight, Play, Plus } from 'lucide-react'
 import { Workout, WorkoutProgram } from '@/types/programCreation'
 import { Button } from '../ui/button'
 import {
@@ -167,6 +167,18 @@ export const NextWorkout = ({ program, isLoading }: NextWorkoutProps) => {
             <>, updated {formatDate(program.updated_at)}</>
           )}
         </p>
+        <Button
+          className={clsx(primaryButtonClass, 'mt-5')}
+          onClick={() =>
+            navigate({
+              to: '/workout',
+              search: { programId: program.id, day: workout.day }
+            })
+          }
+        >
+          {isToday ? 'Start workout' : 'Start early'}
+          <Play aria-hidden className="fill-current" />
+        </Button>
       </div>
 
       <ul className="px-4 pb-3 sm:px-6">

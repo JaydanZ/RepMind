@@ -8,6 +8,11 @@ import { RootState } from '@/store/store'
 import { refreshAccessToken } from '@/features/auth/authSlice'
 import { genNewAccessToken } from './authAPI'
 import { Profile } from '@/types/profile'
+import {
+  PreviousPerformance,
+  SubmitWorkoutResponse,
+  WorkoutSubmission
+} from '@/types/workoutSession'
 
 const BACKEND_API = import.meta.env.VITE_BACKEND_API_URL
 
@@ -44,13 +49,33 @@ const protectedRoutesApi = async (
 
 export const protectedApiSlice = createApi({
   baseQuery: protectedRoutesApi,
+  tagTypes: ['Profile'],
   endpoints: (builder) => ({
     getProfileData: builder.query<Profile, void>({
       query: () => '/profile',
-      keepUnusedDataFor: 5
+      keepUnusedDataFor: 5,
+      providesTags: ['Profile']
+    }),
+    getPreviousPerformance: builder.query<
+      PreviousPerformance,
+      { names: string[]; before: string }
+    >({
+      query: ({ names, before }) => {
+        const params = new URLSearchParams({ before })
+        names.forEach((name) => params.append('names', name))
+        return `/workouts/previous?${params.toString()}`
+      }
+    }),
+    submitWorkout: builder.mutation<SubmitWorkoutResponse, WorkoutSubmission>({
+      query: (body) => ({ url: '/workouts', method: 'POST', body }),
+      invalidatesTags: ['Profile']
     })
   })
 })
 
 // Export generated hooks
-export const { useGetProfileDataQuery } = protectedApiSlice
+export const {
+  useGetProfileDataQuery,
+  useGetPreviousPerformanceQuery,
+  useSubmitWorkoutMutation
+} = protectedApiSlice
