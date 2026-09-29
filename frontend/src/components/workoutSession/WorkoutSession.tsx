@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
-import { Link, useNavigate } from '@tanstack/react-router'
+import { Link } from '@tanstack/react-router'
 import clsx from 'clsx'
-import { ArrowLeft, Check } from 'lucide-react'
+import { ArrowLeft } from 'lucide-react'
 import { Workout } from '@/types/programCreation'
 import { SubmitWorkoutResponse, WeightUnit } from '@/types/workoutSession'
 import {
@@ -25,6 +25,8 @@ import {
 } from '@/components/ui/dialog'
 import { panelClass, primaryButtonClass } from '../profile/profileStyles'
 import { ExerciseItem } from './ExerciseItem'
+import { SessionComplete } from './SessionComplete'
+import { SessionSummary, summarizeSession } from './sessionSummary'
 
 interface WorkoutSessionProps {
   programId: string
@@ -80,53 +82,6 @@ const getErrorMessage = (error: unknown): string => {
   return 'Couldn’t save your workout. Your sets are kept; try again.'
 }
 
-const SessionComplete = ({
-  result,
-  workout
-}: {
-  result: SubmitWorkoutResponse
-  workout: Workout
-}) => {
-  const navigate = useNavigate()
-  return (
-    <section
-      aria-labelledby="session-complete-title"
-      className={clsx(
-        panelClass,
-        'flex flex-col items-start gap-6 px-4 py-8 sm:px-6'
-      )}
-    >
-      <span className="flex size-10 items-center justify-center rounded-full bg-app-colors-300 text-app-colors-500 duration-200 animate-in fade-in zoom-in-90 motion-reduce:animate-none">
-        <Check strokeWidth={3} className="size-5" aria-hidden />
-      </span>
-      <div>
-        <h2
-          id="session-complete-title"
-          className="font-display text-3xl font-bold leading-tight text-neutral-50"
-        >
-          Workout saved
-        </h2>
-        <p className="mt-2 text-sm leading-relaxed text-neutral-400">
-          {workout.day}, {workout.focus}. {result.sets_logged}{' '}
-          {result.sets_logged === 1 ? 'set' : 'sets'} logged.
-        </p>
-      </div>
-      <div>
-        <p className="font-display text-5xl font-bold leading-none tabular-nums text-app-colors-300">
-          {result.workout_streak}
-        </p>
-        <p className="mt-1 text-sm text-neutral-400">workout streak</p>
-      </div>
-      <Button
-        className={primaryButtonClass}
-        onClick={() => navigate({ to: '/profile' })}
-      >
-        Back to profile
-      </Button>
-    </section>
-  )
-}
-
 export const WorkoutSession = ({
   programId,
   programName,
@@ -158,14 +113,21 @@ export const WorkoutSession = ({
     return String(index === -1 ? 0 : index)
   })
   const [confirmOpen, setConfirmOpen] = useState(false)
-  const [result, setResult] = useState<SubmitWorkoutResponse | null>(null)
+  const [completed, setCompleted] = useState<{
+    result: SubmitWorkoutResponse
+    summary: SessionSummary
+  } | null>(null)
 
   const handleSubmit = async (isCompleted: boolean) => {
     try {
-      const response = await submitWorkout(getSubmission(isCompleted)).unwrap()
+      const submission = getSubmission(isCompleted)
+      const response = await submitWorkout(submission).unwrap()
       clearDraft()
       setConfirmOpen(false)
-      setResult(response)
+      setCompleted({
+        result: response,
+        summary: summarizeSession(workout, submission, state.unit)
+      })
       window.scrollTo({ top: 0 })
     } catch (error) {
       console.error(error)
@@ -173,7 +135,16 @@ export const WorkoutSession = ({
     }
   }
 
-  if (result) return <SessionComplete result={result} workout={workout} />
+  if (completed)
+    return (
+      <SessionComplete
+        result={completed.result}
+        summary={completed.summary}
+        workout={workout}
+        programName={programName}
+        performedOn={performedOn}
+      />
+    )
 
   const isSubmitting = submitState.isLoading
   const setsLeft = progress.totalSets - progress.completedSets

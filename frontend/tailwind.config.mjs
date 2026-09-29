@@ -90,6 +90,34 @@ export default {
   					transform: 'translateY(0)'
   				}
   			},
+  			'check-draw': {
+  				from: {
+  					strokeDashoffset: '24'
+  				},
+  				to: {
+  					strokeDashoffset: '0'
+  				}
+  			},
+  			'ring-out': {
+  				from: {
+  					opacity: '0.4',
+  					transform: 'scale(1)'
+  				},
+  				to: {
+  					opacity: '0',
+  					transform: 'scale(1.8)'
+  				}
+  			},
+  			'tick-in': {
+  				from: {
+  					opacity: '0',
+  					transform: 'scaleY(0.4)'
+  				},
+  				to: {
+  					opacity: '1',
+  					transform: 'scaleY(1)'
+  				}
+  			},
   			'accordion-down': {
   				from: {
   					height: '0'
@@ -110,7 +138,10 @@ export default {
   		animation: {
   			'accordion-down': 'accordion-down 0.2s ease-out',
   			'accordion-up': 'accordion-up 0.2s ease-out',
-  			'write-in': 'write-in 420ms cubic-bezier(0.23, 1, 0.32, 1) backwards'
+  			'write-in': 'write-in 420ms cubic-bezier(0.23, 1, 0.32, 1) backwards',
+  			'check-draw': 'check-draw 360ms cubic-bezier(0.23, 1, 0.32, 1) 120ms backwards',
+  			'ring-out': 'ring-out 700ms cubic-bezier(0.23, 1, 0.32, 1) 200ms both',
+  			'tick-in': 'tick-in 320ms cubic-bezier(0.23, 1, 0.32, 1) backwards'
   		}
   	}
   },
