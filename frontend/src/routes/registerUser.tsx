@@ -1,5 +1,10 @@
 import { useState } from 'react'
-import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
+import {
+  createFileRoute,
+  Link,
+  useNavigate,
+  redirect
+} from '@tanstack/react-router'
 import { useForm } from '@tanstack/react-form'
 import axios from 'axios'
 import {
@@ -21,7 +26,17 @@ const MIN_USERNAME_LENGTH = 4
 const MIN_PASSWORD_LENGTH = 8
 
 export const Route = createFileRoute('/registerUser')({
-  component: RouteComponent
+  component: RouteComponent,
+  beforeLoad: async () => {
+    const tokenInStore = await cookieStore.get('auth_token')
+    const userToken = tokenInStore ? tokenInStore?.value : null
+    const isLoggedIn = userToken ? true : false
+    if (isLoggedIn) {
+      throw redirect({
+        to: '/profile'
+      })
+    }
+  }
 })
 
 function RouteComponent() {
