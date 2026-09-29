@@ -1,9 +1,11 @@
+from datetime import date, timedelta
 from pydantic import BaseModel
 from fastapi import APIRouter, Depends, HTTPException, Request, Body
 from typing import Annotated, Any
 from fastapi.security import OAuth2PasswordBearer
 from ..Database.programs import get_user_programs, get_program_by_id, delete_program
 from ..Database.users import find_user_by_id
+from ..Database.workouts import get_workout_history
 from ..middleware.authenticateToken import get_current_user
 from ..models.programs import WorkoutProgram
 from ..Database.users import set_users_active_program
@@ -40,6 +42,7 @@ async def get_profile_data(current_user_id: str = Depends(get_current_user)):
         "workout_streak": user_data["current_streak"],
         "programs": programs,
         "active_program": active_program,
+        "workout_history": get_workout_history(current_user_id, date.today() - timedelta(days=365)),
     }
 
     return profile_data

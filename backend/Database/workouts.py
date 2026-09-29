@@ -56,6 +56,26 @@ def get_last_workout_date(user_id: str, before: date) -> date | None:
     data = ast.literal_eval(str(response.data))
     return date.fromisoformat(data[0]["completed_at"])
 
+def get_workout_history(user_id: str, since: date) -> list[Dict[str, Any]]:
+    response = (
+        supabase.table("completed_workouts")
+        .select("completed_at, program_id")
+        .eq("user_id", user_id)
+        .gte("completed_at", since.isoformat())
+        .order("completed_at")
+        .execute()
+    )
+    
+    history: Dict[str, Dict[str, Any]] = {}
+    data = ast.literal_eval(str(response.data))
+    for row in data or []:
+        history[row["completed_at"]] = {
+            "date": row["completed_at"],
+            "has_worked_out": True,
+            "program_link": row["program_id"]
+        }
+    return list(history.values())
+
 def get_previous_performance(user_id: str, names: list[str], until: date) -> Dict[str, Any]:
     try:
         # Includes `until` itself, so a session already logged today counts as the last time

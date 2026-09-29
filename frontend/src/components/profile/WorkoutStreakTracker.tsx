@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState, PointerEvent } from 'react'
 import clsx from 'clsx'
 import { Flame } from 'lucide-react'
 import { WorkoutTracker } from '@/types/profile'
+import { localDateString } from '@/hooks/useWorkoutSession'
 import {
   panelClass,
   panelHeaderClass,
@@ -28,9 +29,7 @@ const generateYearDates = () => {
   return dates
 }
 
-const formatDateKey = (date: Date): string => {
-  return date.toISOString().split('T')[0]
-}
+const formatDateKey = (date: Date): string => localDateString(date)
 
 const MONTH_LABELS = [
   'Jan',

@@ -8,6 +8,7 @@ export interface Profile {
   programs: WorkoutProgram[] | null
   active_program: WorkoutProgram[] | null
   workout_streak: number
+  workout_history: WorkoutTracker[]
 }
 
 export interface WorkoutTracker {

@@ -94,7 +94,7 @@ function RouteComponent() {
           </div>
           <div className="min-w-0 lg:col-span-12">
             <WorkoutStreakTracker
-              data={null}
+              data={data?.workout_history}
               streak={data?.workout_streak}
               isLoading={isLoading}
             />
