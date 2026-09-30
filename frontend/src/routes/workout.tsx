@@ -96,13 +96,13 @@ function RouteComponent() {
     [program, day]
   )
 
-  const backToProfile = (
+  const backToTraining = (
     <Button
       className={primaryButtonClass}
-      onClick={() => navigate({ to: '/profile' })}
+      onClick={() => navigate({ to: '/training' })}
     >
       <ArrowLeft aria-hidden />
-      Back to profile
+      Back to training
     </Button>
   )
 
@@ -128,14 +128,14 @@ function RouteComponent() {
       ) : !program || !workout ? (
         <SessionMessage
           title="Workout not found"
-          body="This training day isn’t in your saved programs anymore. Start a workout from your profile."
-          action={backToProfile}
+          body="This training day isn’t in your saved programs anymore. Start a workout from Training."
+          action={backToTraining}
         />
       ) : workout.exercises.length === 0 ? (
         <SessionMessage
           title="No exercises on this day"
-          body={`${workout.day} has no exercises to log. Pick another day from your profile.`}
-          action={backToProfile}
+          body={`${workout.day} has no exercises to log. Pick another day from Training.`}
+          action={backToTraining}
         />
       ) : (
         <WorkoutSession

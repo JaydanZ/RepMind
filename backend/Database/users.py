@@ -52,7 +52,7 @@ def update_user_streak(user_id: str, streak: int):
     except Exception as e:
         return {"success": False, "error": str(e)}
 
-def set_users_active_program(program_id: str, user_id: str):
+def set_users_active_program(program_id: str | None, user_id: str):
     try:
         response = supabase.table('users').update({"active_program":program_id}).eq('id',user_id).execute()
         return response.data

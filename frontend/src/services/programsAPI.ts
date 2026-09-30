@@ -53,7 +53,7 @@ protectedApi.interceptors.response.use(
 )
 
 export const getUsersPrograms = async () => {
-  const response = await protectedApi.get(`${BACKEND_API}/profile`)
+  const response = await protectedApi.get(`${BACKEND_API}/programs/`)
   return response.data
 }
 
@@ -66,15 +66,14 @@ export const programImport = async (program: ProgramStruct) => {
 }
 
 export const setProgramActive = async (program: WorkoutProgram) => {
-  const response = await protectedApi.post(
-    `${BACKEND_API}/profile/active`,
-    program
-  )
+  const response = await protectedApi.post(`${BACKEND_API}/programs/active`, {
+    program_id: program.id
+  })
   return response.data
 }
 
 export const deleteProgram = async (programId: string) => {
-  const response = await protectedApi.delete(`${BACKEND_API}/profile/delete`, {
+  const response = await protectedApi.delete(`${BACKEND_API}/programs/delete`, {
     data: {
       program_id: programId
     }

@@ -1,35 +1,17 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import clsx from 'clsx'
-import { ArrowRight } from 'lucide-react'
 import { useGetProfileDataQuery } from '@/services/protectedRoutesAPI'
 import { WorkoutStreakTracker } from '@/components/profile/WorkoutStreakTracker'
-import { ProgramsList } from '@/components/profile/ProgramsList'
-import { NextWorkout } from '@/components/profile/NextWorkout'
 import { Button } from '@/components/ui/button'
-import {
-  panelClass,
-  primaryButtonClass,
-  skeletonClass
-} from '@/components/profile/profileStyles'
+import { panelClass, skeletonClass } from '@/components/profile/profileStyles'
 
 export const Route = createFileRoute('/profile')({
   component: RouteComponent
 })
 
 function RouteComponent() {
-  const navigate = useNavigate()
   const { data, isLoading, isError, isFetching, refetch } =
     useGetProfileDataQuery()
-
-  const refreshAfterProgramDelete = async () => {
-    try {
-      await refetch()
-    } catch (error) {
-      console.error(error)
-    }
-  }
-
-  const activeProgram = data?.active_program?.[0] ?? null
 
   return (
     <main className="mx-auto w-full max-w-6xl px-4 pb-32 pt-8 sm:px-8 min-[800px]:pb-16 min-[800px]:pt-28 lg:px-12">
@@ -53,13 +35,6 @@ function RouteComponent() {
             </>
           )}
         </div>
-        <Button
-          className={clsx(primaryButtonClass, 'self-start sm:self-auto')}
-          onClick={() => navigate({ to: '/aiProgramFactory' })}
-        >
-          Generate a Program
-          <ArrowRight aria-hidden />
-        </Button>
       </header>
 
       {isError ? (
@@ -80,19 +55,8 @@ function RouteComponent() {
           </Button>
         </section>
       ) : (
-        <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-12">
-          <div className="min-w-0 lg:col-span-7">
-            <NextWorkout program={activeProgram} isLoading={isLoading} />
-          </div>
-          <div className="min-w-0 lg:col-span-5">
-            <ProgramsList
-              programs={data ? data.programs : null}
-              activeProgram={data ? data.active_program : null}
-              refreshProgramsList={refreshAfterProgramDelete}
-              isLoading={isLoading}
-            />
-          </div>
-          <div className="min-w-0 lg:col-span-12">
+        <div className="grid grid-cols-1 gap-4 sm:gap-6">
+          <div className="min-w-0">
             <WorkoutStreakTracker
               data={data?.workout_history}
               streak={data?.workout_streak}

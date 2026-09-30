@@ -245,9 +245,9 @@ export const SessionComplete = ({
       >
         <Button
           className={clsx(primaryButtonClass, 'h-11 w-full sm:h-10 sm:w-auto')}
-          onClick={() => navigate({ to: '/profile' })}
+          onClick={() => navigate({ to: '/training' })}
         >
-          Back to profile
+          Back to training
           <ArrowRight aria-hidden />
         </Button>
       </div>

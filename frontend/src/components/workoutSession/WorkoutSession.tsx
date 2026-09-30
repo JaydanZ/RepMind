@@ -155,11 +155,11 @@ export const WorkoutSession = ({
     <>
       <header className="pb-6">
         <Link
-          to="/profile"
+          to="/training"
           className="-ml-2 inline-flex h-9 items-center gap-1.5 rounded-md px-2 text-sm text-neutral-400 outline-none transition-colors duration-150 hover:text-neutral-50 focus-visible:ring-1 focus-visible:ring-app-colors-300"
         >
           <ArrowLeft aria-hidden className="size-4" />
-          Profile
+          Training
         </Link>
         <div className="mt-3 flex items-end justify-between gap-4">
           <div className="min-w-0">

@@ -52,7 +52,7 @@ export const protectedApiSlice = createApi({
   tagTypes: ['Profile', 'PreviousPerformance'],
   endpoints: (builder) => ({
     getProfileData: builder.query<Profile, void>({
-      query: () => '/profile',
+      query: () => '/programs/',
       keepUnusedDataFor: 5,
       providesTags: ['Profile']
     }),

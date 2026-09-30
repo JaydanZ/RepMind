@@ -20,8 +20,8 @@ export const LOGGED_IN_ROUTES: routeData[] = [
     params: {}
   },
   {
-    id: 'My Workouts',
-    href: '/userworkouts',
+    id: 'Training',
+    href: '/training',
     icon: <LuDumbbell />,
     params: {}
   },
