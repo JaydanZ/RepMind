@@ -2,11 +2,7 @@ import { memo } from 'react'
 import clsx from 'clsx'
 import { Check, Plus, Trash2 } from 'lucide-react'
 import { Exercise } from '@/types/programCreation'
-import {
-  PreviousExercise,
-  SetEntry,
-  WeightUnit
-} from '@/types/workoutSession'
+import { PreviousExercise, SetEntry, WeightUnit } from '@/types/workoutSession'
 import {
   isExerciseComplete,
   isSetComplete,
@@ -170,19 +166,21 @@ export const ExerciseItem = memo(
           </ol>
 
           <div className="flex items-center justify-end gap-2 border-t border-neutral-800 pt-3">
-            <button
-              type="button"
-              onClick={() => onRemoveSet(exerciseIndex)}
-              disabled={sets.length <= MIN_SETS}
-              aria-label={`Remove set ${sets.length} from ${exercise.name}`}
-              title="Remove last set"
-              className={clsx(
-                setActionClass,
-                'text-neutral-400 hover:bg-neutral-800/70 hover:text-red-300'
-              )}
-            >
-              <Trash2 aria-hidden />
-            </button>
+            {sets.length > MIN_SETS && (
+              <button
+                type="button"
+                onClick={() => onRemoveSet(exerciseIndex)}
+                disabled={sets.length <= MIN_SETS}
+                aria-label={`Remove set ${sets.length} from ${exercise.name}`}
+                title="Remove last set"
+                className={clsx(
+                  setActionClass,
+                  'text-neutral-400 hover:bg-neutral-800/70 hover:text-red-300'
+                )}
+              >
+                <Trash2 aria-hidden />
+              </button>
+            )}
             <button
               type="button"
               onClick={() => onAddSet(exerciseIndex)}
