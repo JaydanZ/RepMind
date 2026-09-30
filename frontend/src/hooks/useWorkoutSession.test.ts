@@ -4,6 +4,7 @@ import {
   buildSubmission,
   createEntries,
   isExerciseComplete,
+  MAX_SETS,
   sanitizeWeight,
   sessionReducer,
   SessionState
@@ -102,5 +103,72 @@ describe('useWorkoutSession helpers', () => {
     ])
     expect(submission.is_completed).toBe(false)
     expect(submission.day).toBe('Monday')
+  })
+
+  it('adds an empty set to only the targeted exercise', () => {
+    const state = sessionReducer(initialState(), { type: 'addSet', exercise: 1 })
+    expect(state.entries.map((sets) => sets.length)).toEqual([2, 2])
+    expect(state.entries[1][1]).toEqual({ reps: '', weight: '', notes: '' })
+  })
+
+  it('caps sets per exercise at the maximum', () => {
+    let state = initialState()
+    for (let i = 0; i < MAX_SETS + 5; i++)
+      state = sessionReducer(state, { type: 'addSet', exercise: 0 })
+    expect(state.entries[0]).toHaveLength(MAX_SETS)
+  })
+
+  it('removes the last set but never the only one', () => {
+    let state = sessionReducer(initialState(), {
+      type: 'updateSet',
+      exercise: 0,
+      set: 0,
+      field: 'reps',
+      value: '8'
+    })
+    state = sessionReducer(state, { type: 'removeSet', exercise: 0 })
+    expect(state.entries[0]).toHaveLength(1)
+    expect(state.entries[0][0].reps).toBe('8')
+
+    state = sessionReducer(state, { type: 'removeSet', exercise: 0 })
+    state = sessionReducer(state, { type: 'removeSet', exercise: 1 })
+    expect(state.entries.map((sets) => sets.length)).toEqual([1, 1])
+  })
+
+  it('treats a removed set as no longer required for completion', () => {
+    let state = sessionReducer(initialState(), {
+      type: 'updateSet',
+      exercise: 0,
+      set: 0,
+      field: 'reps',
+      value: '8'
+    })
+    expect(isExerciseComplete(state.entries[0])).toBe(false)
+    state = sessionReducer(state, { type: 'removeSet', exercise: 0 })
+    expect(isExerciseComplete(state.entries[0])).toBe(true)
+  })
+
+  it('numbers added sets sequentially in the submission', () => {
+    let state = sessionReducer(initialState(), { type: 'addSet', exercise: 1 })
+    state = sessionReducer(state, {
+      type: 'fillSet',
+      exercise: 1,
+      set: 1,
+      reps: '6',
+      weight: ''
+    })
+    const submission = buildSubmission({
+      programId: 'p1',
+      workout,
+      state,
+      performedOn: '2026-09-30',
+      isCompleted: false
+    })
+    expect(submission.sets).toHaveLength(1)
+    expect(submission.sets[0]).toMatchObject({
+      exercise_name: 'Pull Up',
+      set_number: 2,
+      reps: 6
+    })
   })
 })
