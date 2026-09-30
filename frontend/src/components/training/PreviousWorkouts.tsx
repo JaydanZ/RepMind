@@ -34,7 +34,7 @@ const HistorySkeleton = () => (
     {Array.from({ length: 3 }).map((_, index) => (
       <li
         key={index}
-        className="flex items-center gap-3 border-t border-neutral-800 px-4 py-4 first:border-t-0 sm:gap-4 sm:px-6"
+        className="flex min-h-[4.5rem] items-center gap-3 border-t border-neutral-800 px-4 py-3 first:border-t-0 sm:gap-4 sm:px-6"
       >
         <div className={clsx(skeletonClass, 'h-12 w-12 rounded-md')} />
         <div className="flex-1">

@@ -216,7 +216,15 @@ export const WorkoutStreakTracker = ({
 
       {isLoading ? (
         <div className="px-4 py-5 sm:px-6">
-          <div className={clsx(skeletonClass, 'h-28 w-full')} />
+          <div
+            className={clsx(
+              skeletonClass,
+              'h-[116px] w-full sm:h-[130px] lg:h-[151px]'
+            )}
+          />
+          <div className="mt-3 flex h-4 items-center justify-end">
+            <div className={clsx(skeletonClass, 'h-3 w-28')} />
+          </div>
         </div>
       ) : (
         <div className="px-4 py-5 sm:px-6">

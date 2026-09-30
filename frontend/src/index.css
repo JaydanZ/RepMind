@@ -126,13 +126,16 @@
   * {
     @apply border-border;
   }
+  html {
+    scrollbar-gutter: stable;
+    @apply bg-app-colors-500;
+  }
   body {
     @apply bg-background text-foreground;
   }
 }
 
 @layer utilities {
-  /* Landing page: sample week rows cascade in, staggered by --i */
   .animate-write-in {
     animation-delay: calc(var(--i, 0) * 28ms);
   }

@@ -176,7 +176,10 @@ ProgramRow.displayName = 'ProgramRow'
 const ProgramsSkeleton = () => (
   <ul aria-hidden className="divide-y divide-neutral-800">
     {Array.from({ length: 3 }).map((_, index) => (
-      <li key={index} className="flex items-center gap-3 px-4 py-4 sm:px-6">
+      <li
+        key={index}
+        className="flex min-h-[4.5rem] items-center gap-3 px-4 py-3 sm:px-6"
+      >
         <div className="flex-1">
           <div className={clsx(skeletonClass, 'h-4 w-2/5')} />
           <div className={clsx(skeletonClass, 'mt-2 h-3 w-24')} />

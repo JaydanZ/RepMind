@@ -76,23 +76,37 @@ const formatDate = (dateStr: string): string => {
   })
 }
 
+// Mirrors the loaded card's box sizes so content swaps in without shifting
+// the panels below it
 const NextWorkoutSkeleton = () => (
   <section className={panelClass} aria-busy="true" aria-label="Next workout">
     <div className={panelHeaderClass}>
-      <div className={clsx(skeletonClass, 'h-5 w-28')} />
-    </div>
-    <div className="px-4 py-5 sm:px-6">
-      <div className={clsx(skeletonClass, 'h-8 w-40')} />
-      <div className={clsx(skeletonClass, 'mt-2 h-4 w-24')} />
-      <div className="mt-6 flex flex-col gap-4">
-        {Array.from({ length: 4 }).map((_, index) => (
-          <div key={index} className="flex justify-between gap-4">
-            <div className={clsx(skeletonClass, 'h-4 w-1/2')} />
-            <div className={clsx(skeletonClass, 'h-4 w-12')} />
-          </div>
-        ))}
+      <div className="flex h-6 items-center">
+        <div className={clsx(skeletonClass, 'h-5 w-28')} />
       </div>
+      <div className={clsx(skeletonClass, 'h-6 w-16 rounded-full')} />
     </div>
+    <div className="px-4 pb-2 pt-5 sm:px-6">
+      <div className={clsx(skeletonClass, 'h-[1.875rem] w-40')} />
+      <div className="mt-2 flex h-5 items-center">
+        <div className={clsx(skeletonClass, 'h-4 w-24')} />
+      </div>
+      <div className="mt-1 flex h-5 items-center">
+        <div className={clsx(skeletonClass, 'h-4 w-56 max-w-full')} />
+      </div>
+      <div className={clsx(skeletonClass, 'mt-5 h-10 w-36 rounded-md')} />
+    </div>
+    <ul aria-hidden className="px-4 pb-3 sm:px-6">
+      {Array.from({ length: 5 }).map((_, index) => (
+        <li
+          key={index}
+          className="flex min-h-12 items-center justify-between gap-4 border-t border-neutral-800/80 first:border-t-0"
+        >
+          <div className={clsx(skeletonClass, 'h-4 w-1/2')} />
+          <div className={clsx(skeletonClass, 'h-4 w-12')} />
+        </li>
+      ))}
+    </ul>
   </section>
 )
 
