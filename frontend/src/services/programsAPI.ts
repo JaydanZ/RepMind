@@ -1,5 +1,9 @@
 import axios from 'axios'
-import { ProgramStruct, WorkoutProgram } from '@/types/programCreation'
+import {
+  ProgramActiveResponse,
+  ProgramStruct,
+  WorkoutProgram
+} from '@/types/programCreation'
 import { genNewAccessToken } from './authAPI'
 import { router } from '@/App'
 
@@ -65,10 +69,15 @@ export const programImport = async (program: ProgramStruct) => {
   return response.data
 }
 
-export const setProgramActive = async (program: WorkoutProgram) => {
-  const response = await protectedApi.post(`${BACKEND_API}/programs/active`, {
-    program_id: program.id
-  })
+export const setProgramActive = async (
+  program: WorkoutProgram
+): Promise<ProgramActiveResponse> => {
+  const response = await protectedApi.post<ProgramActiveResponse>(
+    `${BACKEND_API}/programs/active`,
+    {
+      program_id: program.id
+    }
+  )
   return response.data
 }
 

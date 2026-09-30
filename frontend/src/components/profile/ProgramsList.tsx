@@ -37,12 +37,6 @@ interface ProgramsListProps {
   isLoading?: boolean
 }
 
-interface ProgramActiveResponse {
-  message: string
-  program_id: string
-  status: number
-}
-
 export const ProgramRow = memo((props: ProgramRowProps): ReactElement => {
   const [isActivating, setIsActivating] = useState(false)
   const [activateError, setActivateError] = useState(false)
@@ -205,13 +199,10 @@ export const ProgramsList = (props: ProgramsListProps): ReactElement => {
 
   const handleSetActive = async (program: WorkoutProgram) => {
     try {
-      const response = await setProgramActive(program)
-      if (response && (response as ProgramActiveResponse).status === 201) {
-        setOptimisticActiveId(response.program_id)
-        props.refreshProgramsList()
-        return true
-      }
-      return false
+      const { program_id } = await setProgramActive(program)
+      setOptimisticActiveId(program_id)
+      props.refreshProgramsList()
+      return true
     } catch (error) {
       console.error(error)
       return false

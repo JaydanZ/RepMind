@@ -81,8 +81,7 @@ async def set_active_program(payload: ProgramIdRequest, user_id: str = Depends(g
 
     return {
         "message": "active program set",
-        "program_id": update_response[0]["active_program"],
-        "status": 201
+        "program_id": update_response[0]["active_program"]
     }
 
 @programs_router.delete("/delete", status_code=200)
@@ -105,8 +104,7 @@ async def delete_program_route(payload: ProgramIdRequest, user_id: str = Depends
 
     return {
         "message": "program deleted",
-        "program_id": program_id,
-        "status": 200
+        "program_id": program_id
     }
 
 @programs_router.post('/generation', status_code=201)
