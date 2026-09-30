@@ -44,3 +44,30 @@ export interface SubmitWorkoutResponse {
   workout_streak: number
   sets_logged: number
 }
+
+export interface WorkoutHistorySet {
+  set_number: number
+  reps: number | null
+  weight: number | null
+  weight_unit: WeightUnit
+}
+
+export interface WorkoutHistoryExercise {
+  name: string
+  sets: WorkoutHistorySet[]
+}
+
+export interface WorkoutHistoryEntry {
+  id: string
+  date: string
+  day: string | null
+  focus: string | null
+  program_name: string | null
+  is_completed: boolean
+  exercises: WorkoutHistoryExercise[]
+}
+
+export interface WorkoutHistoryResponse {
+  workouts: WorkoutHistoryEntry[]
+  has_more: boolean
+}

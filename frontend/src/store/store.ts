@@ -1,8 +1,20 @@
 import { useDispatch } from 'react-redux'
-import { configureStore } from '@reduxjs/toolkit'
+import {
+  configureStore,
+  createListenerMiddleware,
+  isAnyOf
+} from '@reduxjs/toolkit'
 import { protectedApiSlice } from '@/services/protectedRoutesAPI'
-import authReducer from '@/features/auth/authSlice'
+import authReducer, { userLogin, userLogout } from '@/features/auth/authSlice'
 import programGenerationReducer from '@/features/programGeneration/programGenerationSlice'
+
+const authListener = createListenerMiddleware()
+authListener.startListening({
+  matcher: isAnyOf(userLogin.fulfilled, userLogout.fulfilled),
+  effect: (_action, listenerApi) => {
+    listenerApi.dispatch(protectedApiSlice.util.resetApiState())
+  }
+})
 
 export const store = configureStore({
   reducer: {
@@ -11,7 +23,9 @@ export const store = configureStore({
     programGeneration: programGenerationReducer
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(protectedApiSlice.middleware)
+    getDefaultMiddleware()
+      .prepend(authListener.middleware)
+      .concat(protectedApiSlice.middleware)
 })
 
 export type RootState = ReturnType<typeof store.getState>

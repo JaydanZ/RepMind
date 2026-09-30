@@ -111,3 +111,54 @@ def get_previous_performance(user_id: str, names: list[str], until: date) -> Dic
         return {"success": True, "data": latest}
     except Exception as e:
         return {"success": False, "error": str(e)}
+
+def get_recent_workouts(user_id: str, limit: int, offset: int) -> Dict[str, Any]:
+    try:
+        response = (
+            supabase.table("completed_workouts")
+            .select(
+                "id, completed_at, day, focus, is_completed, "
+                "workout_programs(program_name), "
+                "exercise_set_logs(name, exercise_order, set_number, reps, weight, weight_unit)"
+            )
+            .eq("user_id", user_id)
+            .order("completed_at", desc=True)
+            .range(offset, offset + limit)
+            .execute()
+        )
+        data = ast.literal_eval(str(response.data))
+        rows = data or []
+
+        workouts = []
+        for row in rows[:limit]:
+            exercises: Dict[tuple, Dict[str, Any]] = {}
+            for s in sorted(
+                row.get("exercise_set_logs") or [],
+                key=lambda s: (s.get("exercise_order") or 0, s["set_number"])
+            ):
+                key = (s.get("exercise_order") or 0, s["name"])
+                exercise = exercises.setdefault(key, {"name": s["name"], "sets": []})
+                exercise["sets"].append({
+                    "set_number": s["set_number"],
+                    "reps": s["reps"],
+                    "weight": float(s["weight"]) if s["weight"] is not None else None,
+                    "weight_unit": s["weight_unit"]
+                })
+
+            program = row.get("workout_programs") or {}
+            workouts.append({
+                "id": row["id"],
+                "date": row["completed_at"],
+                "day": row.get("day"),
+                "focus": row.get("focus"),
+                "program_name": program.get("program_name"),
+                "is_completed": bool(row.get("is_completed")),
+                "exercises": list(exercises.values())
+            })
+
+        return {
+            "success": True,
+            "data": {"workouts": workouts, "has_more": len(rows) > limit}
+        }
+    except Exception as e:
+        return {"success": False, "error": str(e)}

@@ -11,6 +11,7 @@ import { Profile } from '@/types/profile'
 import {
   PreviousPerformance,
   SubmitWorkoutResponse,
+  WorkoutHistoryResponse,
   WorkoutSubmission
 } from '@/types/workoutSession'
 
@@ -49,7 +50,7 @@ const protectedRoutesApi = async (
 
 export const protectedApiSlice = createApi({
   baseQuery: protectedRoutesApi,
-  tagTypes: ['Profile', 'PreviousPerformance'],
+  tagTypes: ['Profile', 'PreviousPerformance', 'WorkoutHistory'],
   endpoints: (builder) => ({
     getProfileData: builder.query<Profile, void>({
       query: () => '/programs/',
@@ -67,9 +68,16 @@ export const protectedApiSlice = createApi({
       },
       providesTags: ['PreviousPerformance']
     }),
+    getWorkoutHistory: builder.query<WorkoutHistoryResponse, { limit: number }>(
+      {
+        query: ({ limit }) =>
+          `/workouts/history?${new URLSearchParams({ limit: String(limit) })}`,
+        providesTags: ['WorkoutHistory']
+      }
+    ),
     submitWorkout: builder.mutation<SubmitWorkoutResponse, WorkoutSubmission>({
       query: (body) => ({ url: '/workouts/', method: 'POST', body }),
-      invalidatesTags: ['Profile', 'PreviousPerformance']
+      invalidatesTags: ['Profile', 'PreviousPerformance', 'WorkoutHistory']
     })
   })
 })
@@ -78,5 +86,6 @@ export const protectedApiSlice = createApi({
 export const {
   useGetProfileDataQuery,
   useGetPreviousPerformanceQuery,
+  useGetWorkoutHistoryQuery,
   useSubmitWorkoutMutation
 } = protectedApiSlice

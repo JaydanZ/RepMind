@@ -4,6 +4,7 @@ import { ArrowRight } from 'lucide-react'
 import { useGetProfileDataQuery } from '@/services/protectedRoutesAPI'
 import { ProgramsList } from '@/components/profile/ProgramsList'
 import { NextWorkout } from '@/components/profile/NextWorkout'
+import { PreviousWorkouts } from '@/components/training/PreviousWorkouts'
 import { Button } from '@/components/ui/button'
 import {
   panelClass,
@@ -37,7 +38,7 @@ function RouteComponent() {
             Training
           </h1>
           <p className="mt-1 text-sm text-neutral-400">
-            Your next session and saved programs.
+            Your next session, saved programs and workout log.
           </p>
         </div>
         <Button
@@ -75,6 +76,7 @@ function RouteComponent() {
             refreshProgramsList={refreshAfterProgramChange}
             isLoading={isLoading}
           />
+          <PreviousWorkouts />
         </div>
       )}
     </main>
