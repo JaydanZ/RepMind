@@ -93,6 +93,8 @@ export const WorkoutSession = ({
     progress,
     updateSet,
     fillSet,
+    addSet,
+    removeSet,
     setUnit,
     getSubmission,
     clearDraft
@@ -208,6 +210,8 @@ export const WorkoutSession = ({
               previousLoading={previousQuery.isLoading}
               onChange={updateSet}
               onFill={fillSet}
+              onAddSet={addSet}
+              onRemoveSet={removeSet}
             />
           ))}
         </Accordion>

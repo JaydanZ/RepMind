@@ -29,10 +29,15 @@ export type SessionAction =
       reps: string
       weight: string
     }
+  | { type: 'addSet'; exercise: number }
+  | { type: 'removeSet'; exercise: number }
   | { type: 'setUnit'; unit: WeightUnit }
 
 const UNIT_KEY = 'repmind:weight-unit'
 const EMPTY_SET: SetEntry = { reps: '', weight: '', notes: '' }
+
+export const MIN_SETS = 1
+export const MAX_SETS = 20
 
 export const localDateString = (date = new Date()): string => {
   const month = String(date.getMonth() + 1).padStart(2, '0')
@@ -42,7 +47,10 @@ export const localDateString = (date = new Date()): string => {
 
 export const createEntries = (exercises: Exercise[]): SetEntry[][] =>
   exercises.map((exercise) =>
-    Array.from({ length: Math.max(1, exercise.sets) }, () => ({ ...EMPTY_SET }))
+    Array.from(
+      { length: Math.min(MAX_SETS, Math.max(MIN_SETS, exercise.sets)) },
+      () => ({ ...EMPTY_SET })
+    )
   )
 
 export const sanitizeReps = (value: string): string =>
@@ -102,6 +110,24 @@ export const sessionReducer = (
                       weight: sanitizeWeight(action.weight)
                     }
               )
+        )
+      }
+    case 'addSet':
+      return {
+        ...state,
+        entries: state.entries.map((sets, exerciseIndex) =>
+          exerciseIndex !== action.exercise || sets.length >= MAX_SETS
+            ? sets
+            : [...sets, { ...EMPTY_SET }]
+        )
+      }
+    case 'removeSet':
+      return {
+        ...state,
+        entries: state.entries.map((sets, exerciseIndex) =>
+          exerciseIndex !== action.exercise || sets.length <= MIN_SETS
+            ? sets
+            : sets.slice(0, -1)
         )
       }
     case 'setUnit':
@@ -176,13 +202,15 @@ const loadDraft = (key: string, exercises: Exercise[]): SetEntry[][] | null => {
   if (!raw) return null
   try {
     const parsed = JSON.parse(raw) as SetEntry[][]
-    const fresh = createEntries(exercises)
+    // Set counts can differ from the program once sets are added or removed
     const matches =
       Array.isArray(parsed) &&
-      parsed.length === fresh.length &&
+      parsed.length === exercises.length &&
       parsed.every(
-        (sets, index) =>
-          Array.isArray(sets) && sets.length === fresh[index].length
+        (sets) =>
+          Array.isArray(sets) &&
+          sets.length >= MIN_SETS &&
+          sets.length <= MAX_SETS
       )
     if (!matches) return null
     return parsed.map((sets) =>
@@ -253,6 +281,16 @@ export const useWorkoutSession = ({
     []
   )
 
+  const addSet = useCallback(
+    (exercise: number) => dispatch({ type: 'addSet', exercise }),
+    []
+  )
+
+  const removeSet = useCallback(
+    (exercise: number) => dispatch({ type: 'removeSet', exercise }),
+    []
+  )
+
   const setUnit = useCallback(
     (unit: WeightUnit) => dispatch({ type: 'setUnit', unit }),
     []
@@ -272,6 +310,8 @@ export const useWorkoutSession = ({
     progress,
     updateSet,
     fillSet,
+    addSet,
+    removeSet,
     setUnit,
     getSubmission,
     clearDraft

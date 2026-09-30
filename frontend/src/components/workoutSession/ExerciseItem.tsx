@@ -1,6 +1,6 @@
 import { memo } from 'react'
 import clsx from 'clsx'
-import { Check } from 'lucide-react'
+import { Check, Plus, Trash2 } from 'lucide-react'
 import { Exercise } from '@/types/programCreation'
 import {
   PreviousExercise,
@@ -10,7 +10,9 @@ import {
 import {
   isExerciseComplete,
   isSetComplete,
-  localDateString
+  localDateString,
+  MAX_SETS,
+  MIN_SETS
 } from '@/hooks/useWorkoutSession'
 import {
   AccordionContent,
@@ -38,7 +40,12 @@ interface ExerciseItemProps {
     value: string
   ) => void
   onFill: (exercise: number, set: number, reps: string, weight: string) => void
+  onAddSet: (exercise: number) => void
+  onRemoveSet: (exercise: number) => void
 }
+
+const setActionClass =
+  'inline-flex size-10 items-center justify-center rounded-md outline-none transition-[transform,color,background-color,border-color] duration-150 ease-out-strong focus-visible:ring-1 focus-visible:ring-app-colors-300 active:scale-[0.94] disabled:pointer-events-none disabled:opacity-40 [&_svg]:size-[1.125rem]'
 
 const formatSessionDate = (dateStr: string) => {
   if (dateStr === localDateString()) return 'today'
@@ -56,7 +63,9 @@ export const ExerciseItem = memo(
     previous,
     previousLoading,
     onChange,
-    onFill
+    onFill,
+    onAddSet,
+    onRemoveSet
   }: ExerciseItemProps) => {
     const complete = isExerciseComplete(sets)
     const loggedCount = sets.filter(isSetComplete).length
@@ -160,8 +169,37 @@ export const ExerciseItem = memo(
             ))}
           </ol>
 
+          <div className="flex items-center justify-end gap-2 border-t border-neutral-800 pt-3">
+            <button
+              type="button"
+              onClick={() => onRemoveSet(exerciseIndex)}
+              disabled={sets.length <= MIN_SETS}
+              aria-label={`Remove set ${sets.length} from ${exercise.name}`}
+              title="Remove last set"
+              className={clsx(
+                setActionClass,
+                'text-neutral-400 hover:bg-neutral-800/70 hover:text-red-300'
+              )}
+            >
+              <Trash2 aria-hidden />
+            </button>
+            <button
+              type="button"
+              onClick={() => onAddSet(exerciseIndex)}
+              disabled={sets.length >= MAX_SETS}
+              aria-label={`Add a set to ${exercise.name}`}
+              title="Add set"
+              className={clsx(
+                setActionClass,
+                'border border-neutral-700 text-neutral-200 hover:border-app-colors-300/60 hover:text-app-colors-300'
+              )}
+            >
+              <Plus aria-hidden />
+            </button>
+          </div>
+
           {exercise.exercise_tip && (
-            <p className="mt-2 max-w-prose border-t border-neutral-800 pt-3 text-sm leading-relaxed text-neutral-400">
+            <p className="mt-3 max-w-prose border-t border-neutral-800 pt-3 text-sm leading-relaxed text-neutral-400">
               {exercise.exercise_tip}
             </p>
           )}
