@@ -1,4 +1,4 @@
-import { useState, Activity } from 'react'
+import { useState, useRef, useEffect, Activity } from 'react'
 import { useForm, useStore } from '@tanstack/react-form'
 import clsx from 'clsx'
 
@@ -82,10 +82,19 @@ const daysInWeekList = [
 ]
 const genderOptions = ['Male', 'Female']
 
+const optionClass =
+  'flex flex-row hover:cursor-pointer justify-between items-center w-full p-4 my-1.5 sm:p-5 sm:my-2 bg-neutral-900 border-2 rounded-lg font-medium select-none [-webkit-tap-highlight-color:transparent] transition-[background-color,border-color,color,transform] duration-150 ease-out active:scale-[0.99] motion-reduce:active:scale-100 has-[:focus-visible]:ring-1 has-[:focus-visible]:ring-app-colors-300 has-[:checked]:border-app-colors-300 has-[:checked]:text-app-colors-300 has-[:checked]:bg-app-colors-300/5 [@media(hover:hover)]:hover:bg-neutral-800'
+const radioClass =
+  'ml-3 w-4 h-4 shrink-0 appearance-none rounded-full border-2 border-solid border-neutral-600 bg-neutral-600 transition-colors duration-150 checked:border-app-colors-300 checked:bg-app-colors-300'
+const pressableClass =
+  'h-11 min-[800px]:h-10 transition-[transform,background-color] duration-150 ease-out-strong active:scale-[0.97] motion-reduce:active:scale-100'
+
 export const ProgramFactory = () => {
   const [sectionNumber, setSectionNumber] = useState<number>(0)
   const [weightUnit, setWeightUnit] = useState<WeightUnits>(WeightUnits.Pounds)
   const [sectionError, setSectionError] = useState<string>('')
+  const cardRef = useRef<HTMLDivElement>(null)
+  const hasMounted = useRef(false)
 
   const isUserLoggedIn = useSelector(
     (state: RootState) => state.auth.isLoggedIn
@@ -157,6 +166,24 @@ export const ProgramFactory = () => {
     ([option, value]) => ({ option, value })
   )
 
+  useEffect(() => {
+    if (!hasMounted.current) {
+      hasMounted.current = true
+      return
+    }
+
+    const card = cardRef.current
+    if (!card || card.getBoundingClientRect().top >= 0) return
+
+    const reduceMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)'
+    ).matches
+    card.scrollIntoView({
+      behavior: reduceMotion ? 'auto' : 'smooth',
+      block: 'start'
+    })
+  }, [sectionNumber])
+
   const handleSectionNumChange = (sectionChange: number) => {
     // Before advancing to the next section, we need to manually check if all necessary fields have been filled out in a section
     // Only when user clicks next, ignore if back is clicked
@@ -204,40 +231,51 @@ export const ProgramFactory = () => {
   }
 
   return (
-    <div className="flex flex-col justify-center items-center">
-      <Label className="text-[3rem] mb-8 font-thin">Program Generator</Label>
-      <div className="flex flex-row w-full mb-6 gap-x-4">
-        {sections.map((section, index) => (
-          <div className="flex flex-col items-center" key={index}>
-            <Label
-              className={clsx(
-                'text-[0.8rem] mb-2',
-                sectionNumber >= section.sectionNum
-                  ? 'text-app-colors-300'
-                  : 'text-neutral-500'
-              )}
-            >
-              {section.sectionName}
-            </Label>
+    <div className="flex flex-col justify-center items-center w-full min-[800px]:w-auto">
+      <Label className="text-4xl leading-tight text-center mb-6 min-[800px]:text-[3rem] min-[800px]:leading-none min-[800px]:mb-8 font-thin">
+        Program Generator
+      </Label>
+      <div className="w-full mb-6">
+        <p className="mb-2 text-xs text-neutral-400 tabular-nums min-[800px]:hidden">
+          Step {sectionNumber + 1} of {sections.length}
+        </p>
+        <div className="flex flex-row w-full gap-x-1.5 min-[800px]:gap-x-4">
+          {sections.map((section, index) => (
             <div
-              className={clsx(
-                'inline-block w-[140px] min-h-[4px] rounded-xl',
-                sectionNumber >= section.sectionNum
-                  ? 'bg-app-colors-300'
-                  : 'bg-neutral-500'
-              )}
-            ></div>
-          </div>
-        ))}
+              className="flex flex-1 flex-col items-center min-[800px]:flex-none"
+              key={index}
+            >
+              <Label
+                className={clsx(
+                  'hidden min-[800px]:block text-[0.8rem] mb-2',
+                  sectionNumber >= section.sectionNum
+                    ? 'text-app-colors-300'
+                    : 'text-neutral-500'
+                )}
+              >
+                {section.sectionName}
+              </Label>
+              <div
+                className={clsx(
+                  'inline-block w-full min-[800px]:w-[140px] min-h-[4px] rounded-xl transition-colors duration-300 ease-out',
+                  sectionNumber >= section.sectionNum
+                    ? 'bg-app-colors-300'
+                    : 'bg-neutral-500'
+                )}
+              ></div>
+            </div>
+          ))}
+        </div>
       </div>
       <Card
+        ref={cardRef}
         className={clsx(
-          'flex flex-col w-full min-h-[550px] justify-between',
+          'flex flex-col w-full min-h-[480px] min-[800px]:min-h-[550px] justify-between scroll-mt-4 transition-colors duration-200',
           sectionError.length > 0 && 'border-red-500'
         )}
       >
-        <CardHeader>
-          <CardTitle className="text-[2rem]">
+        <CardHeader className="p-4 sm:p-6">
+          <CardTitle className="text-2xl sm:text-[2rem]">
             {sectionNumber === 0 ? (
               <div>Fitness Goals</div>
             ) : sectionNumber === 1 ? (
@@ -269,7 +307,7 @@ export const ProgramFactory = () => {
             <Label className="pt-4 pb-1 text-red-500">{sectionError}</Label>
           )}
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-4 pt-0 sm:p-6 sm:pt-0">
           <form
             onSubmit={(e) => {
               e.preventDefault()
@@ -282,7 +320,7 @@ export const ProgramFactory = () => {
                   <div>
                     {fitnessGoalList.map((goal, index) => (
                       <div className="flex items-center gap-3" key={index}>
-                        <label className="flex flex-row hover:cursor-pointer justify-between items-center w-full p-5 my-2 bg-neutral-900 border-2 rounded-lg font-medium has-[:checked]:border-app-colors-300 has-[:checked]:text-app-colors-300 has-[:checked]:bg-app-colors-300/5 hover:bg-neutral-800">
+                        <label className={optionClass}>
                           {goal}
                           <input
                             type="radio"
@@ -290,7 +328,7 @@ export const ProgramFactory = () => {
                             value={goal}
                             checked={field.state.value === goal}
                             onChange={(e) => field.handleChange(e.target.value)}
-                            className="w-4 h-4 appearance-none rounded-full border-2 border-solid border-neutral-600 bg-neutral-600 checked:border-app-colors-300 checked:bg-app-colors-300"
+                            className={radioClass}
                           />
                         </label>
                       </div>
@@ -305,7 +343,7 @@ export const ProgramFactory = () => {
                   <div>
                     {yearsOfExperienceList.map((years, index) => (
                       <div className="flex items-center gap-3" key={index}>
-                        <label className="flex flex-row hover:cursor-pointer justify-between items-center w-full p-5 my-2 bg-neutral-900 border-2 rounded-lg font-medium has-[:checked]:border-app-colors-300 has-[:checked]:text-app-colors-300 has-[:checked]:bg-app-colors-300/5 hover:bg-neutral-800">
+                        <label className={optionClass}>
                           {years}
                           <input
                             type="radio"
@@ -313,7 +351,7 @@ export const ProgramFactory = () => {
                             value={years}
                             checked={field.state.value === years}
                             onChange={(e) => field.handleChange(e.target.value)}
-                            className="w-4 h-4 appearance-none rounded-full border-2 border-solid border-neutral-600 bg-neutral-600 checked:border-app-colors-300 checked:bg-app-colors-300"
+                            className={radioClass}
                           />
                         </label>
                       </div>
@@ -328,7 +366,7 @@ export const ProgramFactory = () => {
                   <div>
                     {daysInWeekList.map((days, index) => (
                       <div className="flex items-center gap-3" key={index}>
-                        <label className="flex flex-row hover:cursor-pointer justify-between items-center w-full p-5 my-2 bg-neutral-900 border-2 rounded-lg font-medium has-[:checked]:border-app-colors-300 has-[:checked]:text-app-colors-300 has-[:checked]:bg-app-colors-300/5 hover:bg-neutral-800">
+                        <label className={optionClass}>
                           {days}
                           <input
                             type="radio"
@@ -336,7 +374,7 @@ export const ProgramFactory = () => {
                             value={days}
                             checked={field.state.value === days}
                             onChange={(e) => field.handleChange(e.target.value)}
-                            className="w-4 h-4 appearance-none rounded-full border-2 border-solid border-neutral-600 bg-neutral-600 checked:border-app-colors-300 checked:bg-app-colors-300"
+                            className={radioClass}
                           />
                         </label>
                       </div>
@@ -466,15 +504,12 @@ export const ProgramFactory = () => {
                         Gender
                       </Label>
                       <div
-                        className="flex flex-row w-full justify-between space-x-4"
+                        className="flex flex-row w-full justify-between gap-3 sm:gap-4"
                         id="gender"
                       >
                         {genderOptions.map((gender, index) => (
-                          <div
-                            className="flex items-center m w-full"
-                            key={index}
-                          >
-                            <label className="flex flex-row hover:cursor-pointer justify-between items-center w-full p-5 my-2 bg-neutral-900 border-2 rounded-lg font-medium has-[:checked]:border-app-colors-300 has-[:checked]:text-app-colors-300 has-[:checked]:bg-app-colors-300/5 hover:bg-neutral-800">
+                          <div className="flex items-center w-full" key={index}>
+                            <label className={optionClass}>
                               {gender}
                               <input
                                 type="radio"
@@ -484,7 +519,7 @@ export const ProgramFactory = () => {
                                 onChange={(e) =>
                                   field.handleChange(e.target.value)
                                 }
-                                className="w-4 h-4 appearance-none rounded-full border-2 border-solid border-neutral-600 bg-neutral-600 checked:border-app-colors-300 checked:bg-app-colors-300"
+                                className={radioClass}
                               />
                             </label>
                           </div>
@@ -502,24 +537,28 @@ export const ProgramFactory = () => {
                 <div className="flex flex-col w-full">
                   {formValuesArray.map((formField, index) => (
                     <div
-                      className="flex flex-row my-1 justify-between"
+                      className="flex flex-row my-1 gap-4 justify-between items-center"
                       key={index}
                     >
-                      <Label className="text-[1.1rem] text-neutral-400">
+                      <Label className="shrink-0 text-base sm:text-[1.1rem] text-neutral-400">
                         {summaryFieldNames[index].section}
                       </Label>
-                      <div className="flex flex-row justify-center items-center">
-                        <Label className="text-[1.1rem]">
+                      <div className="flex flex-row min-w-0 justify-end items-center">
+                        <Label className="text-right leading-snug text-base sm:text-[1.1rem]">
                           {formField.value}
                         </Label>
                         <Button
+                          type="button"
                           variant="ghost"
+                          aria-label={`Edit ${summaryFieldNames[
+                            index
+                          ].section.toLowerCase()}`}
                           onClick={() =>
                             setSectionNumber(
                               summaryFieldNames[index].sectionNum
                             )
                           }
-                          className="p-0 pl-2 w-fit h-fit text-neutral-400 text-xs"
+                          className="shrink-0 size-10 -my-2.5 -ml-1 -mr-3 p-0 text-neutral-400 text-xs [-webkit-tap-highlight-color:transparent]"
                         >
                           <Cog className="!size-4" />
                         </Button>
@@ -531,7 +570,7 @@ export const ProgramFactory = () => {
                   variant="default"
                   type="submit"
                   size="lg"
-                  className="mt-6 w-full"
+                  className={clsx(pressableClass, 'mt-6 w-full')}
                 >
                   Generate Program
                 </Button>
@@ -539,15 +578,15 @@ export const ProgramFactory = () => {
             </Activity>
           </form>
         </CardContent>
-        <Separator className="mt-auto mb-6" orientation="horizontal" />
-        <CardFooter className="flex flex-col">
+        <Separator className="mt-auto mb-4 sm:mb-6" orientation="horizontal" />
+        <CardFooter className="flex flex-col p-4 pt-0 sm:p-6 sm:pt-0">
           <div className="flex flex-row w-full justify-between">
             {sectionNumber > 0 && (
               <Button
                 variant="secondary"
                 size="lg"
                 onClick={() => handleSectionNumChange(-1)}
-                className="mr-auto"
+                className={clsx(pressableClass, 'mr-auto')}
               >
                 Back
               </Button>
@@ -557,7 +596,7 @@ export const ProgramFactory = () => {
                 variant="default"
                 size="lg"
                 onClick={() => handleSectionNumChange(+1)}
-                className="ml-auto"
+                className={clsx(pressableClass, 'ml-auto')}
               >
                 Next
               </Button>

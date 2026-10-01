@@ -41,27 +41,22 @@ function RouteComponent() {
       ? true
       : false
 
-  const displayLoggedOutRateLimit =
-    !programResult && !isLoading && limitProgramGen && !rateLimitReached
-      ? true
-      : false
-  const displayLoggedInRateLimit =
-    !programResult && !isLoading && rateLimitReached && !limitProgramGen
-      ? true
-      : false
+  const displayRateLimit =
+    !programResult && !isLoading && (limitProgramGen || rateLimitReached)
 
   return (
     <div
       className={clsx(
-        'flex justify-center pt-[90px]',
-        programResult && !isLoading ? 'items-start h-max' : 'items-center h-dvh'
+        'flex justify-center px-4 pt-8 pb-32 min-[800px]:px-0 min-[800px]:pt-[90px] min-[800px]:pb-0',
+        programResult && !isLoading
+          ? 'items-start h-max'
+          : 'items-center min-h-dvh'
       )}
     >
       {displayProgramFactory && <ProgramFactory />}
-      {displayLoggedOutRateLimit ||
-        (displayLoggedInRateLimit && (
-          <LimitReachedDisplay authLimitReached={rateLimitReached} />
-        ))}
+      {displayRateLimit && (
+        <LimitReachedDisplay authLimitReached={isLoggedIn} />
+      )}
       {isLoading && <ProgramLoadingScreen />}
       {programResult && !isLoading && <ProgramResult />}
     </div>

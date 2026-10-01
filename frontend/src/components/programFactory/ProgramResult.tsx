@@ -25,6 +25,9 @@ import { Label } from '../ui/label'
 import { Button } from '../ui/button'
 import { ArrowLeft } from 'lucide-react'
 
+const ctaClass =
+  'border-app-colors-300 text-lg py-5 h-12 sm:h-10 [-webkit-tap-highlight-color:transparent] transition-[transform,background-color,color] duration-150 ease-out-strong active:scale-[0.97] motion-reduce:active:scale-100 [@media(hover:hover)]:hover:bg-app-colors-300 [@media(hover:hover)]:hover:text-black'
+
 export const ProgramResult = () => {
   const [selectedDay, setSelectedDay] = useState<number>(0)
   const dispatch = useDispatch()
@@ -50,28 +53,35 @@ export const ProgramResult = () => {
   }
 
   return (
-    <div className="flex flex-col justify-center items-center">
+    <div className="flex flex-col justify-center items-center w-full min-[800px]:w-auto">
       <Button
         variant="ghost"
-        className="text-app-colors-300 mr-auto"
+        className="text-app-colors-300 mr-auto -ml-2 h-11 px-2 min-[800px]:ml-0 min-[800px]:h-9 min-[800px]:px-4"
         onClick={() => dispatch(clearProgram())}
       >
         <ArrowLeft />
         Back
       </Button>
-      <Label className="text-[3rem] mb-10 font-thin">
+      <Label className="text-[2.25rem] leading-tight text-center text-balance mt-2 mb-8 min-[800px]:mt-0 min-[800px]:text-[3rem] min-[800px]:mb-10 font-thin">
         {programData?.name ? programData.name : 'Your Program'}
       </Label>
-      <div className="flex flex-row -mb-px">
+      <div className="flex flex-row w-full -mb-px min-[800px]:w-auto">
         {programData?.program_structure?.map((workout, index) => (
-          <div key={index} className={clsx(index === selectedDay && 'z-10')}>
+          <div
+            key={index}
+            className={clsx(
+              'flex-1 min-w-0 px-0.5 min-[800px]:flex-none min-[800px]:px-0',
+              index === selectedDay && 'z-10'
+            )}
+          >
             <Button
               variant="outline"
               className={clsx(
-                'mx-1 border-b-0 rounded-b-none',
+                'w-full h-11 px-0 border-b-0 rounded-b-none [-webkit-tap-highlight-color:transparent] min-[800px]:w-auto min-[800px]:h-9 min-[800px]:px-4 min-[800px]:mx-1',
                 index === selectedDay &&
                   'border-app-colors-300 text-app-colors-300 hover:text-app-colors-300 hover:bg-background'
               )}
+              aria-pressed={index === selectedDay}
               onClick={() => setSelectedDay(index)}
             >
               {workout.day.substring(0, 3)}
@@ -79,9 +89,9 @@ export const ProgramResult = () => {
           </div>
         ))}
       </div>
-      <div className="flex flex-col w-[650px] border rounded-md border-app-colors-300 bg-background p-5">
+      <div className="flex flex-col w-full min-[800px]:w-[650px] border rounded-md border-app-colors-300 bg-background p-4 sm:p-5">
         {programData?.program_structure && (
-          <Label className="text-3xl mb-6">
+          <Label className="text-2xl leading-tight mb-4 sm:text-3xl sm:mb-6">
             {programData.program_structure[selectedDay].focus}
           </Label>
         )}
@@ -90,7 +100,7 @@ export const ProgramResult = () => {
             programData?.program_structure[selectedDay]?.exercises.map(
               (exercise, index) => (
                 <AccordionItem key={index} value={`exercise-${index}`}>
-                  <AccordionTrigger>{`${exercise.name} | ${exercise.sets}x${exercise.reps}`}</AccordionTrigger>
+                  <AccordionTrigger className="gap-3 [-webkit-tap-highlight-color:transparent] [@media(hover:none)]:hover:no-underline">{`${exercise.name} | ${exercise.sets}x${exercise.reps}`}</AccordionTrigger>
                   <AccordionContent className="flex flex-col gap-4">
                     <Label>{`Sets: ${exercise.sets}`}</Label>
                     <Label>{`Reps: ${exercise.reps}`}</Label>
@@ -102,28 +112,30 @@ export const ProgramResult = () => {
         </Accordion>
       </div>
       <Separator className="w-full mt-10 mb-6" />
-      <div className="flex flex-col max-w-[650px]">
-        <Label className="text-[2rem] mb-6">Program Tips and Goals</Label>
+      <div className="flex flex-col w-full max-w-[650px]">
+        <Label className="text-2xl leading-tight mb-6 sm:text-[2rem]">
+          Program Tips and Goals
+        </Label>
         {programData?.program_tips_and_goals &&
           programData.program_tips_and_goals.map((tip, index) => (
             <div className="flex flex-row" key={index}>
-              <span className="font-bold text-app-colors-300 text-[1.1rem] mr-2">{`${
+              <span className="font-bold text-app-colors-300 text-base leading-relaxed tabular-nums sm:text-[1.1rem] mr-2">{`${
                 index + 1
               }.`}</span>
-              <Label className="font-thin text-[1.1rem] mb-5">
+              <Label className="font-thin text-base leading-relaxed sm:text-[1.1rem] mb-5">
                 {` ${tip}`}
               </Label>
             </div>
           ))}
       </div>
       <Separator className="w-full my-8" />
-      <div className="flex flex-col items-center pb-20">
+      <div className="flex flex-col items-center w-full pb-20">
         {isLoggedIn ? (
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center w-full sm:w-auto">
             <Button
               size="lg"
               variant="outline"
-              className="border-app-colors-300 text-lg py-5 hover:bg-app-colors-300 hover:text-black"
+              className={clsx(ctaClass, 'w-full sm:w-auto')}
               onClick={handleProgramImport}
             >
               Import program into profile
@@ -135,38 +147,38 @@ export const ProgramResult = () => {
               size="lg"
               variant="outline"
               onClick={() => dispatch(clearProgram())}
-              className="border-app-colors-300 text-lg py-5 hover:bg-app-colors-300 hover:text-black"
+              className={clsx(ctaClass, 'w-full sm:w-auto')}
             >
               Generate new program
             </Button>
           </div>
         ) : (
-          <div className="flex flex-col items-center pt-4">
-            <Card className="w-max">
-              <CardHeader className="pb-10">
-                <CardTitle className="text-app-colors-300 text-2xl">
+          <div className="flex flex-col items-center w-full pt-4 sm:w-auto">
+            <Card className="w-full sm:w-max">
+              <CardHeader className="p-4 pb-8 sm:p-6 sm:pb-10">
+                <CardTitle className="text-app-colors-300 text-xl leading-tight sm:text-2xl">
                   Want to generate a new program?
                 </CardTitle>
                 <CardDescription>
                   Login or register an account to continue using this feature!
                 </CardDescription>
               </CardHeader>
-              <CardContent className="flex flex-row gap-10 justify-between items-center">
-                <Link to="/login">
+              <CardContent className="flex flex-col gap-3 p-4 pt-0 sm:flex-row sm:gap-10 sm:p-6 sm:pt-0 justify-between items-center">
+                <Link to="/login" className="w-full sm:w-auto">
                   <Button
                     size="lg"
                     variant="outline"
-                    className="border-app-colors-300 text-lg py-5 hover:bg-app-colors-300 hover:text-black"
+                    className={clsx(ctaClass, 'w-full')}
                   >
                     Login
                   </Button>
                 </Link>
                 <Label className="italic text-neutral-500">Or</Label>
-                <Link to="/registerUser">
+                <Link to="/registerUser" className="w-full sm:w-auto">
                   <Button
                     size="lg"
                     variant="outline"
-                    className="border-app-colors-300 text-lg py-5 hover:bg-app-colors-300 hover:text-black"
+                    className={clsx(ctaClass, 'w-full')}
                   >
                     Register
                   </Button>
