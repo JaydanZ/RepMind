@@ -65,12 +65,12 @@ export const ProgramResult = () => {
       <Label className="text-[2.25rem] leading-tight text-center text-balance mt-2 mb-8 min-[800px]:mt-0 min-[800px]:text-[3rem] min-[800px]:mb-10 font-thin">
         {programData?.name ? programData.name : 'Your Program'}
       </Label>
-      <div className="flex flex-row w-full -mb-px min-[800px]:w-auto">
+      <div className="flex flex-row w-full gap-1 -mb-px min-[800px]:w-auto min-[800px]:gap-0">
         {programData?.program_structure?.map((workout, index) => (
           <div
             key={index}
             className={clsx(
-              'flex-1 min-w-0 px-0.5 min-[800px]:flex-none min-[800px]:px-0',
+              'flex-1 min-w-0 min-[800px]:flex-none',
               index === selectedDay && 'z-10'
             )}
           >
@@ -89,7 +89,7 @@ export const ProgramResult = () => {
           </div>
         ))}
       </div>
-      <div className="flex flex-col w-full min-[800px]:w-[650px] border rounded-md border-app-colors-300 bg-background p-4 sm:p-5">
+      <div className="flex flex-col w-full min-[800px]:w-[650px] border rounded-md rounded-t-none min-[800px]:rounded-t-md border-app-colors-300 bg-background p-4 sm:p-5">
         {programData?.program_structure && (
           <Label className="text-2xl leading-tight mb-4 sm:text-3xl sm:mb-6">
             {programData.program_structure[selectedDay].focus}
