@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, Activity } from 'react'
+import { useState, useRef, useEffect, useLayoutEffect, Activity } from 'react'
 import { useForm, useStore } from '@tanstack/react-form'
 import clsx from 'clsx'
 
@@ -86,6 +86,13 @@ const optionClass =
   'flex flex-row hover:cursor-pointer justify-between items-center w-full p-4 my-1.5 sm:p-5 sm:my-2 bg-neutral-900 border-2 rounded-lg font-medium select-none [-webkit-tap-highlight-color:transparent] transition-[background-color,border-color,color,transform] duration-150 ease-out active:scale-[0.99] motion-reduce:active:scale-100 has-[:focus-visible]:ring-1 has-[:focus-visible]:ring-app-colors-300 has-[:checked]:border-app-colors-300 has-[:checked]:text-app-colors-300 has-[:checked]:bg-app-colors-300/5 [@media(hover:hover)]:hover:bg-neutral-800'
 const radioClass =
   'ml-3 w-4 h-4 shrink-0 appearance-none rounded-full border-2 border-solid border-neutral-600 bg-neutral-600 transition-colors duration-150 checked:border-app-colors-300 checked:bg-app-colors-300'
+
+const SECTION_EASING = 'cubic-bezier(0.23, 1, 0.32, 1)'
+const SECTION_DURATION_MS = 240
+const SECTION_REDUCED_DURATION_MS = 150
+const SECTION_STAGGER_MS = 40
+const SECTION_SHIFT_PX = 12
+
 const pressableClass =
   'h-11 min-[800px]:h-10 transition-[transform,background-color] duration-150 ease-out-strong active:scale-[0.97] motion-reduce:active:scale-100'
 
@@ -94,7 +101,12 @@ export const ProgramFactory = () => {
   const [weightUnit, setWeightUnit] = useState<WeightUnits>(WeightUnits.Pounds)
   const [sectionError, setSectionError] = useState<string>('')
   const cardRef = useRef<HTMLDivElement>(null)
+  const headerRef = useRef<HTMLDivElement>(null)
+  const formRef = useRef<HTMLFormElement>(null)
   const hasMounted = useRef(false)
+  const prevSectionRef = useRef(sectionNumber)
+  const prevCardHeightRef = useRef<number | null>(null)
+  const sectionAnimationsRef = useRef<Animation[]>([])
 
   const isUserLoggedIn = useSelector(
     (state: RootState) => state.auth.isLoggedIn
@@ -184,6 +196,71 @@ export const ProgramFactory = () => {
     })
   }, [sectionNumber])
 
+  useLayoutEffect(() => {
+    const direction = Math.sign(sectionNumber - prevSectionRef.current)
+    prevSectionRef.current = sectionNumber
+    if (direction === 0) return
+
+    sectionAnimationsRef.current.forEach((animation) => animation.cancel())
+    sectionAnimationsRef.current = []
+
+    const reduceMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)'
+    ).matches
+
+    const enterFrames: Keyframe[] = reduceMotion
+      ? [{ opacity: 0 }, { opacity: 1 }]
+      : [
+          {
+            opacity: 0,
+            transform: `translateX(${direction * SECTION_SHIFT_PX}px)`
+          },
+          { opacity: 1, transform: 'translateX(0)' }
+        ]
+
+    ;[headerRef.current, formRef.current].forEach((element, index) => {
+      if (!element) return
+      sectionAnimationsRef.current.push(
+        element.animate(enterFrames, {
+          duration: reduceMotion
+            ? SECTION_REDUCED_DURATION_MS
+            : SECTION_DURATION_MS,
+          delay: reduceMotion ? 0 : index * SECTION_STAGGER_MS,
+          easing: SECTION_EASING,
+          fill: 'backwards'
+        })
+      )
+    })
+
+    const card = cardRef.current
+    const fromHeight = prevCardHeightRef.current
+    prevCardHeightRef.current = null
+    if (reduceMotion || !card || fromHeight === null) return
+
+    const toHeight = card.offsetHeight
+    if (Math.abs(toHeight - fromHeight) < 1) return
+
+    card.style.overflow = 'hidden'
+    const heightAnimation = card.animate(
+      [{ height: `${fromHeight}px` }, { height: `${toHeight}px` }],
+      { duration: SECTION_DURATION_MS, easing: SECTION_EASING }
+    )
+
+    const releaseOverflow = () => {
+      if (sectionAnimationsRef.current.includes(heightAnimation)) {
+        card.style.overflow = ''
+      }
+    }
+    heightAnimation.onfinish = releaseOverflow
+    heightAnimation.oncancel = releaseOverflow
+    sectionAnimationsRef.current.push(heightAnimation)
+  }, [sectionNumber])
+
+  const goToSection = (nextSection: number) => {
+    prevCardHeightRef.current = cardRef.current?.offsetHeight ?? null
+    setSectionNumber(nextSection)
+  }
+
   const handleSectionNumChange = (sectionChange: number) => {
     // Before advancing to the next section, we need to manually check if all necessary fields have been filled out in a section
     // Only when user clicks next, ignore if back is clicked
@@ -224,9 +301,9 @@ export const ProgramFactory = () => {
     }
 
     if (sectionChange < 0 && sectionNumber > 0) {
-      setSectionNumber((prevSection) => prevSection - 1)
+      goToSection(sectionNumber - 1)
     } else if (sectionChange > 0 && sectionNumber < MAX_SECTION_NUM) {
-      setSectionNumber((prevSection) => prevSection + 1)
+      goToSection(sectionNumber + 1)
     }
   }
 
@@ -244,7 +321,7 @@ export const ProgramFactory = () => {
             >
               <Label
                 className={clsx(
-                  'hidden min-[800px]:block text-[0.8rem] mb-2',
+                  'hidden min-[800px]:block text-[0.8rem] mb-2 transition-colors duration-300',
                   sectionNumber >= section.sectionNum
                     ? 'text-app-colors-300'
                     : 'text-neutral-500'
@@ -252,14 +329,16 @@ export const ProgramFactory = () => {
               >
                 {section.sectionName}
               </Label>
-              <div
-                className={clsx(
-                  'inline-block w-full min-[800px]:w-[140px] min-h-[4px] rounded-xl transition-colors duration-300 ease-out',
-                  sectionNumber >= section.sectionNum
-                    ? 'bg-app-colors-300'
-                    : 'bg-neutral-500'
-                )}
-              ></div>
+              <div className="relative inline-block w-full min-[800px]:w-[140px] min-h-[4px] rounded-xl overflow-hidden bg-neutral-500">
+                <div
+                  className={clsx(
+                    'absolute inset-0 origin-left bg-app-colors-300 transition-[transform,opacity] duration-300 ease-out-strong motion-reduce:scale-x-100 motion-reduce:transition-opacity motion-reduce:duration-150',
+                    sectionNumber >= section.sectionNum
+                      ? 'scale-x-100 opacity-100'
+                      : 'scale-x-0 opacity-0'
+                  )}
+                />
+              </div>
             </div>
           ))}
         </div>
@@ -271,7 +350,7 @@ export const ProgramFactory = () => {
           sectionError.length > 0 && 'border-red-500'
         )}
       >
-        <CardHeader className="p-4 sm:p-6">
+        <CardHeader ref={headerRef} className="p-4 sm:p-6">
           <CardTitle className="text-2xl sm:text-[2rem]">
             {sectionNumber === 0 ? (
               <div>Fitness Goals</div>
@@ -306,6 +385,7 @@ export const ProgramFactory = () => {
         </CardHeader>
         <CardContent className="p-4 pt-0 sm:p-6 sm:pt-0">
           <form
+            ref={formRef}
             onSubmit={(e) => {
               e.preventDefault()
               form.handleSubmit()
@@ -551,9 +631,7 @@ export const ProgramFactory = () => {
                             index
                           ].section.toLowerCase()}`}
                           onClick={() =>
-                            setSectionNumber(
-                              summaryFieldNames[index].sectionNum
-                            )
+                            goToSection(summaryFieldNames[index].sectionNum)
                           }
                           className="shrink-0 size-10 -my-2.5 -ml-1 -mr-3 p-0 text-neutral-400 text-xs [-webkit-tap-highlight-color:transparent]"
                         >
