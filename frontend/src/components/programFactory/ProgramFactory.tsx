@@ -236,9 +236,6 @@ export const ProgramFactory = () => {
         Program Generator
       </Label>
       <div className="w-full mb-6">
-        <p className="mb-2 text-xs text-neutral-400 tabular-nums min-[800px]:hidden">
-          Step {sectionNumber + 1} of {sections.length}
-        </p>
         <div className="flex flex-row w-full gap-x-1.5 min-[800px]:gap-x-4">
           {sections.map((section, index) => (
             <div
