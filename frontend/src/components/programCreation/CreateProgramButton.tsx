@@ -51,7 +51,8 @@ export function CreateProgramButton({
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
-        <Button className={cn('group', buttonClass)}>
+        {/* No press scale: the menu anchors to this button's measured box, so shrinking it shifts the menu */}
+        <Button className={cn('group', buttonClass, 'active:scale-100')}>
           Create a Program
           <ChevronDown
             aria-hidden
