@@ -1,8 +1,9 @@
-import { useMemo, useState } from 'react'
+import { useId, useMemo, useState } from 'react'
+import { motion, useReducedMotion } from 'motion/react'
 import { useNavigate } from '@tanstack/react-router'
 import clsx from 'clsx'
-import { Play, Plus } from 'lucide-react'
-import { Workout, WorkoutProgram } from '@/types/programCreation'
+import { ChevronDown, Play } from 'lucide-react'
+import { Exercise, Workout, WorkoutProgram } from '@/types/programCreation'
 import { Button } from '../ui/button'
 import { CreateProgramButton } from '../programCreation/CreateProgramButton'
 import {
@@ -109,9 +110,93 @@ const NextWorkoutSkeleton = () => (
   </section>
 )
 
+const MAX_FULL_LIST = 5
+const COLLAPSED_ROWS = 4
+const PREVIEW_HEIGHT = '3rem'
+const EASE_OUT_STRONG = [0.23, 1, 0.32, 1] as const
+
+const ExerciseRow = ({ exercise }: { exercise: Exercise }) => (
+  <li className="flex min-h-12 items-center gap-3 border-t border-neutral-800/80 py-3">
+    <span className="flex-1 text-[0.9375rem] leading-snug text-neutral-100">
+      {exercise.name}
+    </span>
+    <span className="whitespace-nowrap text-sm tabular-nums text-neutral-400">
+      {exercise.sets} &times; {exercise.reps}
+    </span>
+  </li>
+)
+
+const ExerciseList = ({ exercises }: { exercises: Exercise[] }) => {
+  const [isExpanded, setIsExpanded] = useState(false)
+  const prefersReducedMotion = useReducedMotion()
+  const extraListId = useId()
+
+  const isCollapsible = exercises.length > MAX_FULL_LIST
+  const shown = isCollapsible ? exercises.slice(0, COLLAPSED_ROWS) : exercises
+  const extra = isCollapsible ? exercises.slice(COLLAPSED_ROWS) : []
+  const transition = {
+    duration: prefersReducedMotion ? 0 : 0.25,
+    ease: EASE_OUT_STRONG
+  }
+
+  return (
+    <div className="px-4 pb-3 sm:px-6">
+      <ul className="[&>li:first-child]:border-t-0">
+        {shown.map((exercise, index) => (
+          <ExerciseRow key={`${exercise.name}-${index}`} exercise={exercise} />
+        ))}
+      </ul>
+
+      {isCollapsible && (
+        <>
+          <motion.div
+            className="relative overflow-hidden"
+            initial={false}
+            animate={{ height: isExpanded ? 'auto' : PREVIEW_HEIGHT }}
+            transition={transition}
+            aria-hidden={!isExpanded}
+          >
+            <ul id={extraListId}>
+              {extra.map((exercise, index) => (
+                <ExerciseRow
+                  key={`${exercise.name}-${index + COLLAPSED_ROWS}`}
+                  exercise={exercise}
+                />
+              ))}
+            </ul>
+            <motion.div
+              aria-hidden
+              className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent to-[#141414]"
+              initial={false}
+              animate={{ opacity: isExpanded ? 0 : 1 }}
+              transition={transition}
+            />
+          </motion.div>
+
+          <button
+            type="button"
+            aria-expanded={isExpanded}
+            aria-controls={extraListId}
+            onClick={() => setIsExpanded((prev) => !prev)}
+            className="group -ml-2 mt-1 inline-flex h-10 items-center gap-1.5 rounded-md px-2 text-sm font-medium text-app-colors-300 outline-none transition-colors duration-150 [-webkit-tap-highlight-color:transparent] hover:bg-neutral-800/70 focus-visible:ring-1 focus-visible:ring-app-colors-300 [&_svg]:size-4"
+          >
+            {isExpanded ? 'Show less' : 'Show more'}
+            <ChevronDown
+              aria-hidden
+              className={clsx(
+                'transition-transform duration-200 ease-out-strong motion-reduce:transition-none',
+                isExpanded && 'rotate-180'
+              )}
+            />
+          </button>
+        </>
+      )}
+    </div>
+  )
+}
+
 export const NextWorkout = ({ program, isLoading }: NextWorkoutProps) => {
   const navigate = useNavigate()
-  const [openTip, setOpenTip] = useState<number | null>(null)
   const workout = useMemo(
     () => resolveWorkout(program?.program_structure ?? []),
     [program]
@@ -188,60 +273,10 @@ export const NextWorkout = ({ program, isLoading }: NextWorkoutProps) => {
         </Button>
       </div>
 
-      <ul className="px-4 pb-3 sm:px-6">
-        {workout.exercises.map((exercise, index) => {
-          const isOpen = openTip === index
-          const hasTip = Boolean(exercise.exercise_tip)
-          return (
-            <li
-              key={`${exercise.name}-${index}`}
-              className="border-t border-neutral-800/80 first:border-t-0"
-            >
-              <button
-                type="button"
-                disabled={!hasTip}
-                aria-expanded={hasTip ? isOpen : undefined}
-                aria-controls={hasTip ? `next-tip-${index}` : undefined}
-                onClick={() => setOpenTip(isOpen ? null : index)}
-                className="group flex min-h-12 w-full items-center gap-3 rounded-sm py-3 text-left outline-none focus-visible:ring-1 focus-visible:ring-app-colors-300 disabled:cursor-default"
-              >
-                <span className="flex-1 text-[0.9375rem] leading-snug text-neutral-100">
-                  {exercise.name}
-                </span>
-                <span className="whitespace-nowrap text-sm tabular-nums text-neutral-400">
-                  {exercise.sets} &times; {exercise.reps}
-                </span>
-                {hasTip && (
-                  <Plus
-                    aria-hidden
-                    className={clsx(
-                      'size-4 shrink-0 text-neutral-500 transition-transform duration-200 ease-out-strong group-hover:text-app-colors-300',
-                      isOpen && 'rotate-45 text-app-colors-300'
-                    )}
-                  />
-                )}
-              </button>
-              {hasTip && (
-                <div
-                  id={`next-tip-${index}`}
-                  className={clsx(
-                    'grid transition-[grid-template-rows,opacity] duration-200 ease-out-strong',
-                    isOpen
-                      ? 'grid-rows-[1fr] opacity-100'
-                      : 'grid-rows-[0fr] opacity-0'
-                  )}
-                >
-                  <p className="overflow-hidden text-sm leading-relaxed text-neutral-400">
-                    <span className="block pb-3 pr-7">
-                      {exercise.exercise_tip}
-                    </span>
-                  </p>
-                </div>
-              )}
-            </li>
-          )
-        })}
-      </ul>
+      <ExerciseList
+        key={`${program.id}-${workout.day}`}
+        exercises={workout.exercises}
+      />
     </section>
   )
 }
