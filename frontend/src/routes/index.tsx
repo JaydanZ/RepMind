@@ -1,6 +1,6 @@
-import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
-import { ArrowRight, Bookmark, Flame, Power } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { createFileRoute, Link } from '@tanstack/react-router'
+import { Bookmark, Flame, Power } from 'lucide-react'
+import { CreateProgramButton } from '@/components/programCreation/CreateProgramButton'
 import { SampleWeek } from '@/components/landing/SampleWeek'
 import { SAMPLE_PROFILE } from '@/data/landingData'
 
@@ -26,28 +26,7 @@ const TRACKING_FEATURES = [
   }
 ]
 
-function GenerateButton({ onClick }: { onClick: () => void }) {
-  return (
-    <Button
-      onClick={onClick}
-      className="group h-12 gap-2.5 rounded-md bg-app-colors-300 px-6 text-base font-semibold text-app-colors-500 shadow-[0_6px_16px_-8px_rgba(0,0,0,0.6)] transition-[transform,background-color] duration-150 ease-out-strong hover:bg-[#a6f062] active:scale-[0.97] focus-visible:ring-2 focus-visible:ring-app-colors-300 focus-visible:ring-offset-2 focus-visible:ring-offset-app-colors-500 [&_svg]:size-[1.125rem]"
-    >
-      Generate a Program
-      <ArrowRight
-        aria-hidden
-        className="transition-transform duration-200 ease-out-strong [@media(hover:hover)]:group-hover:translate-x-0.5"
-      />
-    </Button>
-  )
-}
-
 function RouteComponent() {
-  const navigate = useNavigate()
-
-  const handleCTAClick = () => {
-    navigate({ to: '/aiProgramFactory' })
-  }
-
   return (
     <main className="landing mx-auto w-full max-w-7xl px-4 pb-36 pt-12 sm:px-8 min-[800px]:pb-0 min-[800px]:pt-32 lg:px-12">
       <section className="pb-10 pt-4 md:pb-14">
@@ -62,7 +41,7 @@ function RouteComponent() {
           reps and a coaching tip for every exercise.
         </p>
         <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-4">
-          <GenerateButton onClick={handleCTAClick} />
+          <CreateProgramButton size="lg" />
           <a
             href="#how-it-works"
             className="text-sm font-medium text-neutral-300 underline decoration-neutral-600 underline-offset-[6px] transition-colors duration-150 hover:text-neutral-50 hover:decoration-app-colors-300"
@@ -163,7 +142,7 @@ function RouteComponent() {
           Your first session is a minute away.
         </h2>
         <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-4">
-          <GenerateButton onClick={handleCTAClick} />
+          <CreateProgramButton size="lg" />
           <p className="text-sm text-neutral-400">
             Free to try. No account needed.
           </p>

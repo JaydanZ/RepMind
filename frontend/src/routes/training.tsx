@@ -1,11 +1,11 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import clsx from 'clsx'
-import { ArrowRight } from 'lucide-react'
 import { useGetProfileDataQuery } from '@/services/protectedRoutesAPI'
 import { ProgramsList } from '@/components/profile/ProgramsList'
 import { NextWorkout } from '@/components/profile/NextWorkout'
 import { PreviousWorkouts } from '@/components/training/PreviousWorkouts'
 import { Button } from '@/components/ui/button'
+import { CreateProgramButton } from '@/components/programCreation/CreateProgramButton'
 import {
   panelClass,
   primaryButtonClass
@@ -16,7 +16,6 @@ export const Route = createFileRoute('/training')({
 })
 
 function RouteComponent() {
-  const navigate = useNavigate()
   const { data, isLoading, isError, isFetching, refetch } =
     useGetProfileDataQuery()
 
@@ -41,13 +40,9 @@ function RouteComponent() {
             Your next session, saved programs and workout log.
           </p>
         </div>
-        <Button
+        <CreateProgramButton
           className={clsx(primaryButtonClass, 'self-start sm:self-auto')}
-          onClick={() => navigate({ to: '/aiProgramFactory' })}
-        >
-          Generate a Program
-          <ArrowRight aria-hidden />
-        </Button>
+        />
       </header>
 
       {isError ? (

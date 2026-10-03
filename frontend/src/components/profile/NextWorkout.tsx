@@ -1,9 +1,10 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import clsx from 'clsx'
-import { ArrowRight, Play, Plus } from 'lucide-react'
+import { Play, Plus } from 'lucide-react'
 import { Workout, WorkoutProgram } from '@/types/programCreation'
 import { Button } from '../ui/button'
+import { CreateProgramButton } from '../programCreation/CreateProgramButton'
 import {
   panelClass,
   panelHeaderClass,
@@ -76,8 +77,6 @@ const formatDate = (dateStr: string): string => {
   })
 }
 
-// Mirrors the loaded card's box sizes so content swaps in without shifting
-// the panels below it
 const NextWorkoutSkeleton = () => (
   <section className={panelClass} aria-busy="true" aria-label="Next workout">
     <div className={panelHeaderClass}>
@@ -134,17 +133,11 @@ export const NextWorkout = ({ program, isLoading }: NextWorkoutProps) => {
               No active program yet
             </p>
             <p className="mt-2 max-w-[48ch] text-sm leading-relaxed text-neutral-400">
-              Set one of your saved programs as active, or generate a new one,
-              and your next training day will show up here.
+              Set one of your saved programs as active, or create a new one, and
+              your next training day will show up here.
             </p>
           </div>
-          <Button
-            className={primaryButtonClass}
-            onClick={() => navigate({ to: '/aiProgramFactory' })}
-          >
-            Generate a Program
-            <ArrowRight aria-hidden />
-          </Button>
+          <CreateProgramButton className={primaryButtonClass} />
         </div>
       </section>
     )

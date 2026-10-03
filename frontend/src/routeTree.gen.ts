@@ -13,6 +13,7 @@ import { Route as WorkoutRouteImport } from './routes/workout'
 import { Route as TrainingRouteImport } from './routes/training'
 import { Route as RegisterUserRouteImport } from './routes/registerUser'
 import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as ManualProgramCreationRouteImport } from './routes/manualProgramCreation'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AiProgramFactoryRouteImport } from './routes/aiProgramFactory'
 import { Route as IndexRouteImport } from './routes/index'
@@ -37,6 +38,11 @@ const ProfileRoute = ProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ManualProgramCreationRoute = ManualProgramCreationRouteImport.update({
+  id: '/manualProgramCreation',
+  path: '/manualProgramCreation',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -57,6 +63,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/aiProgramFactory': typeof AiProgramFactoryRoute
   '/login': typeof LoginRoute
+  '/manualProgramCreation': typeof ManualProgramCreationRoute
   '/profile': typeof ProfileRoute
   '/registerUser': typeof RegisterUserRoute
   '/training': typeof TrainingRoute
@@ -66,6 +73,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/aiProgramFactory': typeof AiProgramFactoryRoute
   '/login': typeof LoginRoute
+  '/manualProgramCreation': typeof ManualProgramCreationRoute
   '/profile': typeof ProfileRoute
   '/registerUser': typeof RegisterUserRoute
   '/training': typeof TrainingRoute
@@ -76,6 +84,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/aiProgramFactory': typeof AiProgramFactoryRoute
   '/login': typeof LoginRoute
+  '/manualProgramCreation': typeof ManualProgramCreationRoute
   '/profile': typeof ProfileRoute
   '/registerUser': typeof RegisterUserRoute
   '/training': typeof TrainingRoute
@@ -87,6 +96,7 @@ export interface FileRouteTypes {
     | '/'
     | '/aiProgramFactory'
     | '/login'
+    | '/manualProgramCreation'
     | '/profile'
     | '/registerUser'
     | '/training'
@@ -96,6 +106,7 @@ export interface FileRouteTypes {
     | '/'
     | '/aiProgramFactory'
     | '/login'
+    | '/manualProgramCreation'
     | '/profile'
     | '/registerUser'
     | '/training'
@@ -105,6 +116,7 @@ export interface FileRouteTypes {
     | '/'
     | '/aiProgramFactory'
     | '/login'
+    | '/manualProgramCreation'
     | '/profile'
     | '/registerUser'
     | '/training'
@@ -115,6 +127,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AiProgramFactoryRoute: typeof AiProgramFactoryRoute
   LoginRoute: typeof LoginRoute
+  ManualProgramCreationRoute: typeof ManualProgramCreationRoute
   ProfileRoute: typeof ProfileRoute
   RegisterUserRoute: typeof RegisterUserRoute
   TrainingRoute: typeof TrainingRoute
@@ -151,6 +164,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/manualProgramCreation': {
+      id: '/manualProgramCreation'
+      path: '/manualProgramCreation'
+      fullPath: '/manualProgramCreation'
+      preLoaderRoute: typeof ManualProgramCreationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -179,6 +199,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AiProgramFactoryRoute: AiProgramFactoryRoute,
   LoginRoute: LoginRoute,
+  ManualProgramCreationRoute: ManualProgramCreationRoute,
   ProfileRoute: ProfileRoute,
   RegisterUserRoute: RegisterUserRoute,
   TrainingRoute: TrainingRoute,
