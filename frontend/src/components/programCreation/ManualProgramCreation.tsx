@@ -551,7 +551,7 @@ export function ManualProgramCreation() {
                                                     htmlFor={`${exercise.id}-name`}
                                                     className="text-neutral-400"
                                                   >
-                                                    Exercise
+                                                    Exercise Name
                                                   </Label>
                                                   <Input
                                                     id={`${exercise.id}-name`}
