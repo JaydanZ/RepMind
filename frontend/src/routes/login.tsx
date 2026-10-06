@@ -60,9 +60,8 @@ function RouteComponent() {
         // Store bearer token in local storage
         await dispatch(userLogin(dataResponse))
 
-        // Navigate to home page {FUTURE UPDATE: Navigate user to user dashboard}
         setIsLoading(false)
-        navigate({ to: '/' })
+        navigate({ to: '/home' })
       } catch (error: unknown) {
         if (axios.isAxiosError(error)) {
           if (error.response) {

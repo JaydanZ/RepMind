@@ -15,7 +15,7 @@ interface routeData {
 export const LOGGED_IN_ROUTES: routeData[] = [
   {
     id: 'Home',
-    href: '/',
+    href: '/home',
     icon: <IoHomeOutline />,
     params: {}
   },

@@ -33,7 +33,7 @@ export const Route = createFileRoute('/registerUser')({
     const isLoggedIn = userToken ? true : false
     if (isLoggedIn) {
       throw redirect({
-        to: '/profile'
+        to: '/home'
       })
     }
   }
