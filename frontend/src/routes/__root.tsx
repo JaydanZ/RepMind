@@ -2,14 +2,11 @@ import {
   Outlet,
   createRootRoute,
   Link,
-  useNavigate,
   useRouterState
 } from '@tanstack/react-router'
 
 import { useSelector } from 'react-redux'
 import { RootState } from '@/store/store'
-import { useAsyncDispatch } from '@/store/store'
-import { userLogout } from '@/features/auth/authSlice'
 
 import useIsMobile from '@/hooks/useIsMobile'
 import { LOGGED_IN_ROUTES, LOGGED_OUT_ROUTES } from '@/data/routesData'
@@ -19,27 +16,24 @@ import { Toaster } from '@/components/ui/toaster'
 
 interface MobileNavRoute {
   id: string
-  href?: string
+  href: string
   icon: React.ReactNode
   params: object
 }
 
 interface MobileNavProps {
   routes: MobileNavRoute[]
-  onLogout: () => void
 }
 
 export const Route = createRootRoute({
   component: RootComponent
 })
 
-function MobileNav({ routes, onLogout }: MobileNavProps) {
+function MobileNav({ routes }: MobileNavProps) {
   const pathname = useRouterState({ select: (s) => s.location.pathname })
 
   const activeIndex = routes.findIndex((route) =>
-    route.href === '/'
-      ? pathname === '/'
-      : !!route.href && pathname.startsWith(route.href)
+    route.href === '/' ? pathname === '/' : pathname.startsWith(route.href)
   )
 
   const itemClass =
@@ -97,7 +91,7 @@ function MobileNav({ routes, onLogout }: MobileNavProps) {
             </>
           )
 
-          return route.href ? (
+          return (
             <Link
               key={route.id}
               to={route.href}
@@ -107,15 +101,6 @@ function MobileNav({ routes, onLogout }: MobileNavProps) {
             >
               {content}
             </Link>
-          ) : (
-            <button
-              key={route.id}
-              type="button"
-              onClick={onLogout}
-              className={itemClass}
-            >
-              {content}
-            </button>
           )
         })}
       </div>
@@ -124,34 +109,14 @@ function MobileNav({ routes, onLogout }: MobileNavProps) {
 }
 
 function RootComponent() {
-  const navigate = useNavigate()
-
-  const dispatch = useAsyncDispatch()
   const authStatus = useSelector((state: RootState) => state.auth.userToken)
-  const authErrors = useSelector((state: RootState) => state.auth.error)
   const isMobile = useIsMobile()
-
-  const handleLogout = async () => {
-    try {
-      // Dispatch user logout reducer
-      await dispatch(userLogout())
-
-      if (!authErrors) {
-        // If successful, redirect user to home page
-        navigate({ to: '/' })
-      }
-    } catch (error) {
-      console.error(error)
-    }
-  }
+  const navRoutes = authStatus ? LOGGED_IN_ROUTES : LOGGED_OUT_ROUTES
 
   return (
     <div className="relative min-h-dvh h-max bg-app-colors-500 z-50">
       {isMobile ? (
-        <MobileNav
-          routes={authStatus ? LOGGED_IN_ROUTES : LOGGED_OUT_ROUTES}
-          onLogout={handleLogout}
-        />
+        <MobileNav routes={navRoutes} />
       ) : (
         <nav className="flex flex-nowrap fixed top-0 z-50 w-full items-center justify-between bg-app-colors-500 py-6">
           {/* DESKTOP VIEW */}
@@ -163,38 +128,14 @@ function RootComponent() {
           </ul>
           {/* Right elements */}
           <div className="flex flex-row items-center pr-12 gap-12">
-            {authStatus
-              ? LOGGED_IN_ROUTES.map((route, key) => (
-                  <>
-                    {route.href ? (
-                      <Link to={route.href} key={key} params={route.params}>
-                        <Button variant="ghost" size="lg" className="p-0">
-                          {route.icon}
-                          {route.id}
-                        </Button>
-                      </Link>
-                    ) : (
-                      <Button
-                        variant="ghost"
-                        size="lg"
-                        key={key}
-                        className="flex flex-row p-0"
-                        onClick={handleLogout}
-                      >
-                        {route.icon}
-                        {route.id}
-                      </Button>
-                    )}
-                  </>
-                ))
-              : LOGGED_OUT_ROUTES.map((route, key) => (
-                  <Link to={route.href} key={key} params={route.params}>
-                    <Button variant="ghost" size="lg" className="p-0">
-                      {route.icon}
-                      {route.id}
-                    </Button>
-                  </Link>
-                ))}
+            {navRoutes.map((route) => (
+              <Link to={route.href} key={route.id} params={route.params}>
+                <Button variant="ghost" size="lg" className="p-0">
+                  {route.icon}
+                  {route.id}
+                </Button>
+              </Link>
+            ))}
           </div>
         </nav>
       )}

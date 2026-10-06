@@ -81,12 +81,10 @@ export const userLogout = createAsyncThunk(
       return
     } catch (error) {
       // If there was an error, cancel logout action
-      if (isAxiosError(error)) {
-        return rejectWithValue({
-          errorMessage: error.message,
-          errorCode: error.code
-        })
-      }
+      return rejectWithValue({
+        errorMessage: error instanceof Error ? error.message : String(error),
+        errorCode: isAxiosError(error) ? error.code : undefined
+      })
     }
   }
 )
