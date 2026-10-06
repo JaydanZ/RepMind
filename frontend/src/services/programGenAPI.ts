@@ -1,7 +1,6 @@
 import axios from 'axios'
 import { ProgramOptions, ProgramSubmission } from '@/types/programCreation'
-
-const BACKEND_API = import.meta.env.VITE_BACKEND_API_URL
+import { API_BASE_URL } from './apiConfig'
 
 const LIMIT_EXPIRATION_TIME = 3600000 // 1 Hour
 
@@ -25,7 +24,7 @@ export const generateProgram = async (programInput: ProgramOptions) => {
   }
 
   const response = await axios.post(
-    `${BACKEND_API}/programs/generation`,
+    `${API_BASE_URL}/programs/generate`,
     submission
   )
   return response.data

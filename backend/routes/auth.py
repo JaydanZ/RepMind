@@ -20,7 +20,7 @@ auth_router = APIRouter(
 MIN_USERNAME_LENGTH = 4
 MIN_PASSWORD_LENGTH = 8
 
-@auth_router.post("/createuser", status_code=201)
+@auth_router.post("/register", status_code=201)
 def create_user(user: CreateUser):
 
     ## Validate user info
@@ -92,7 +92,7 @@ def logout_user(refresh_token: RefreshToken):
     return { "Message": "User logged out successfully" }
 
 
-@auth_router.post('/token', status_code=201)
+@auth_router.post('/refresh', status_code=201)
 def generate_new_access_token(refresh_token: RefreshToken):
     if refresh_token is None:
         raise HTTPException(status_code=401, detail="Invalid or no refresh token was provided")

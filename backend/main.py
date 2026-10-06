@@ -1,7 +1,7 @@
-from fastapi import FastAPI
+from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .config import get_settings
-from .routes import auth_router, programs_router, workouts_router
+from .config import get_settings, API_V1_PREFIX
+from .routes import auth_router, programs_router, workouts_router, users_router
 from .middleware import TokenAuthMiddleware
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
@@ -32,9 +32,13 @@ app.add_middleware(
 app.add_middleware(TokenAuthMiddleware)
 
 ## Routes
-app.include_router(auth_router)
-app.include_router(programs_router)
-app.include_router(workouts_router)
+api_v1_router = APIRouter(prefix=API_V1_PREFIX)
+api_v1_router.include_router(auth_router)
+api_v1_router.include_router(users_router)
+api_v1_router.include_router(programs_router)
+api_v1_router.include_router(workouts_router)
+
+app.include_router(api_v1_router)
 
 @app.get("/")
 async def root():

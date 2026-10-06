@@ -14,11 +14,10 @@ import {
   WorkoutHistoryResponse,
   WorkoutSubmission
 } from '@/types/workoutSession'
-
-const BACKEND_API = import.meta.env.VITE_BACKEND_API_URL
+import { API_BASE_URL } from './apiConfig'
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: BACKEND_API,
+  baseUrl: API_BASE_URL,
   credentials: 'include',
   prepareHeaders: async (headers, { getState }) => {
     const token = (getState() as RootState).auth.userToken
@@ -53,7 +52,7 @@ export const protectedApiSlice = createApi({
   tagTypes: ['Profile', 'PreviousPerformance', 'WorkoutHistory'],
   endpoints: (builder) => ({
     getProfileData: builder.query<Profile, void>({
-      query: () => '/programs/',
+      query: () => '/users/me',
       keepUnusedDataFor: 5,
       providesTags: ['Profile']
     }),
@@ -64,19 +63,19 @@ export const protectedApiSlice = createApi({
       query: ({ names, until }) => {
         const params = new URLSearchParams({ until })
         names.forEach((name) => params.append('names', name))
-        return `/workouts/previous?${params.toString()}`
+        return `/workouts/previous-performance?${params.toString()}`
       },
       providesTags: ['PreviousPerformance']
     }),
     getWorkoutHistory: builder.query<WorkoutHistoryResponse, { limit: number }>(
       {
         query: ({ limit }) =>
-          `/workouts/history?${new URLSearchParams({ limit: String(limit) })}`,
+          `/workouts?${new URLSearchParams({ limit: String(limit) })}`,
         providesTags: ['WorkoutHistory']
       }
     ),
     submitWorkout: builder.mutation<SubmitWorkoutResponse, WorkoutSubmission>({
-      query: (body) => ({ url: '/workouts/', method: 'POST', body }),
+      query: (body) => ({ url: '/workouts', method: 'POST', body }),
       invalidatesTags: ['Profile', 'PreviousPerformance', 'WorkoutHistory']
     })
   })

@@ -13,7 +13,12 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env")
 
 ## NON AUTHENTICATED ROUTES GO HERE
-non_auth_routes = ["/docs","/auth", "/auth/login", "/auth/logout", "/auth/createuser", "/auth/token", "/programs/generation"]
+API_V1_PREFIX = "/api/v1"
+
+non_auth_routes = ["/docs", "/openapi.json"] + [
+    f"{API_V1_PREFIX}{path}"
+    for path in ["/auth/login", "/auth/logout", "/auth/register", "/auth/refresh", "/programs/generate"]
+]
 
 @lru_cache
 def get_settings():

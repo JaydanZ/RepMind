@@ -6,11 +6,10 @@ import {
 } from '@/types/programCreation'
 import { genNewAccessToken } from './authAPI'
 import { router } from '@/App'
-
-const BACKEND_API = import.meta.env.VITE_BACKEND_API_URL
+import { API_BASE_URL } from './apiConfig'
 
 export const protectedApi = axios.create({
-  baseURL: `${BACKEND_API}`,
+  baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json'
   }
@@ -57,13 +56,13 @@ protectedApi.interceptors.response.use(
 )
 
 export const getUsersPrograms = async () => {
-  const response = await protectedApi.get(`${BACKEND_API}/programs/`)
+  const response = await protectedApi.get(`${API_BASE_URL}/users/me`)
   return response.data
 }
 
 export const programImport = async (program: ProgramStruct) => {
   const response = await protectedApi.post(
-    `${BACKEND_API}/programs/import`,
+    `${API_BASE_URL}/programs/import`,
     program
   )
   return response.data
@@ -72,8 +71,8 @@ export const programImport = async (program: ProgramStruct) => {
 export const setProgramActive = async (
   program: WorkoutProgram
 ): Promise<ProgramActiveResponse> => {
-  const response = await protectedApi.post<ProgramActiveResponse>(
-    `${BACKEND_API}/programs/active`,
+  const response = await protectedApi.put<ProgramActiveResponse>(
+    `${API_BASE_URL}/users/me/active-program`,
     {
       program_id: program.id
     }
@@ -82,10 +81,8 @@ export const setProgramActive = async (
 }
 
 export const deleteProgram = async (programId: string) => {
-  const response = await protectedApi.delete(`${BACKEND_API}/programs/delete`, {
-    data: {
-      program_id: programId
-    }
-  })
+  const response = await protectedApi.delete(
+    `${API_BASE_URL}/programs/${encodeURIComponent(programId)}`
+  )
   return response.data
 }

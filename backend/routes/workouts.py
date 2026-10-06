@@ -31,7 +31,7 @@ def _check_client_date(value: date):
     if abs((value - server_today).days) > 1:
         raise HTTPException(status_code=422, detail="Workout date must be today")
 
-@workouts_router.post("/", status_code=201)
+@workouts_router.post("", status_code=201)
 async def submit_workout(submission: WorkoutSubmission, user_id: str = Depends(get_current_user)):
     _check_client_date(submission.performed_on)
 
@@ -70,7 +70,7 @@ async def submit_workout(submission: WorkoutSubmission, user_id: str = Depends(g
         "sets_logged": len(submission.sets)
     }
 
-@workouts_router.get("/previous", status_code=200)
+@workouts_router.get("/previous-performance", status_code=200)
 async def previous_performance(
     names: Annotated[list[str], Query(min_length=1, max_length=50)],
     until: date,
@@ -83,7 +83,7 @@ async def previous_performance(
         raise HTTPException(status_code=500, detail="Failed to load previous performance")
     return result["data"]
 
-@workouts_router.get("/history", status_code=200)
+@workouts_router.get("", status_code=200)
 async def workout_history(
     limit: Annotated[int, Query(ge=1, le=HISTORY_MAX_LIMIT)] = 10,
     offset: Annotated[int, Query(ge=0, le=HISTORY_MAX_OFFSET)] = 0,
