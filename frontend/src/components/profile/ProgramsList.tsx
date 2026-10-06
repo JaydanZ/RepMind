@@ -22,6 +22,7 @@ import {
   panelTitleClass,
   skeletonClass
 } from './profileStyles'
+import { orderProgramsActiveFirst } from './programOrder'
 
 interface ProgramRowProps {
   program: WorkoutProgram
@@ -199,6 +200,10 @@ export const ProgramsList = (props: ProgramsListProps): ReactElement => {
   const activeProgramId =
     optimisticActiveId ?? props.activeProgram?.[0]?.id ?? null
   const programCount = props.programs?.length ?? 0
+  const orderedPrograms = orderProgramsActiveFirst(
+    props.programs ?? [],
+    activeProgramId
+  )
 
   const handleSetActive = async (program: WorkoutProgram) => {
     try {
@@ -248,7 +253,7 @@ export const ProgramsList = (props: ProgramsListProps): ReactElement => {
         </div>
       ) : (
         <ul className="divide-y divide-neutral-800">
-          {props.programs?.map((program: WorkoutProgram) => (
+          {orderedPrograms.map((program: WorkoutProgram) => (
             <ProgramRow
               program={program}
               key={program.id}
