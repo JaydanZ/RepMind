@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils'
 import { Trash2, Power } from 'lucide-react'
 import { setProgramActive, deleteProgram } from '@/services/programsAPI'
 import { WorkoutProgram } from '@/types/programCreation'
+import { toast } from '@/hooks/use-toast'
 import { Button } from '../ui/button'
 import {
   Dialog,
@@ -209,6 +210,11 @@ export const ProgramsList = (props: ProgramsListProps): ReactElement => {
     try {
       const { program_id } = await setProgramActive(program)
       setOptimisticActiveId(program_id)
+      toast({
+        variant: 'success',
+        title: 'Active program updated',
+        description: `${program.program_name} is now your active program.`
+      })
       props.refreshProgramsList()
       return true
     } catch (error) {

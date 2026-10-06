@@ -1,3 +1,4 @@
+import { Check } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import {
   Toast,
@@ -17,7 +18,17 @@ export function Toaster() {
         return (
           <Toast key={id} {...props}>
             <div className="grid gap-1">
-              {title && <ToastTitle>{title}</ToastTitle>}
+              {title && (
+                <div className="flex items-center gap-2">
+                  {props.variant === "success" && (
+                    <Check
+                      aria-hidden
+                      className="size-4 shrink-0 text-app-colors-300"
+                    />
+                  )}
+                  <ToastTitle>{title}</ToastTitle>
+                </div>
+              )}
               {description && (
                 <ToastDescription>{description}</ToastDescription>
               )}

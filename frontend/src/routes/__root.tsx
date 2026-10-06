@@ -15,6 +15,7 @@ import useIsMobile from '@/hooks/useIsMobile'
 import { LOGGED_IN_ROUTES, LOGGED_OUT_ROUTES } from '@/data/routesData'
 import clsx from 'clsx'
 import { Button } from '@/components/ui/button'
+import { Toaster } from '@/components/ui/toaster'
 
 interface MobileNavRoute {
   id: string
@@ -198,6 +199,7 @@ function RootComponent() {
         </nav>
       )}
       <Outlet />
+      <Toaster />
     </div>
   )
 }
