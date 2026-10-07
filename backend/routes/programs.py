@@ -5,7 +5,7 @@ from fastapi import APIRouter, HTTPException, Depends, Request
 from ..models.programGeneration import ProgramOptions
 from ..utils.programGenerator import generate_program
 from ..models.programs import ProgramImport
-from ..Database.programs import insert_program_from_import, delete_program
+from ..Database.programs import insert_program_from_import, delete_program, update_program
 from ..Database.users import find_user_by_id, set_users_active_program
 from ..middleware.authenticateToken import get_current_user
 from ..utils.limiter import limiter
@@ -38,6 +38,25 @@ async def delete_program_route(program_id: str, user_id: str = Depends(get_curre
     return {
         "message": "program deleted",
         "program_id": program_id
+    }
+
+@programs_router.put("/{program_id}", status_code=200)
+async def update_program_route(
+    program_id: UUID,
+    programImport: ProgramImport,
+    user_id: str = Depends(get_current_user)
+):
+    response = update_program(str(program_id), user_id, programImport)
+    if not response["success"]:
+        logger.error("Failed to update program: %s", response.get("error"))
+        raise HTTPException(status_code=500, detail="Failed to update program")
+
+    if not response["data"]:
+        raise HTTPException(status_code=404, detail="Program not found")
+
+    return {
+        "message": "program updated",
+        "program_id": str(program_id)
     }
 
 @programs_router.post('/generate', status_code=201)

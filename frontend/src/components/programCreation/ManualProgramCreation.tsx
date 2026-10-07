@@ -14,8 +14,9 @@ import {
   Plus,
   Trash2
 } from 'lucide-react'
-import { ProgramStruct } from '@/types/programCreation'
-import { programImport } from '@/services/programsAPI'
+import { ProgramStruct, WorkoutProgram } from '@/types/programCreation'
+import { programImport, updateProgram } from '@/services/programsAPI'
+import { toast } from '@/hooks/use-toast'
 import { protectedApiSlice } from '@/services/protectedRoutesAPI'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
@@ -60,6 +61,8 @@ interface ExerciseDraft {
   name: string
   sets: string
   reps: string
+  // Not editable here, but kept so tips on generated programs survive an edit
+  exerciseTip: string
 }
 
 interface DayDraft {
@@ -77,7 +80,8 @@ const newExercise = (): ExerciseDraft => ({
   id: draftId(),
   name: '',
   sets: '3',
-  reps: '10'
+  reps: '10',
+  exerciseTip: ''
 })
 
 const newDay = (usedDays: string[]): DayDraft => ({
@@ -86,6 +90,20 @@ const newDay = (usedDays: string[]): DayDraft => ({
   day: WEEKDAYS.find((weekday) => !usedDays.includes(weekday)) ?? WEEKDAYS[0],
   exercises: [newExercise()]
 })
+
+const draftsFromProgram = (program: WorkoutProgram): DayDraft[] =>
+  program.program_structure.map((workout) => ({
+    id: draftId(),
+    focus: workout.focus,
+    day: workout.day,
+    exercises: workout.exercises.map((exercise) => ({
+      id: draftId(),
+      name: exercise.name,
+      sets: String(exercise.sets),
+      reps: String(exercise.reps),
+      exerciseTip: exercise.exercise_tip ?? ''
+    }))
+  }))
 
 const byWeekday = (a: DayDraft, b: DayDraft) =>
   WEEKDAYS.indexOf(a.day) - WEEKDAYS.indexOf(b.day)
@@ -137,7 +155,14 @@ function FieldError({ errors }: { errors: unknown[] }) {
   )
 }
 
-export function ManualProgramCreation() {
+interface ManualProgramCreationProps {
+  program?: WorkoutProgram
+}
+
+export function ManualProgramCreation({
+  program: existingProgram
+}: ManualProgramCreationProps = {}) {
+  const isEditing = existingProgram !== undefined
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle')
@@ -175,11 +200,15 @@ export function ManualProgramCreation() {
     })
   }
 
+  // Built once: the form re-applies defaultValues while untouched, and fresh
+  // draft ids on every render would reset it each time, looping forever
+  const [defaultValues] = useState(() => ({
+    programName: existingProgram?.program_name ?? '',
+    days: existingProgram ? draftsFromProgram(existingProgram) : [newDay([])]
+  }))
+
   const form = useForm({
-    defaultValues: {
-      programName: '',
-      days: [newDay([])]
-    },
+    defaultValues,
     onSubmit: async ({ value }) => {
       const program: ProgramStruct = {
         program_name: value.programName.trim(),
@@ -190,15 +219,26 @@ export function ManualProgramCreation() {
             name: exercise.name.trim(),
             sets: Number(exercise.sets),
             reps: Number(exercise.reps),
-            exercise_tip: ''
+            exercise_tip: exercise.exerciseTip
           }))
         }))
       }
 
       setSaveStatus('saving')
       try {
-        await programImport(program)
+        if (existingProgram) {
+          await updateProgram(existingProgram.id, program)
+        } else {
+          await programImport(program)
+        }
         dispatch(protectedApiSlice.util.invalidateTags(['Profile']))
+        if (existingProgram) {
+          toast({
+            variant: 'success',
+            title: 'Program updated',
+            description: `Your changes to ${program.program_name} are saved.`
+          })
+        }
         navigate({ to: '/training' })
       } catch (error) {
         console.error(error)
@@ -250,10 +290,12 @@ export function ManualProgramCreation() {
             Training
           </Link>
           <h1 className="mt-3 font-display text-3xl font-bold leading-tight text-neutral-50 sm:text-4xl">
-            Build a program
+            {isEditing ? 'Edit program' : 'Build a program'}
           </h1>
           <p className="mt-1 text-sm text-neutral-400">
-            Set your training days, then add the exercises for each one.
+            {isEditing
+              ? 'Change your training days and the exercises for each one.'
+              : 'Set your training days, then add the exercises for each one.'}
           </p>
         </header>
 
@@ -336,8 +378,6 @@ export function ManualProgramCreation() {
                               isCollapsed && '!border-b-transparent'
                             )}
                           >
-                            {/* Fields are keyed by name so they remount when a removal shifts their index;
-                          a reused field briefly reads the old index, which no longer exists */}
                             <form.Field
                               key={`days[${dayIndex}].day`}
                               name={`days[${dayIndex}].day`}
@@ -744,7 +784,7 @@ export function ManualProgramCreation() {
           >
             <div className="min-w-0" aria-live="polite">
               <p className="text-base font-semibold text-neutral-50">
-                Save this program
+                {isEditing ? 'Save your changes' : 'Save this program'}
               </p>
               {saveStatus === 'error' ? (
                 <p role="alert" className="mt-1 text-sm text-red-400">
@@ -753,7 +793,9 @@ export function ManualProgramCreation() {
                 </p>
               ) : (
                 <p className="mt-1 text-sm leading-snug text-neutral-400">
-                  It goes to Training, where you can set it as active.
+                  {isEditing
+                    ? 'The updated program replaces the saved one in Training.'
+                    : 'It goes to Training, where you can set it as active.'}
                 </p>
               )}
             </div>
@@ -772,7 +814,7 @@ export function ManualProgramCreation() {
                 </>
               ) : (
                 <>
-                  Save program
+                  {isEditing ? 'Save changes' : 'Save program'}
                   <ArrowRight aria-hidden />
                 </>
               )}

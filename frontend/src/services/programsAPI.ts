@@ -68,6 +68,17 @@ export const programImport = async (program: ProgramStruct) => {
   return response.data
 }
 
+export const updateProgram = async (
+  programId: string,
+  program: ProgramStruct
+) => {
+  const response = await protectedApi.put(
+    `${API_BASE_URL}/programs/${encodeURIComponent(programId)}`,
+    program
+  )
+  return response.data
+}
+
 export const setProgramActive = async (
   program: WorkoutProgram
 ): Promise<ProgramActiveResponse> => {

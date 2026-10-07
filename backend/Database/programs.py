@@ -67,11 +67,18 @@ def get_user_programs(user_id: str):
         return {"success": False, "error": str(e)}
 
 
-def update_program(program_id: str, updates: Dict[str, Any]) -> Dict[str, Any]:
+def update_program(program_id: str, user_id: str, program_import: ProgramImport) -> Dict[str, Any]:
     try:
-        response = supabase.table("workout_programs").update(updates).eq("id", program_id).execute()
+        updates = {
+            "program_name": program_import.program_name,
+            "program_structure": _convert_workouts_to_json(program_import.program_structure),
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }
+        # Scoped to the owner and to programs that haven't been soft deleted
+        response = supabase.table("active_workout_programs").update(updates).eq("id", program_id).eq("user_id", user_id).execute()
         return {
             "success": True,
+            "data": response.data,
             "message": "Program updated successfully"
         }
     except Exception as e:

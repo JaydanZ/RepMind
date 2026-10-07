@@ -1,5 +1,6 @@
 import { useState, memo, ReactElement } from 'react'
 import clsx from 'clsx'
+import { Link } from '@tanstack/react-router'
 import { cn } from '@/lib/utils'
 import { Trash2, Power } from 'lucide-react'
 import { setProgramActive, deleteProgram } from '@/services/programsAPI'
@@ -68,9 +69,14 @@ export const ProgramRow = memo((props: ProgramRowProps): ReactElement => {
   return (
     <li className="flex min-h-[4.5rem] items-center gap-3 px-4 py-3 sm:px-6">
       <div className="min-w-0 flex-1">
-        <p className="line-clamp-2 font-medium leading-snug text-neutral-50">
+        <Link
+          to="/editProgram/$programId"
+          params={{ programId: props.program.id }}
+          title="Edit program"
+          className="line-clamp-2 rounded-sm font-medium leading-snug text-neutral-50 underline-offset-4 outline-none transition-colors duration-150 focus-visible:ring-1 focus-visible:ring-app-colors-300 [@media(hover:hover)]:hover:text-app-colors-300 [@media(hover:hover)]:hover:underline"
+        >
           {props.program.program_name}
-        </p>
+        </Link>
         <p className="mt-0.5 text-sm text-neutral-400">
           {props.isActive && (
             <span className="font-medium text-app-colors-300">Active · </span>
