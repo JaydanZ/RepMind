@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { useForm, useStore } from '@tanstack/react-form'
 import { useDispatch } from 'react-redux'
@@ -12,6 +12,7 @@ import {
   ChevronDown,
   ChevronUp,
   Plus,
+  Star,
   Trash2
 } from 'lucide-react'
 import { ProgramStruct, WorkoutProgram } from '@/types/programCreation'
@@ -41,6 +42,13 @@ import {
   menuItemClass
 } from './menuStyles'
 import { fixedNavInsets, scrollTargetForCard } from './scrollToCard'
+import {
+  EditableField,
+  fieldKey,
+  findProgramEdits,
+  programBaseline,
+  textChanged
+} from './programEdits'
 
 type SaveStatus = 'idle' | 'saving' | 'error'
 
@@ -61,7 +69,6 @@ interface ExerciseDraft {
   name: string
   sets: string
   reps: string
-  // Not editable here, but kept so tips on generated programs survive an edit
   exerciseTip: string
 }
 
@@ -72,7 +79,6 @@ interface DayDraft {
   exercises: ExerciseDraft[]
 }
 
-// Stable keys for list items, since days and exercises can be removed from the middle
 let nextDraftId = 0
 const draftId = () => String(nextDraftId++)
 
@@ -152,6 +158,19 @@ function FieldError({ errors }: { errors: unknown[] }) {
     <p role="alert" className="text-sm text-red-400">
       {errors.join(', ')}
     </p>
+  )
+}
+
+function EditedMark({ id, label }: { id: string; label: string }) {
+  return (
+    <span
+      id={id}
+      title={label}
+      className="inline-flex items-center text-app-colors-300"
+    >
+      <Star aria-hidden className="size-3.5 fill-current" />
+      <span className="sr-only">{label}</span>
+    </span>
   )
 }
 
@@ -278,6 +297,28 @@ export function ManualProgramCreation({
     .filter(Boolean)
     .map(Number)
 
+  const [baseline] = useState(() =>
+    isEditing ? programBaseline(defaultValues.days) : null
+  )
+  const programName = useStore(form.store, (state) => state.values.programName)
+  const days = useStore(form.store, (state) => state.values.days)
+  const edits = useMemo(
+    () => (baseline ? findProgramEdits(baseline, days) : null),
+    [baseline, days]
+  )
+  const programNameEdited =
+    isEditing && textChanged(programName, defaultValues.programName)
+  const fieldEdited = (id: string, field: EditableField) =>
+    edits?.editedFields.has(fieldKey(id, field)) ?? false
+  const editedMarkId = (id: string, field: EditableField) =>
+    `${fieldKey(id, field)}-edited`
+  const editedFieldMark = (id: string, field: EditableField) =>
+    fieldEdited(id, field) && (
+      <EditedMark id={editedMarkId(id, field)} label="Edited" />
+    )
+  const editedDescription = (id: string, field: EditableField) =>
+    fieldEdited(id, field) ? editedMarkId(id, field) : undefined
+
   return (
     <MotionConfig reducedMotion="user">
       <section className="w-full max-w-3xl">
@@ -315,11 +356,19 @@ export function ManualProgramCreation({
           >
             {(field) => (
               <div className={clsx(panelClass, 'grid gap-2 px-4 py-4 sm:px-6')}>
-                <Label htmlFor={field.name} className="text-neutral-50">
-                  Program name
-                </Label>
+                <div className="flex items-center gap-1.5">
+                  <Label htmlFor={field.name} className="text-neutral-50">
+                    Program name
+                  </Label>
+                  {programNameEdited && (
+                    <EditedMark id="programName-edited" label="Edited" />
+                  )}
+                </div>
                 <Input
                   id={field.name}
+                  aria-describedby={
+                    programNameEdited ? 'programName-edited' : undefined
+                  }
                   placeholder="Upper / Lower Split"
                   value={field.state.value}
                   onChange={(e) => field.handleChange(e.target.value)}
@@ -343,6 +392,10 @@ export function ManualProgramCreation({
                     const isCollapsed = canCollapse && collapsedDays.has(day.id)
                     const showHiddenError =
                       isCollapsed && daysWithErrors.includes(dayIndex)
+                    const isNewDay = edits?.newDays.has(day.id) ?? false
+                    const showHiddenEdit =
+                      isCollapsed && (edits?.editedDays.has(day.id) ?? false)
+                    const weekdayMarked = isNewDay || fieldEdited(day.id, 'day')
                     return (
                       <motion.div
                         key={day.id}
@@ -364,11 +417,18 @@ export function ManualProgramCreation({
                             panelClass,
                             enterClass,
                             'transition-colors duration-200',
-                            showHiddenError && 'border-red-500'
+                            // An error outranks an edit; the user has to fix it to save
+                            showHiddenError
+                              ? 'border-red-500'
+                              : showHiddenEdit && 'border-app-colors-300'
                           )}
-                          aria-label={
-                            showHiddenError ? `${day.day}, has errors` : day.day
-                          }
+                          aria-label={[
+                            day.day,
+                            showHiddenEdit && 'edited',
+                            showHiddenError && 'has errors'
+                          ]
+                            .filter(Boolean)
+                            .join(', ')}
                           role="group"
                         >
                           <div
@@ -383,80 +443,92 @@ export function ManualProgramCreation({
                               name={`days[${dayIndex}].day`}
                             >
                               {(field) => (
-                                <DropdownMenu modal={false}>
-                                  <DropdownMenuTrigger
-                                    data-day-trigger
-                                    aria-label={`Training day: ${field.state.value}. Change day of the week`}
-                                    className="group -ml-2 inline-flex h-10 items-center gap-1.5 rounded-md px-2 text-base font-semibold text-neutral-50 outline-none transition-colors duration-150 hover:bg-neutral-800/70 focus-visible:ring-1 focus-visible:ring-app-colors-300 [&_svg]:size-4"
-                                  >
-                                    {field.state.value}
-                                    <ChevronDown
-                                      aria-hidden
-                                      className="text-neutral-400 transition-transform duration-200 ease-out-strong group-data-[state=open]:rotate-180 motion-reduce:transition-none"
-                                    />
-                                  </DropdownMenuTrigger>
-                                  <DropdownMenuContent
-                                    side="bottom"
-                                    align="start"
-                                    sideOffset={6}
-                                    collisionPadding={menuCollisionPadding}
-                                    className={clsx('w-48', menuContentClass)}
-                                    // Return focus to the trigger without the browser jumping to it;
-                                    // a moved card is scrolled into view smoothly once it lands
-                                    onCloseAutoFocus={(e) => {
-                                      e.preventDefault()
-                                      cardRefs.current
-                                        .get(day.id)
-                                        ?.querySelector<HTMLElement>(
-                                          '[data-day-trigger]'
-                                        )
-                                        ?.focus({ preventScroll: true })
-                                    }}
-                                  >
-                                    <DropdownMenuRadioGroup
-                                      value={field.state.value}
-                                      onValueChange={(weekday) => {
-                                        if (
-                                          changesPosition(
-                                            daysField.state.value,
-                                            day.id,
-                                            weekday
+                                <div className="flex items-center gap-1.5">
+                                  <DropdownMenu modal={false}>
+                                    <DropdownMenuTrigger
+                                      data-day-trigger
+                                      aria-label={`Training day: ${field.state.value}. Change day of the week`}
+                                      aria-describedby={
+                                        weekdayMarked
+                                          ? editedMarkId(day.id, 'day')
+                                          : undefined
+                                      }
+                                      className="group -ml-2 inline-flex h-10 items-center gap-1.5 rounded-md px-2 text-base font-semibold text-neutral-50 outline-none transition-colors duration-150 hover:bg-neutral-800/70 focus-visible:ring-1 focus-visible:ring-app-colors-300 [&_svg]:size-4"
+                                    >
+                                      {field.state.value}
+                                      <ChevronDown
+                                        aria-hidden
+                                        className="text-neutral-400 transition-transform duration-200 ease-out-strong group-data-[state=open]:rotate-180 motion-reduce:transition-none"
+                                      />
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent
+                                      side="bottom"
+                                      align="start"
+                                      sideOffset={6}
+                                      collisionPadding={menuCollisionPadding}
+                                      className={clsx('w-48', menuContentClass)}
+                                      onCloseAutoFocus={(e) => {
+                                        e.preventDefault()
+                                        cardRefs.current
+                                          .get(day.id)
+                                          ?.querySelector<HTMLElement>(
+                                            '[data-day-trigger]'
                                           )
-                                        ) {
-                                          followDayId.current = day.id
-                                        }
-                                        field.handleChange(weekday)
+                                          ?.focus({ preventScroll: true })
                                       }}
                                     >
-                                      {WEEKDAYS.map((weekday) => {
-                                        const isTaken =
-                                          weekday !== field.state.value &&
-                                          usedDays.includes(weekday)
-                                        return (
-                                          <DropdownMenuRadioItem
-                                            key={weekday}
-                                            value={weekday}
-                                            disabled={isTaken}
-                                            className={clsx(
-                                              menuItemClass,
-                                              'items-center justify-between py-2 pl-3 data-[state=checked]:text-app-colors-300 data-[disabled]:opacity-40 [&>span:first-child]:hidden'
-                                            )}
-                                          >
-                                            {weekday}
-                                            {isTaken && (
-                                              <span className="text-xs text-neutral-500">
-                                                Scheduled
-                                              </span>
-                                            )}
-                                            {weekday === field.state.value && (
-                                              <Check aria-hidden />
-                                            )}
-                                          </DropdownMenuRadioItem>
-                                        )
-                                      })}
-                                    </DropdownMenuRadioGroup>
-                                  </DropdownMenuContent>
-                                </DropdownMenu>
+                                      <DropdownMenuRadioGroup
+                                        value={field.state.value}
+                                        onValueChange={(weekday) => {
+                                          if (
+                                            changesPosition(
+                                              daysField.state.value,
+                                              day.id,
+                                              weekday
+                                            )
+                                          ) {
+                                            followDayId.current = day.id
+                                          }
+                                          field.handleChange(weekday)
+                                        }}
+                                      >
+                                        {WEEKDAYS.map((weekday) => {
+                                          const isTaken =
+                                            weekday !== field.state.value &&
+                                            usedDays.includes(weekday)
+                                          return (
+                                            <DropdownMenuRadioItem
+                                              key={weekday}
+                                              value={weekday}
+                                              disabled={isTaken}
+                                              className={clsx(
+                                                menuItemClass,
+                                                'items-center justify-between py-2 pl-3 data-[state=checked]:text-app-colors-300 data-[disabled]:opacity-40 [&>span:first-child]:hidden'
+                                              )}
+                                            >
+                                              {weekday}
+                                              {isTaken && (
+                                                <span className="text-xs text-neutral-500">
+                                                  Scheduled
+                                                </span>
+                                              )}
+                                              {weekday ===
+                                                field.state.value && (
+                                                <Check aria-hidden />
+                                              )}
+                                            </DropdownMenuRadioItem>
+                                          )
+                                        })}
+                                      </DropdownMenuRadioGroup>
+                                    </DropdownMenuContent>
+                                  </DropdownMenu>
+                                  {weekdayMarked && (
+                                    <EditedMark
+                                      id={editedMarkId(day.id, 'day')}
+                                      label={isNewDay ? 'New day' : 'Edited'}
+                                    />
+                                  )}
+                                </div>
                               )}
                             </form.Field>
                             {canCollapse && (
@@ -529,11 +601,18 @@ export function ManualProgramCreation({
                                 >
                                   {(field) => (
                                     <div className="grid gap-2">
-                                      <Label htmlFor={`${day.id}-focus`}>
-                                        Focus
-                                      </Label>
+                                      <div className="flex items-center gap-1.5">
+                                        <Label htmlFor={`${day.id}-focus`}>
+                                          Focus
+                                        </Label>
+                                        {editedFieldMark(day.id, 'focus')}
+                                      </div>
                                       <Input
                                         id={`${day.id}-focus`}
+                                        aria-describedby={editedDescription(
+                                          day.id,
+                                          'focus'
+                                        )}
                                         placeholder="Push, Legs, Full Body..."
                                         value={field.state.value}
                                         onChange={(e) =>
@@ -567,176 +646,222 @@ export function ManualProgramCreation({
                                     </h3>
                                     <ul className="mt-3 flex flex-col gap-4">
                                       {exercisesField.state.value.map(
-                                        (exercise, exerciseIndex) => (
-                                          <li
-                                            key={exercise.id}
-                                            className={clsx(
-                                              enterClass,
-                                              'grid grid-cols-[1fr_1fr_auto] items-start gap-x-2 gap-y-3 rounded-md border border-neutral-800 p-3 sm:grid-cols-[minmax(0,1fr)_5.5rem_5.5rem_auto] sm:border-0 sm:p-0'
-                                            )}
-                                          >
-                                            <form.Field
-                                              key={`days[${dayIndex}].exercises[${exerciseIndex}].name`}
-                                              name={`days[${dayIndex}].exercises[${exerciseIndex}].name`}
-                                              validators={{
-                                                onChange: ({ value }) =>
-                                                  requiredText('Exercise name')(
-                                                    value
-                                                  )
-                                              }}
-                                            >
-                                              {(field) => (
-                                                <div className="col-span-2 row-start-1 grid gap-2 sm:col-span-1">
-                                                  <Label
-                                                    htmlFor={`${exercise.id}-name`}
-                                                    className="text-neutral-400"
-                                                  >
-                                                    Exercise Name
-                                                  </Label>
-                                                  <Input
-                                                    id={`${exercise.id}-name`}
-                                                    placeholder="Bench Press"
-                                                    value={field.state.value}
-                                                    onChange={(e) =>
-                                                      field.handleChange(
-                                                        e.target.value
-                                                      )
-                                                    }
-                                                    onBlur={field.handleBlur}
-                                                    aria-invalid={
-                                                      field.state.meta.errors
-                                                        .length > 0
-                                                    }
-                                                    className={inputClass(
-                                                      field.state.meta.errors
-                                                        .length > 0
-                                                    )}
-                                                  />
-                                                  <FieldError
-                                                    errors={
-                                                      field.state.meta.errors
-                                                    }
-                                                  />
-                                                </div>
-                                              )}
-                                            </form.Field>
-                                            <form.Field
-                                              key={`days[${dayIndex}].exercises[${exerciseIndex}].sets`}
-                                              name={`days[${dayIndex}].exercises[${exerciseIndex}].sets`}
-                                              validators={{
-                                                onChange: ({ value }) =>
-                                                  validateCount('Sets')(value)
-                                              }}
-                                            >
-                                              {(field) => (
-                                                <div className="col-start-1 row-start-2 grid gap-2 sm:col-start-2 sm:row-start-1">
-                                                  <Label
-                                                    htmlFor={`${exercise.id}-sets`}
-                                                    className="text-neutral-400"
-                                                  >
-                                                    Sets
-                                                  </Label>
-                                                  <Input
-                                                    id={`${exercise.id}-sets`}
-                                                    type="number"
-                                                    inputMode="numeric"
-                                                    min={1}
-                                                    max={MAX_SETS_OR_REPS}
-                                                    value={field.state.value}
-                                                    onChange={(e) =>
-                                                      field.handleChange(
-                                                        e.target.value
-                                                      )
-                                                    }
-                                                    onBlur={field.handleBlur}
-                                                    aria-invalid={
-                                                      field.state.meta.errors
-                                                        .length > 0
-                                                    }
-                                                    className={inputClass(
-                                                      field.state.meta.errors
-                                                        .length > 0
-                                                    )}
-                                                  />
-                                                  <FieldError
-                                                    errors={
-                                                      field.state.meta.errors
-                                                    }
-                                                  />
-                                                </div>
-                                              )}
-                                            </form.Field>
-                                            <form.Field
-                                              key={`days[${dayIndex}].exercises[${exerciseIndex}].reps`}
-                                              name={`days[${dayIndex}].exercises[${exerciseIndex}].reps`}
-                                              validators={{
-                                                onChange: ({ value }) =>
-                                                  validateCount('Reps')(value)
-                                              }}
-                                            >
-                                              {(field) => (
-                                                <div className="col-start-2 row-start-2 grid gap-2 sm:col-start-3 sm:row-start-1">
-                                                  <Label
-                                                    htmlFor={`${exercise.id}-reps`}
-                                                    className="text-neutral-400"
-                                                  >
-                                                    Reps
-                                                  </Label>
-                                                  <Input
-                                                    id={`${exercise.id}-reps`}
-                                                    type="number"
-                                                    inputMode="numeric"
-                                                    min={1}
-                                                    max={MAX_SETS_OR_REPS}
-                                                    value={field.state.value}
-                                                    onChange={(e) =>
-                                                      field.handleChange(
-                                                        e.target.value
-                                                      )
-                                                    }
-                                                    onBlur={field.handleBlur}
-                                                    aria-invalid={
-                                                      field.state.meta.errors
-                                                        .length > 0
-                                                    }
-                                                    className={inputClass(
-                                                      field.state.meta.errors
-                                                        .length > 0
-                                                    )}
-                                                  />
-                                                  <FieldError
-                                                    errors={
-                                                      field.state.meta.errors
-                                                    }
-                                                  />
-                                                </div>
-                                              )}
-                                            </form.Field>
-
-                                            <button
-                                              type="button"
+                                        (exercise, exerciseIndex) => {
+                                          const isNewExercise =
+                                            edits?.newExercises.has(
+                                              exercise.id
+                                            ) ?? false
+                                          return (
+                                            <li
+                                              key={exercise.id}
                                               className={clsx(
-                                                iconButtonClass,
-                                                'col-start-3 row-start-1 mt-[1.625rem] sm:col-start-4'
+                                                enterClass,
+                                                'grid grid-cols-[1fr_1fr_auto] items-start gap-x-2 gap-y-3 rounded-md border border-neutral-800 p-3 sm:grid-cols-[minmax(0,1fr)_5.5rem_5.5rem_auto] sm:border-0 sm:p-0'
                                               )}
-                                              aria-label={`Remove exercise ${
-                                                exerciseIndex + 1
-                                              } from ${day.day}`}
-                                              title="Remove exercise"
-                                              disabled={
-                                                exercisesField.state.value
-                                                  .length === 1
-                                              }
-                                              onClick={() =>
-                                                exercisesField.removeValue(
-                                                  exerciseIndex
-                                                )
-                                              }
                                             >
-                                              <Trash2 aria-hidden />
-                                            </button>
-                                          </li>
-                                        )
+                                              <form.Field
+                                                key={`days[${dayIndex}].exercises[${exerciseIndex}].name`}
+                                                name={`days[${dayIndex}].exercises[${exerciseIndex}].name`}
+                                                validators={{
+                                                  onChange: ({ value }) =>
+                                                    requiredText(
+                                                      'Exercise name'
+                                                    )(value)
+                                                }}
+                                              >
+                                                {(field) => (
+                                                  <div className="col-span-2 row-start-1 grid gap-2 sm:col-span-1">
+                                                    <div className="flex items-center gap-1.5">
+                                                      <Label
+                                                        htmlFor={`${exercise.id}-name`}
+                                                        className="text-neutral-400"
+                                                      >
+                                                        Exercise Name
+                                                      </Label>
+                                                      {isNewExercise && (
+                                                        <EditedMark
+                                                          id={`${exercise.id}-new`}
+                                                          label="New exercise"
+                                                        />
+                                                      )}
+                                                      {editedFieldMark(
+                                                        exercise.id,
+                                                        'name'
+                                                      )}
+                                                    </div>
+                                                    <Input
+                                                      id={`${exercise.id}-name`}
+                                                      aria-describedby={
+                                                        isNewExercise
+                                                          ? `${exercise.id}-new`
+                                                          : editedDescription(
+                                                              exercise.id,
+                                                              'name'
+                                                            )
+                                                      }
+                                                      placeholder="Bench Press"
+                                                      value={field.state.value}
+                                                      onChange={(e) =>
+                                                        field.handleChange(
+                                                          e.target.value
+                                                        )
+                                                      }
+                                                      onBlur={field.handleBlur}
+                                                      aria-invalid={
+                                                        field.state.meta.errors
+                                                          .length > 0
+                                                      }
+                                                      className={inputClass(
+                                                        field.state.meta.errors
+                                                          .length > 0
+                                                      )}
+                                                    />
+                                                    <FieldError
+                                                      errors={
+                                                        field.state.meta.errors
+                                                      }
+                                                    />
+                                                  </div>
+                                                )}
+                                              </form.Field>
+                                              <form.Field
+                                                key={`days[${dayIndex}].exercises[${exerciseIndex}].sets`}
+                                                name={`days[${dayIndex}].exercises[${exerciseIndex}].sets`}
+                                                validators={{
+                                                  onChange: ({ value }) =>
+                                                    validateCount('Sets')(value)
+                                                }}
+                                              >
+                                                {(field) => (
+                                                  <div className="col-start-1 row-start-2 grid gap-2 sm:col-start-2 sm:row-start-1">
+                                                    <div className="flex items-center gap-1.5">
+                                                      <Label
+                                                        htmlFor={`${exercise.id}-sets`}
+                                                        className="text-neutral-400"
+                                                      >
+                                                        Sets
+                                                      </Label>
+                                                      {editedFieldMark(
+                                                        exercise.id,
+                                                        'sets'
+                                                      )}
+                                                    </div>
+                                                    <Input
+                                                      id={`${exercise.id}-sets`}
+                                                      aria-describedby={editedDescription(
+                                                        exercise.id,
+                                                        'sets'
+                                                      )}
+                                                      type="number"
+                                                      inputMode="numeric"
+                                                      min={1}
+                                                      max={MAX_SETS_OR_REPS}
+                                                      value={field.state.value}
+                                                      onChange={(e) =>
+                                                        field.handleChange(
+                                                          e.target.value
+                                                        )
+                                                      }
+                                                      onBlur={field.handleBlur}
+                                                      aria-invalid={
+                                                        field.state.meta.errors
+                                                          .length > 0
+                                                      }
+                                                      className={inputClass(
+                                                        field.state.meta.errors
+                                                          .length > 0
+                                                      )}
+                                                    />
+                                                    <FieldError
+                                                      errors={
+                                                        field.state.meta.errors
+                                                      }
+                                                    />
+                                                  </div>
+                                                )}
+                                              </form.Field>
+                                              <form.Field
+                                                key={`days[${dayIndex}].exercises[${exerciseIndex}].reps`}
+                                                name={`days[${dayIndex}].exercises[${exerciseIndex}].reps`}
+                                                validators={{
+                                                  onChange: ({ value }) =>
+                                                    validateCount('Reps')(value)
+                                                }}
+                                              >
+                                                {(field) => (
+                                                  <div className="col-start-2 row-start-2 grid gap-2 sm:col-start-3 sm:row-start-1">
+                                                    <div className="flex items-center gap-1.5">
+                                                      <Label
+                                                        htmlFor={`${exercise.id}-reps`}
+                                                        className="text-neutral-400"
+                                                      >
+                                                        Reps
+                                                      </Label>
+                                                      {editedFieldMark(
+                                                        exercise.id,
+                                                        'reps'
+                                                      )}
+                                                    </div>
+                                                    <Input
+                                                      id={`${exercise.id}-reps`}
+                                                      aria-describedby={editedDescription(
+                                                        exercise.id,
+                                                        'reps'
+                                                      )}
+                                                      type="number"
+                                                      inputMode="numeric"
+                                                      min={1}
+                                                      max={MAX_SETS_OR_REPS}
+                                                      value={field.state.value}
+                                                      onChange={(e) =>
+                                                        field.handleChange(
+                                                          e.target.value
+                                                        )
+                                                      }
+                                                      onBlur={field.handleBlur}
+                                                      aria-invalid={
+                                                        field.state.meta.errors
+                                                          .length > 0
+                                                      }
+                                                      className={inputClass(
+                                                        field.state.meta.errors
+                                                          .length > 0
+                                                      )}
+                                                    />
+                                                    <FieldError
+                                                      errors={
+                                                        field.state.meta.errors
+                                                      }
+                                                    />
+                                                  </div>
+                                                )}
+                                              </form.Field>
+
+                                              <button
+                                                type="button"
+                                                className={clsx(
+                                                  iconButtonClass,
+                                                  'col-start-3 row-start-1 mt-[1.625rem] sm:col-start-4'
+                                                )}
+                                                aria-label={`Remove exercise ${
+                                                  exerciseIndex + 1
+                                                } from ${day.day}`}
+                                                title="Remove exercise"
+                                                disabled={
+                                                  exercisesField.state.value
+                                                    .length === 1
+                                                }
+                                                onClick={() =>
+                                                  exercisesField.removeValue(
+                                                    exerciseIndex
+                                                  )
+                                                }
+                                              >
+                                                <Trash2 aria-hidden />
+                                              </button>
+                                            </li>
+                                          )
+                                        }
                                       )}
                                     </ul>
                                     <Button
