@@ -264,7 +264,14 @@ export function ManualProgramCreation({
         setSaveStatus('error')
       }
     },
-    onSubmitInvalid: () => setCollapsedDays(new Set())
+    onSubmitInvalid: () => {
+      setCollapsedDays(new Set())
+      toast({
+        variant: 'error',
+        title: 'Can’t save yet',
+        description: 'Fix the fields marked in red, then try again.'
+      })
+    }
   })
 
   const usedDays = useStore(form.store, (state) =>

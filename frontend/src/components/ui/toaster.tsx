@@ -1,4 +1,4 @@
-import { Check } from "lucide-react"
+import { Check, CircleX } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import {
   Toast,
@@ -25,6 +25,9 @@ export function Toaster() {
                       aria-hidden
                       className="size-4 shrink-0 text-app-colors-300"
                     />
+                  )}
+                  {props.variant === "error" && (
+                    <CircleX aria-hidden className="size-4 shrink-0 text-red-400" />
                   )}
                   <ToastTitle>{title}</ToastTitle>
                 </div>
