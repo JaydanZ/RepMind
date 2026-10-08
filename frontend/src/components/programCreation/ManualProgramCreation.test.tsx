@@ -10,6 +10,7 @@ import {
 import { ManualProgramCreation } from './ManualProgramCreation'
 import { programImport, updateProgram } from '@/services/programsAPI'
 import { WorkoutProgram } from '@/types/programCreation'
+import { toast } from '@/hooks/use-toast'
 
 vi.mock('@tanstack/react-router', () => ({
   Link: ({ children }: { children: React.ReactNode }) => <a>{children}</a>,
@@ -26,7 +27,10 @@ vi.mock('@/services/protectedRoutesAPI', () => ({
 }))
 
 describe('ManualProgramCreation', () => {
-  afterEach(cleanup)
+  afterEach(() => {
+    cleanup()
+    vi.clearAllMocks()
+  })
 
   it.each([0, 1])('removes day %i without crashing', (removeIndex) => {
     render(<ManualProgramCreation />)
@@ -69,6 +73,20 @@ describe('ManualProgramCreation', () => {
       'value',
       'Curl'
     )
+  })
+
+  it('shows an error toast on every invalid save while creating a program', async () => {
+    render(<ManualProgramCreation />)
+
+    fireEvent.click(screen.getByRole('button', { name: /Save program/ }))
+    await waitFor(() => expect(toast).toHaveBeenCalledTimes(1))
+    fireEvent.click(screen.getByRole('button', { name: /Save program/ }))
+    await waitFor(() => expect(toast).toHaveBeenCalledTimes(2))
+
+    expect(toast).toHaveBeenLastCalledWith(
+      expect.objectContaining({ variant: 'error', title: 'Can’t save yet' })
+    )
+    expect(programImport).not.toHaveBeenCalled()
   })
 
   it('shows no edit marks while creating a program', () => {
@@ -212,6 +230,22 @@ describe('ManualProgramCreation', () => {
       })
       expect(withError.className).toContain('border-red-500')
       expect(withError.className).not.toContain('border-app-colors-300')
+    })
+
+    it('shows an error toast instead of saving an invalid edit', async () => {
+      render(<ManualProgramCreation program={savedProgram} />)
+
+      fireEvent.change(screen.getAllByLabelText('Focus')[0], {
+        target: { value: '' }
+      })
+      fireEvent.click(screen.getByRole('button', { name: /Save changes/ }))
+
+      await waitFor(() =>
+        expect(toast).toHaveBeenCalledWith(
+          expect.objectContaining({ variant: 'error' })
+        )
+      )
+      expect(updateProgram).not.toHaveBeenCalled()
     })
 
     it('updates the saved program and keeps exercise tips', async () => {
