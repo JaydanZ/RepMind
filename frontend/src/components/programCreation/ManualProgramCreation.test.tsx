@@ -65,7 +65,21 @@ describe('ManualProgramCreation', () => {
     )
 
     expect(screen.getByLabelText('Focus')).toHaveProperty('value', 'Pull')
-    expect(screen.getByLabelText('Exercise Name')).toHaveProperty('value', 'Curl')
+    expect(screen.getByLabelText('Exercise Name')).toHaveProperty(
+      'value',
+      'Curl'
+    )
+  })
+
+  it('shows no edit marks while creating a program', () => {
+    render(<ManualProgramCreation />)
+
+    fireEvent.change(screen.getByLabelText('Focus'), {
+      target: { value: 'Push' }
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Add day' }))
+
+    expect(screen.queryByTitle(/Edited|New/)).toBeNull()
   })
 
   it('moves a day to its place in the week and keeps its values', () => {
@@ -124,9 +138,7 @@ describe('ManualProgramCreation', () => {
     it('fills the form with the saved program', () => {
       render(<ManualProgramCreation program={savedProgram} />)
 
-      expect(
-        screen.getByRole('heading', { name: 'Edit program' })
-      ).toBeTruthy()
+      expect(screen.getByRole('heading', { name: 'Edit program' })).toBeTruthy()
       expect(screen.getByLabelText('Program name')).toHaveProperty(
         'value',
         'Upper / Lower'
@@ -153,6 +165,53 @@ describe('ManualProgramCreation', () => {
           .getByRole('button', { name: 'Expand Monday' })
           .getAttribute('aria-expanded')
       ).toBe('false')
+    })
+
+    it('marks an edited field and clears the mark when it is changed back', () => {
+      render(<ManualProgramCreation program={savedProgram} />)
+      const sets = screen.getAllByLabelText('Sets')[0]
+
+      expect(screen.queryByTitle('Edited')).toBeNull()
+
+      fireEvent.change(sets, { target: { value: '4' } })
+      expect(
+        document.getElementById(sets.getAttribute('aria-describedby') ?? '')
+          ?.textContent
+      ).toBe('Edited')
+
+      fireEvent.change(sets, { target: { value: '3' } })
+      expect(sets.getAttribute('aria-describedby')).toBeNull()
+      expect(screen.queryByTitle('Edited')).toBeNull()
+    })
+
+    it('marks a new exercise once instead of each of its fields', () => {
+      render(<ManualProgramCreation program={savedProgram} />)
+
+      fireEvent.click(
+        screen.getAllByRole('button', { name: 'Add exercise' })[0]
+      )
+
+      expect(screen.getAllByTitle('New exercise')).toHaveLength(1)
+      expect(screen.queryByTitle('Edited')).toBeNull()
+    })
+
+    it('outlines a collapsed day in lime when it was edited, red when it also has an error', () => {
+      render(<ManualProgramCreation program={savedProgram} />)
+      const mondayFocus = screen.getAllByLabelText('Focus')[0]
+
+      fireEvent.change(mondayFocus, { target: { value: 'Push' } })
+      fireEvent.click(screen.getByRole('button', { name: 'Collapse Monday' }))
+      const monday = screen.getByRole('group', { name: 'Monday, edited' })
+      expect(monday.className).toContain('border-app-colors-300')
+
+      fireEvent.click(screen.getByRole('button', { name: 'Expand Monday' }))
+      fireEvent.change(mondayFocus, { target: { value: '' } })
+      fireEvent.click(screen.getByRole('button', { name: 'Collapse Monday' }))
+      const withError = screen.getByRole('group', {
+        name: 'Monday, edited, has errors'
+      })
+      expect(withError.className).toContain('border-red-500')
+      expect(withError.className).not.toContain('border-app-colors-300')
     })
 
     it('updates the saved program and keeps exercise tips', async () => {
