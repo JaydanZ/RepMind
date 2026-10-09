@@ -1,4 +1,7 @@
-from pydantic import BaseModel, Field
+from typing import Annotated
+from pydantic import BaseModel, Field, field_validator
+from .programs import ProgramName, Focus, ExerciseName, ExerciseTip, SetsOrReps, check_unique_days
+from .programRules import Weekday, MAX_DAYS, MAX_EXERCISES_PER_DAY
 
 class ProgramOptions(BaseModel):
     fitness_goal:str
@@ -11,16 +14,22 @@ class ProgramOptions(BaseModel):
     isLoggedIn:bool
     freeLimitEnabled:bool
 
+## Uses the same field limits as saved programs so a generated program can always be saved
 class Exercise(BaseModel):
-    name: str = Field(description="Name of the exercise")
-    sets: int = Field(description="Number of sets to perform for the exercise")
-    reps: int = Field(description="Number of reps to perform per set for the exercise")
-    exercise_tip: str = Field(description="Tip / Goal for the exercise to increase the users performance and ensure users safety when performing the exercise")
+    name: ExerciseName = Field(description="Name of the exercise")
+    sets: SetsOrReps = Field(description="Number of sets to perform for the exercise")
+    reps: SetsOrReps = Field(description="Number of reps to perform per set for the exercise")
+    exercise_tip: ExerciseTip = Field(description="Tip / Goal for the exercise to increase the users performance and ensure users safety when performing the exercise")
 class Workout(BaseModel):
-    day: str = Field(description="Name of the day the user will perform the workout (i.e. Monday, Tuesday, etc.)")
-    focus: str = Field(description="Focus of the workout (i.e. Push day, Upper Day, etc.)")
-    exercises: list[Exercise] = Field(description="A collection of exercises the user will perform for the day")
+    day: Weekday = Field(description="Name of the day the user will perform the workout (i.e. Monday, Tuesday, etc.)")
+    focus: Focus = Field(description="Focus of the workout (i.e. Push day, Upper Day, etc.)")
+    exercises: Annotated[list[Exercise], Field(min_length=1, max_length=MAX_EXERCISES_PER_DAY)] = Field(description="A collection of exercises the user will perform for the day")
 class ProgramResult(BaseModel):
-    name: str = Field(description="A short descriptive name for the program (i.e. '5-Day Upper/Lower Split')")
-    program_structure: list[Workout] = Field(description="A collection of workouts the user will perform for the week")
+    name: ProgramName = Field(description="A short descriptive name for the program (i.e. '5-Day Upper/Lower Split')")
+    program_structure: Annotated[list[Workout], Field(min_length=1, max_length=MAX_DAYS)] = Field(description="A collection of workouts the user will perform for the week, at most one per weekday")
     program_tips_and_goals: list[str] = Field(description="A collection of workout tips / goals to help the user along their journey (Max 4 entries)")
+
+    @field_validator("program_structure")
+    @classmethod
+    def unique_days(cls, workouts):
+        return check_unique_days(workouts)

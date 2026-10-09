@@ -3,12 +3,13 @@ import ast
 from uuid import UUID
 from fastapi import APIRouter, HTTPException, Depends, Request
 from ..models.programGeneration import ProgramOptions
-from ..utils.programGenerator import generate_program
+from ..utils.programGenerator import generate_program, ProgramGenerationError
 from ..models.programs import ProgramImport
+from ..models.programRules import PROGRAM_SAVE_RATE_LIMIT
 from ..Database.programs import insert_program_from_import, delete_program, update_program
 from ..Database.users import find_user_by_id, set_users_active_program
 from ..middleware.authenticateToken import get_current_user
-from ..utils.limiter import limiter
+from ..utils.limiter import limiter, user_and_ip_key
 
 logger = logging.getLogger(__name__)
 
@@ -41,7 +42,9 @@ async def delete_program_route(program_id: str, user_id: str = Depends(get_curre
     }
 
 @programs_router.put("/{program_id}", status_code=200)
+@limiter.limit(PROGRAM_SAVE_RATE_LIMIT, key_func=user_and_ip_key)
 async def update_program_route(
+    request: Request,
     program_id: UUID,
     programImport: ProgramImport,
     user_id: str = Depends(get_current_user)
@@ -65,11 +68,17 @@ def handleProgramGeneration(request: Request, programInput: ProgramOptions):
     ## Check if free limit is enabled -> means user is not logged in
     if(programInput.freeLimitEnabled == True):
         raise HTTPException(status_code=401, detail="User must login to continue using API")
-    content = generate_program(programInput)
+    try:
+        content = generate_program(programInput)
+    except ProgramGenerationError:
+        logger.exception("Program generation failed after retrying")
+        raise HTTPException(status_code=502, detail="Couldn't generate a valid program")
     return content
 
 @programs_router.post('/import', status_code=201)
+@limiter.limit(PROGRAM_SAVE_RATE_LIMIT, key_func=user_and_ip_key)
 def handleProgramImport(
+    request: Request,
     programImport: ProgramImport,
     current_user_id: str = Depends(get_current_user)
 ):

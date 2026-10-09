@@ -50,19 +50,16 @@ import {
   textChanged
 } from './programEdits'
 
+import {
+  MAX_EXERCISE_NAME_LENGTH,
+  MAX_EXERCISES_PER_DAY,
+  MAX_FOCUS_LENGTH,
+  MAX_PROGRAM_NAME_LENGTH,
+  MAX_SETS_OR_REPS,
+  WEEKDAYS
+} from '@/constants/programRules'
+
 type SaveStatus = 'idle' | 'saving' | 'error'
-
-const WEEKDAYS = [
-  'Monday',
-  'Tuesday',
-  'Wednesday',
-  'Thursday',
-  'Friday',
-  'Saturday',
-  'Sunday'
-]
-
-const MAX_SETS_OR_REPS = 99
 
 interface ExerciseDraft {
   id: string
@@ -129,8 +126,13 @@ const changesPosition = (days: DayDraft[], dayId: string, weekday: string) => {
 // Days slide to their new place in the week; no bounce so it reads as a move, not a toy
 const reorderTransition = { type: 'spring', duration: 0.35, bounce: 0 } as const
 
-const requiredText = (label: string) => (value: string) =>
-  value.trim().length === 0 ? `${label} is required` : undefined
+const requiredText = (label: string, maxLength: number) => (value: string) => {
+  const length = value.trim().length
+  if (length === 0) return `${label} is required`
+  if (length > maxLength)
+    return `${label} must be ${maxLength} characters or fewer`
+  return undefined
+}
 
 const validateCount = (label: string) => (value: string) => {
   const count = Number(value)
@@ -358,7 +360,8 @@ export function ManualProgramCreation({
           <form.Field
             name="programName"
             validators={{
-              onChange: ({ value }) => requiredText('Name')(value)
+              onChange: ({ value }) =>
+                requiredText('Name', MAX_PROGRAM_NAME_LENGTH)(value)
             }}
           >
             {(field) => (
@@ -603,7 +606,10 @@ export function ManualProgramCreation({
                                   name={`days[${dayIndex}].focus`}
                                   validators={{
                                     onChange: ({ value }) =>
-                                      requiredText('Focus')(value)
+                                      requiredText(
+                                        'Focus',
+                                        MAX_FOCUS_LENGTH
+                                      )(value)
                                   }}
                                 >
                                   {(field) => (
@@ -672,7 +678,8 @@ export function ManualProgramCreation({
                                                 validators={{
                                                   onChange: ({ value }) =>
                                                     requiredText(
-                                                      'Exercise name'
+                                                      'Exercise name',
+                                                      MAX_EXERCISE_NAME_LENGTH
                                                     )(value)
                                                 }}
                                               >
@@ -875,12 +882,19 @@ export function ManualProgramCreation({
                                       type="button"
                                       variant="ghost"
                                       className="mt-3 h-10 gap-2 px-3 text-sm font-medium text-app-colors-300 hover:bg-neutral-800/70 hover:text-app-colors-300 [&_svg]:size-4"
+                                      disabled={
+                                        exercisesField.state.value.length >=
+                                        MAX_EXERCISES_PER_DAY
+                                      }
                                       onClick={() =>
                                         exercisesField.pushValue(newExercise())
                                       }
                                     >
                                       <Plus aria-hidden />
-                                      Add exercise
+                                      {exercisesField.state.value.length >=
+                                      MAX_EXERCISES_PER_DAY
+                                        ? `${MAX_EXERCISES_PER_DAY} exercise limit reached`
+                                        : 'Add exercise'}
                                     </Button>
                                   </div>
                                 )}
