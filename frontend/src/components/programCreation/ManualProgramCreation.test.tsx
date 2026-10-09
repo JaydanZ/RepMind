@@ -11,6 +11,12 @@ import { ManualProgramCreation } from './ManualProgramCreation'
 import { programImport, updateProgram } from '@/services/programsAPI'
 import { WorkoutProgram } from '@/types/programCreation'
 import { toast } from '@/hooks/use-toast'
+import {
+  MAX_EXERCISE_NAME_LENGTH,
+  MAX_EXERCISES_PER_DAY,
+  MAX_FOCUS_LENGTH,
+  MAX_PROGRAM_NAME_LENGTH
+} from '@/constants/programRules'
 
 vi.mock('@tanstack/react-router', () => ({
   Link: ({ children }: { children: React.ReactNode }) => <a>{children}</a>,
@@ -87,6 +93,40 @@ describe('ManualProgramCreation', () => {
       expect.objectContaining({ variant: 'error', title: 'Can’t save yet' })
     )
     expect(programImport).not.toHaveBeenCalled()
+  })
+
+  it.each([
+    ['Program name', MAX_PROGRAM_NAME_LENGTH, 'Name'],
+    ['Focus', MAX_FOCUS_LENGTH, 'Focus'],
+    ['Exercise Name', MAX_EXERCISE_NAME_LENGTH, 'Exercise name']
+  ])('limits %s to %i characters', (label, maxLength, errorLabel) => {
+    render(<ManualProgramCreation />)
+    const input = screen.getByLabelText(label)
+
+    fireEvent.change(input, { target: { value: 'x'.repeat(maxLength) } })
+    expect(screen.queryByRole('alert')).toBeNull()
+
+    fireEvent.change(input, { target: { value: 'x'.repeat(maxLength + 1) } })
+    expect(screen.getByRole('alert').textContent).toBe(
+      `${errorLabel} must be ${maxLength} characters or fewer`
+    )
+  })
+
+  it(`stops adding exercises at ${MAX_EXERCISES_PER_DAY} per day`, () => {
+    render(<ManualProgramCreation />)
+
+    for (let count = 1; count < MAX_EXERCISES_PER_DAY; count++) {
+      fireEvent.click(screen.getByRole('button', { name: 'Add exercise' }))
+    }
+
+    expect(screen.getAllByLabelText('Exercise Name')).toHaveLength(
+      MAX_EXERCISES_PER_DAY
+    )
+    expect(
+      screen.getByRole('button', {
+        name: `${MAX_EXERCISES_PER_DAY} exercise limit reached`
+      })
+    ).toHaveProperty('disabled', true)
   })
 
   it('shows no edit marks while creating a program', () => {

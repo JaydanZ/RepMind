@@ -5,7 +5,11 @@ import clsx from 'clsx'
 import { useAsyncDispatch } from '@/store/store'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/store/store'
-import { getAIProgram } from '@/features/programGeneration/programGenerationSlice'
+import {
+  getAIProgram,
+  ProgramGenerationError
+} from '@/features/programGeneration/programGenerationSlice'
+import { toast } from '@/hooks/use-toast'
 import { ProgramOptions } from '@/types/programCreation'
 
 import { ChevronDownIcon, Cog } from 'lucide-react'
@@ -165,7 +169,18 @@ export const ProgramFactory = () => {
       }
 
       try {
-        await dispatch(getAIProgram(programInput))
+        const result = await dispatch(getAIProgram(programInput))
+        if (
+          getAIProgram.rejected.match(result) &&
+          (result.payload as ProgramGenerationError | undefined)?.errorCode !==
+            429
+        ) {
+          toast({
+            variant: 'error',
+            title: 'We couldn’t generate your program',
+            description: 'Try again in a moment.'
+          })
+        }
       } catch (error) {
         console.error(error)
       }
