@@ -1,5 +1,6 @@
 import bcrypt
 import json
+from typing import Any, cast
 from postgrest.exceptions import APIError
 from ..models.users import CreateUser
 from .supabase import supabase
@@ -13,10 +14,10 @@ def insert_user(user: CreateUser):
         'password': hashed_password
     }).execute()
 
-def find_user_by_id(id: str):
+def find_user_by_id(id: str) -> dict[str, Any] | None:
     try:
         response = (supabase.table('users').select('*').eq('id',id).single()).execute()
-        return response.data
+        return cast(dict[str, Any], response.data)
     except APIError as error:
         if error.code == "PGRST116":
             return None
@@ -24,10 +25,10 @@ def find_user_by_id(id: str):
             raise error
 
 
-def find_user_by_username(username: str):
+def find_user_by_username(username: str) -> dict[str, Any] | None:
     try: 
         response = supabase.table('users').select("*").eq('username',username).single().execute()
-        return response.data
+        return cast(dict[str, Any], response.data)
     except APIError as error:
         if error.code == "PGRST116":
             return None
@@ -35,10 +36,10 @@ def find_user_by_username(username: str):
             raise error
 
     
-def find_user_by_email(email: str):
+def find_user_by_email(email: str) -> dict[str, Any] | None:
     try: 
         response = supabase.table('users').select("*").eq('email',email).single().execute()
-        return response.data
+        return cast(dict[str, Any], response.data)
     except APIError as error:
         if error.code == "PGRST116":
             return None
@@ -51,6 +52,10 @@ def update_user_streak(user_id: str, streak: int):
         return response.data
     except Exception as e:
         return {"success": False, "error": str(e)}
+
+def update_user_password(user_id: str, new_password: str):
+    hashed_password = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+    supabase.table('users').update({"password": hashed_password}).eq('id', user_id).execute()
 
 def set_users_active_program(program_id: str | None, user_id: str):
     try:
