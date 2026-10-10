@@ -20,6 +20,8 @@ app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, cast(Any,_rate_limit_exceeded_handler))
 
 ## Middleware
+app.add_middleware(TokenAuthMiddleware)
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -28,8 +30,6 @@ app.add_middleware(
     allow_headers=["Authorization", "Content-Type", "Accept"],
     max_age=3600
 )
-
-app.add_middleware(TokenAuthMiddleware)
 
 ## Routes
 api_v1_router = APIRouter(prefix=API_V1_PREFIX)

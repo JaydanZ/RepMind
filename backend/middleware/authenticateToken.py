@@ -7,18 +7,14 @@ from ..config import get_settings
 
 ## Setup env vars
 envVars = get_settings()
-allowed_origin = envVars.CLIENT_URL
 JWT_SECRET_KEY = envVars.JWT_SECRET_KEY
 ALGORITHM = 'HS256'
 
 def handleTokenError(detail: str):
-    response = JSONResponse(
+    return JSONResponse(
                 content={"detail": detail},
                 status_code=status.HTTP_401_UNAUTHORIZED
             )
-    response.headers['Access-Control-Allow-Origin'] = allowed_origin
-    response.headers["Access-Control-Allow-Credentials"] = "true"
-    return response
 
 class TokenAuthMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
