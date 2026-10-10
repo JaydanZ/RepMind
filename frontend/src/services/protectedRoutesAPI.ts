@@ -8,6 +8,7 @@ import { RootState } from '@/store/store'
 import { refreshAccessToken } from '@/features/auth/authSlice'
 import { genNewAccessToken } from './authAPI'
 import { Profile } from '@/types/profile'
+import { AuthorizedResponse, ChangePasswordRequest } from '@/types/auth'
 import {
   PreviousPerformance,
   SubmitWorkoutResponse,
@@ -77,7 +78,12 @@ export const protectedApiSlice = createApi({
     submitWorkout: builder.mutation<SubmitWorkoutResponse, WorkoutSubmission>({
       query: (body) => ({ url: '/workouts', method: 'POST', body }),
       invalidatesTags: ['Profile', 'PreviousPerformance', 'WorkoutHistory']
-    })
+    }),
+    changePassword: builder.mutation<AuthorizedResponse, ChangePasswordRequest>(
+      {
+        query: (body) => ({ url: '/users/me/password', method: 'PUT', body })
+      }
+    )
   })
 })
 
@@ -86,5 +92,6 @@ export const {
   useGetProfileDataQuery,
   useGetPreviousPerformanceQuery,
   useGetWorkoutHistoryQuery,
-  useSubmitWorkoutMutation
+  useSubmitWorkoutMutation,
+  useChangePasswordMutation
 } = protectedApiSlice

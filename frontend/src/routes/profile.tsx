@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import clsx from 'clsx'
 import { useGetProfileDataQuery } from '@/services/protectedRoutesAPI'
 import { SessionPanel } from '@/components/profile/SessionPanel'
@@ -15,24 +15,33 @@ function RouteComponent() {
 
   return (
     <main className="mx-auto w-full max-w-6xl px-4 pb-32 pt-8 sm:px-8 min-[800px]:pb-16 min-[800px]:pt-28 lg:px-12">
-      <header className="min-w-0 pb-8">
-        {isLoading ? (
-          <>
-            <div className={clsx(skeletonClass, 'h-9 w-56')} />
-            <div className={clsx(skeletonClass, 'mt-3 h-4 w-40')} />
-          </>
-        ) : (
-          <>
-            <h1 className="truncate font-display text-3xl font-bold leading-tight text-neutral-50 sm:text-4xl">
-              {data?.username ?? 'Your profile'}
-            </h1>
-            {data?.email && (
-              <p className="mt-1 truncate text-sm text-neutral-400">
-                {data.email}
-              </p>
-            )}
-          </>
-        )}
+      <header className="flex min-w-0 flex-wrap items-start justify-between gap-4 pb-8">
+        <div className="min-w-0">
+          {isLoading ? (
+            <>
+              <div className={clsx(skeletonClass, 'h-9 w-56')} />
+              <div className={clsx(skeletonClass, 'mt-3 h-4 w-40')} />
+            </>
+          ) : (
+            <>
+              <h1 className="truncate font-display text-3xl font-bold leading-tight text-neutral-50 sm:text-4xl">
+                {data?.username ?? 'Your profile'}
+              </h1>
+              {data?.email && (
+                <p className="mt-1 truncate text-sm text-neutral-400">
+                  {data.email}
+                </p>
+              )}
+            </>
+          )}
+        </div>
+        <Button
+          asChild
+          variant="ghost"
+          className="h-10 shrink-0 border border-neutral-700 px-4 text-neutral-100 transition-[transform,background-color] duration-150 hover:bg-neutral-800/70 active:scale-[0.97]"
+        >
+          <Link to="/changePassword">Change password</Link>
+        </Button>
       </header>
 
       <div className="grid grid-cols-1 gap-4 sm:gap-6">

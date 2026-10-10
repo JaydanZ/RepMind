@@ -15,3 +15,16 @@ export interface AuthState {
   error: object | null
   success: boolean
 }
+
+export interface ChangePasswordRequest {
+  old_password: string
+  new_password: string
+  confirm_password: string
+}
+
+export interface AuthorizedResponse {
+  token_data: { access_token: string; token_type: string }
+  refresh_token_data: string
+  username: string
+  email: string
+}

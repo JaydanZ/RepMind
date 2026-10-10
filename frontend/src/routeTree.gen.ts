@@ -16,6 +16,8 @@ import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as ManualProgramCreationRouteImport } from './routes/manualProgramCreation'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as HomeRouteImport } from './routes/home'
+import { Route as ForgotPasswordRouteImport } from './routes/forgotPassword'
+import { Route as ChangePasswordRouteImport } from './routes/changePassword'
 import { Route as AiProgramFactoryRouteImport } from './routes/aiProgramFactory'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as EditProgramProgramIdRouteImport } from './routes/editProgram.$programId'
@@ -55,6 +57,16 @@ const HomeRoute = HomeRouteImport.update({
   path: '/home',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgotPassword',
+  path: '/forgotPassword',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChangePasswordRoute = ChangePasswordRouteImport.update({
+  id: '/changePassword',
+  path: '/changePassword',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AiProgramFactoryRoute = AiProgramFactoryRouteImport.update({
   id: '/aiProgramFactory',
   path: '/aiProgramFactory',
@@ -74,6 +86,8 @@ const EditProgramProgramIdRoute = EditProgramProgramIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/aiProgramFactory': typeof AiProgramFactoryRoute
+  '/changePassword': typeof ChangePasswordRoute
+  '/forgotPassword': typeof ForgotPasswordRoute
   '/home': typeof HomeRoute
   '/login': typeof LoginRoute
   '/manualProgramCreation': typeof ManualProgramCreationRoute
@@ -86,6 +100,8 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/aiProgramFactory': typeof AiProgramFactoryRoute
+  '/changePassword': typeof ChangePasswordRoute
+  '/forgotPassword': typeof ForgotPasswordRoute
   '/home': typeof HomeRoute
   '/login': typeof LoginRoute
   '/manualProgramCreation': typeof ManualProgramCreationRoute
@@ -99,6 +115,8 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/aiProgramFactory': typeof AiProgramFactoryRoute
+  '/changePassword': typeof ChangePasswordRoute
+  '/forgotPassword': typeof ForgotPasswordRoute
   '/home': typeof HomeRoute
   '/login': typeof LoginRoute
   '/manualProgramCreation': typeof ManualProgramCreationRoute
@@ -113,6 +131,8 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/aiProgramFactory'
+    | '/changePassword'
+    | '/forgotPassword'
     | '/home'
     | '/login'
     | '/manualProgramCreation'
@@ -125,6 +145,8 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/aiProgramFactory'
+    | '/changePassword'
+    | '/forgotPassword'
     | '/home'
     | '/login'
     | '/manualProgramCreation'
@@ -137,6 +159,8 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/aiProgramFactory'
+    | '/changePassword'
+    | '/forgotPassword'
     | '/home'
     | '/login'
     | '/manualProgramCreation'
@@ -150,6 +174,8 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AiProgramFactoryRoute: typeof AiProgramFactoryRoute
+  ChangePasswordRoute: typeof ChangePasswordRoute
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
   HomeRoute: typeof HomeRoute
   LoginRoute: typeof LoginRoute
   ManualProgramCreationRoute: typeof ManualProgramCreationRoute
@@ -211,6 +237,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HomeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/forgotPassword': {
+      id: '/forgotPassword'
+      path: '/forgotPassword'
+      fullPath: '/forgotPassword'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/changePassword': {
+      id: '/changePassword'
+      path: '/changePassword'
+      fullPath: '/changePassword'
+      preLoaderRoute: typeof ChangePasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/aiProgramFactory': {
       id: '/aiProgramFactory'
       path: '/aiProgramFactory'
@@ -238,6 +278,8 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AiProgramFactoryRoute: AiProgramFactoryRoute,
+  ChangePasswordRoute: ChangePasswordRoute,
+  ForgotPasswordRoute: ForgotPasswordRoute,
   HomeRoute: HomeRoute,
   LoginRoute: LoginRoute,
   ManualProgramCreationRoute: ManualProgramCreationRoute,

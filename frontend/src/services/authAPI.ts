@@ -43,3 +43,35 @@ export const genNewAccessToken = async () => {
     return
   }
 }
+
+export const requestPasswordReset = async (email: string) => {
+  const response = await axios.post(
+    `${API_BASE_URL}/auth/password-reset/request`,
+    { email }
+  )
+  return response.data as { message: string }
+}
+
+export const verifyResetCode = async (email: string, code: string) => {
+  const response = await axios.post(
+    `${API_BASE_URL}/auth/password-reset/verify`,
+    { email, code }
+  )
+  return response.data as { reset_token: string }
+}
+
+export const confirmPasswordReset = async (
+  resetToken: string,
+  newPassword: string,
+  confirmPassword: string
+) => {
+  const response = await axios.post(
+    `${API_BASE_URL}/auth/password-reset/confirm`,
+    {
+      reset_token: resetToken,
+      new_password: newPassword,
+      confirm_password: confirmPassword
+    }
+  )
+  return response.data
+}
