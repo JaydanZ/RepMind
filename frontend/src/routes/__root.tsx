@@ -123,7 +123,7 @@ function RootComponent() {
           {/* Left elements */}
           <ul className="flex flex-row list-style-none me-auto pl-12">
             <li className="text-app-colors-300 font-main-font font-medium text-[1.5rem]">
-              RepMind
+              Ironwise
             </li>
           </ul>
           {/* Right elements */}

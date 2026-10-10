@@ -24,7 +24,7 @@ def send_email(to: str, subject: str, html: str) -> None:
 def send_reset_code_email(to: str, username: str, code: str, expires_minutes: int) -> None:
     send_email(
         to,
-        "Your RepMind password reset code",
+        "Your Ironwise password reset code",
         f"<p>Hi {escape(username)},</p>"
         f"<p>Your password reset code is <strong>{code}</strong>.</p>"
         f"<p>It expires in {expires_minutes} minutes. If you didn't ask to reset your password, you can ignore this email.</p>",
@@ -34,8 +34,8 @@ def send_reset_code_email(to: str, username: str, code: str, expires_minutes: in
 def send_password_changed_email(to: str, username: str) -> None:
     send_email(
         to,
-        "Your RepMind password was changed",
+        "Your Ironwise password was changed",
         f"<p>Hi {escape(username)},</p>"
-        "<p>Your RepMind password was just changed, and other devices have been signed out.</p>"
+        "<p>Your Ironwise password was just changed, and other devices have been signed out.</p>"
         "<p>If this wasn't you, reset your password right away from the login page.</p>",
     )

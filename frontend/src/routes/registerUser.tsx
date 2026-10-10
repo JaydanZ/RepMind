@@ -86,7 +86,7 @@ function RouteComponent() {
         <CardHeader>
           <CardTitle className="text-[2.5rem]">Signup</CardTitle>
           <CardDescription className="pb-5">
-            Create an account to unlock the full features of RepMind
+            Create an account to unlock the full features of Ironwise
           </CardDescription>
         </CardHeader>
         <CardContent className="pb-3">

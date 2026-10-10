@@ -33,7 +33,7 @@ export type SessionAction =
   | { type: 'removeSet'; exercise: number }
   | { type: 'setUnit'; unit: WeightUnit }
 
-const UNIT_KEY = 'repmind:weight-unit'
+const UNIT_KEY = 'ironwise:weight-unit'
 const EMPTY_SET: SetEntry = { reps: '', weight: '', notes: '' }
 
 export const MIN_SETS = 1
@@ -235,7 +235,7 @@ export const useWorkoutSession = ({
   workout
 }: UseWorkoutSessionArgs) => {
   const performedOn = useMemo(() => localDateString(), [])
-  const draftKey = `repmind:workout:${programId}:${workout.day}:${performedOn}`
+  const draftKey = `ironwise:workout:${programId}:${workout.day}:${performedOn}`
 
   const [state, dispatch] = useReducer(
     sessionReducer,

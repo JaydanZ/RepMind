@@ -36,7 +36,7 @@ export const SessionPanel = (): ReactElement => {
             Session
           </h2>
           <p className="mt-1 max-w-[46ch] text-sm leading-relaxed text-neutral-400">
-            Log out of RepMind on this device. Your programs and progress stay
+            Log out of Ironwise on this device. Your programs and progress stay
             saved to your account.
           </p>
         </div>

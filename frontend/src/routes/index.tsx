@@ -65,7 +65,7 @@ function RouteComponent() {
           Four answers. <span className="md:block">One week of training.</span>
         </h2>
         <p className="mt-5 max-w-[56ch] text-lg leading-relaxed text-neutral-400">
-          These are the answers behind the sample week above. RepMind turns
+          These are the answers behind the sample week above. Ironwise turns
           yours into a program in under a minute.
         </p>
 
@@ -150,7 +150,7 @@ function RouteComponent() {
       </section>
 
       <footer className="flex flex-col gap-2 border-t border-neutral-800 py-8 text-sm text-neutral-400 sm:flex-row sm:items-center sm:justify-between">
-        <span className="font-medium text-app-colors-300">RepMind</span>
+        <span className="font-medium text-app-colors-300">Ironwise</span>
         <span>Reps and workouts, guided by AI intelligence.</span>
       </footer>
     </main>

@@ -10,7 +10,7 @@ TEST_ENV = {
     "SUPABASE_KEY": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoic2.test",
     "OPENAI_API_KEY": "sk-test",
     "RESEND_API_KEY": "re_test",
-    "EMAIL_FROM": "RepMind <test@example.com>",
+    "EMAIL_FROM": "Ironwise <test@example.com>",
 }
 for name, value in TEST_ENV.items():
     os.environ[name] = value
